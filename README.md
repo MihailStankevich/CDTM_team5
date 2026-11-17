@@ -3,10 +3,10 @@
 **Sherpas challenge at CDTM Valencia Hacks 2026. Saturday 21 November 2026, The Terminal Hub, Valencia**
 
 > **TODO (organisers, delete this block before sharing):**
-> 1. Discord invite link and QR, and the name of the hand-in command (`/entrega` is a placeholder).
+> 1. Discord invite link and QR (the server and its bot are ready; hand-in is `/submit`).
 > 2. Exact hours: start, hand-in deadline, pitches.
 > 3. Pitch length and jury questions.
-> 4. Team size.
+> 4. Team size (the Discord bot allows up to 5 per team now).
 > 5. Repo visibility: make this repo public on the day, or invite teams.
 > 6. CDTM emails on the case login, and what the access page shows CDTM teams (no AI key).
 > 7. Jury criteria and weights: sign-off.
@@ -17,9 +17,10 @@
 
 **[Discord: TODO invite link](#)** is where the day happens:
 
-- **Announcements and rules**
-- **Questions to the Sherpas mentor**, product and data questions on the day
-- **Hand-in** with `/entrega` (TODO: confirm command)
+- **Announcements and rules**: accept the rules in #welcome to see the rest
+- **Your team's private channels**: one of you runs `/team create`, then `/team add` for each teammate
+- **Questions**: the #help forum, or `/mentor` in your team channel to call the Sherpas mentor
+- **Your idea** with `/idea`, and the **hand-in** with `/submit` (type `/help` for all commands)
 
 ## Start here
 
@@ -146,7 +147,7 @@ The QCD limit does not apply to any of the four today: all are under 70½.
 | When | What |
 |---|---|
 | Sat 21 Nov, TODO | **Kick-off**: the challenge and the rule change |
-| TODO | **Hand-in**, one per team, on Discord with `/entrega` (TODO: confirm) |
+| TODO | **Hand-in**, one per team, on Discord with `/submit` from your team channel (resubmit any time; the last one before the deadline counts) |
 | TODO | **Pitches**: a live demo on the projector, TODO minutes per team, then the prize |
 
 What you hand in:
