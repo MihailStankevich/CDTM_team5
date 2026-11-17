@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/banner.png" alt="First to know, first to tell. Sherpas x CDTM VLC Hacks, Saturday 21 November 2026, Valencia" width="100%">
+</p>
+
 # First to know, first to tell
 
 **Sherpas challenge at CDTM Valencia Hacks 2026. Saturday 21 November 2026, The Terminal Hub, Valencia**
@@ -7,7 +11,7 @@
 > 2. Exact hours: start, hand-in deadline, pitches.
 > 3. Pitch length and jury questions.
 > 4. Team size (the Discord bot allows up to 5 per team now).
-> 5. Repo visibility: make this repo public on the day, or invite teams.
+> 5. Repo visibility: it is a private template now; make it public on the day so teams can use the template (or invite them).
 > 6. CDTM emails on the case login, and what the access page shows CDTM teams (no AI key).
 > 7. Jury criteria and weights: sign-off.
 > 8. Which rule change teams get at the start.
@@ -25,7 +29,7 @@
 ## Start here
 
 1. Read this page: the challenge, the families, the data and the hand-in are all here.
-2. Create your team's own GitHub repo and copy what you need from this one (TODO: template or copy, once visibility is decided). Everyone in the team needs a free GitHub account.
+2. Click **Use this template > Create a new repository** (top right on GitHub). One person per team does this, under their own account, and chooses **Public** so the mentors and the jury can open it. Everyone in the team needs a free GitHub account.
 3. Open one family's plan from [the cases table](#the-cases) and read the same family's `persona.md`.
 4. Connect to the case data ([Connect to the cases](#connect-to-the-cases)) or read the files in [`cases/`](cases/) and [`legal/`](legal/).
 
