@@ -7,24 +7,27 @@
 **Sherpas challenge at CDTM Valencia Hacks 2026. Saturday 21 November 2026, The Terminal Hub, Valencia**
 
 > **TODO (organisers, delete this block before sharing):**
-> 1. Discord invite link and QR (the server and its bot are ready; hand-in is `/submit`).
-> 2. Exact hours: start, hand-in deadline, pitches.
-> 3. Pitch length and jury questions.
-> 4. Team size (the Discord bot allows up to 5 per team now).
-> 5. Repo visibility: it is a private template now; make it public on the day so teams can use the template (or invite them).
-> 6. CDTM emails on the case login, and what the access page shows CDTM teams (no AI key).
-> 7. Jury criteria and weights: sign-off.
-> 8. Which rule change teams get at the start.
-> 9. Legal values through the MCP: tool not live yet.
+> 1. Exact hours: start, hand-in deadline, pitches.
+> 2. Pitch length and jury questions.
+> 3. Team size (the Discord bot allows up to 5 per team now).
+> 4. Repo visibility: it is a private template now; make it public on the day so teams can use the template (or invite them).
+> 5. CDTM emails on the case login, and what the access page shows CDTM teams (no AI key).
+> 6. Jury criteria and weights: sign-off.
+> 7. Which rule change teams get at the start.
+> 8. Legal values through the MCP: tool not live yet.
 
 ## Join the Discord first
 
-**[Discord: TODO invite link](#)** is where the day happens:
+<a href="https://discord.gg/mCHYWRhFw"><img src="assets/discord-qr.png" alt="QR code: join the Discord" width="160" align="right"></a>
+
+**[CDTM VLC Hacks x Sherpas Wealth on Discord](https://discord.gg/mCHYWRhFw)** is where the day happens. Scan the code or click the link:
 
 - **Announcements and rules**: accept the rules in #welcome to see the rest
 - **Your team's private channels**: one of you runs `/team create`, then `/team add` for each teammate
 - **Questions**: the #help forum, or `/mentor` in your team channel to call the Sherpas mentor
 - **Your idea** with `/idea`, and the **hand-in** with `/submit` (type `/help` for all commands)
+
+Every team member should join before the kick-off on Saturday.
 
 ## Start here
 
