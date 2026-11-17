@@ -105,33 +105,34 @@ All amounts are US dollars.
 
 ## Legal values
 
-[`legal/legal-dataset-sample.json`](legal/legal-dataset-sample.json) holds the five legal tables that touch every family: public law figures, each with its official source, in the same shape Sherpas uses to build plans (`key: { "value", "source" }`).
+[`legal/legal-dataset-sample.json`](legal/legal-dataset-sample.json) holds the legal values that touch these families, each with its official source, in the shape Sherpas uses to build plans (`key: { "value", "source" }`). The Social Security and Medicare tables come from Sherpas' legal dataset; the federal brackets, standard deduction and child tax credit for 2026 and 2027 come from the IRS releases cited in each value.
 
-```json
-"SSWageBaseByYear": {
-  "2026": { "value": 184500, "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)" },
-  "2027": { "value": 192300, "source": "SSA contribution and benefit base 2027: $192,300 (...)" }
-}
-```
+### What changes in 2027, and what it means for each family per year
+
+Same salaries in both years, all wages, standard deduction, no other income or credits. Plus is money the family keeps, minus is money it pays.
+
+| Change from 2026 to 2027 | Weah (CA, couple, $270,000) | Carter (TX, single, $180,000) | Johnson (CO, couple, $280,000) | Lewis (FL, single, $250,000) |
+|---|---|---|---|---|
+| Social Security wage base: $184,500 to $192,300 | $0 (both under it) | $0 (under it) | $0 (both under it) | **-$484** (earns above it: $7,800 more taxed at 6.2%) |
+| Standard deduction: $32,200 to $33,200 (couples), $16,100 to $16,600 (single) | +$240 (24% bracket) | +$120 (24% bracket) | +$240 (24% bracket) | +$160 (32% bracket) |
+| Federal brackets widened for inflation | +$478 | +$239 | +$478 | +$763 |
+| Child tax credit: $2,200 to $2,300 per child under 17 | +$200 (two children) | $0 (no children) | +$200 (two children) | $0 (her income phases it out) |
+| **Net change per year** | **+$918** | **+$359** | **+$918** | **+$439** |
+
+One family loses on one rule and still gains overall; two families gain from a credit the others cannot get; the same bracket update is worth $763 to Samantha and $239 to Michael. That is the difference between a general announcement and advice. Illustration only, not a full tax return: state tax, retirement contributions and other credits are left out.
+
+### The tables
 
 | Table | What it holds |
 |---|---|
-| `SSWageBaseByYear` | Social Security wage base by year, 2023 to 2027: salary above it pays no Social Security tax |
-| `FICATaxSS` | Social Security tax rate (6.2% for employees). Use `SSWageBaseByYear` for the limit of each year |
-| `FICATaxMedicare` | Medicare tax rate (1.45% for employees), on all wages, no limit |
-| `FICATaxAdditionalMedicare` | Extra 0.9% Medicare tax on wages above a threshold by filing status ($200,000 single, $250,000 married filing jointly) |
-| `StandardDeduction` | 2026 federal standard deduction by filing status |
+| `SSWageBaseByYear` | Social Security wage base by year, 2023 to 2027: salary above it pays no Social Security tax (per person) |
+| `FICATaxSS`, `FICATaxMedicare` | Employee rates: 6.2% Social Security (use `SSWageBaseByYear` for each year's limit), 1.45% Medicare on all wages |
+| `FICATaxAdditionalMedicare` | Extra 0.9% Medicare tax on wages above $200,000 single or $250,000 for a couple's combined wages (not indexed, so no 2027 change) |
+| `StandardDeductionByYear` | 2026 and 2027 standard deduction by filing status |
+| `FederalIncomeTaxBracketsByYear` | 2026 and 2027 federal brackets, single and married filing jointly (`upTo` is the top of each bracket) |
+| `ChildTaxCreditByYear` | Credit per child under 17 and the income where it starts to shrink |
 
-Each family's salaries, ages, state and filing status are in its `financial-health.json`. With today's salaries, 2026 values:
-
-| Family | Salaries | Social Security tax (6.2% up to the wage base) | Additional Medicare | Standard deduction |
-|---|---|---|---|---|
-| Timothy & Melanie Weah, CA, married filing jointly | $150,000 and $120,000 | Both under the base: $9,300 and $7,440 | $270,000 together, $20,000 over $250,000: $180 | $32,200 |
-| Michael Carter, TX, single | $180,000 | Under the base: $11,160 | Under $200,000: none | $16,100 |
-| Daniel & Emily Johnson, CO, married filing jointly | $160,000 and $120,000 | Both under the base: $9,920 and $7,440 | $280,000 together, $30,000 over: $270 | $32,200 |
-| Samantha Lewis, FL, single | $250,000 | Capped at $184,500: $11,439 | $50,000 over $200,000: $450 | $16,100 |
-
-All six earners are covered by the wage base, but only Samantha earns above it, so only her tax moves when it changes. The wage base and the Social Security rate apply per person; the Additional Medicare threshold applies to the couple's combined wages.
+Each family's salaries, ages, children, state and filing status are in its `financial-health.json`.
 
 ## Your tools
 
