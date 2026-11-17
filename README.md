@@ -110,7 +110,7 @@ All amounts are US dollars.
 | `FICATaxSS`, `FICATaxMedicare`, `FICATaxAdditionalMedicare` | Payroll tax rates and the Additional Medicare thresholds by filing status |
 | `SSWageBaseByYear` | Social Security wage base by year, 2023 to 2027 |
 | `FullRetirementAgeByBirthdate` | SSA wage base (`SSWB`) and national average wage index (`NAWI`) by year, used to index earnings |
-| `FullRetirementAgeByYearOfBirth` | Full retirement age (67) and the benefit factor for claiming at 62 to 70; the `default` row covers everyone born in 1960 or later |
+| `FullRetirementAgeByYearOfBirth` | Full retirement age (67) and the benefit factor for claiming at 62 to 70; the `default` row covers everyone born after 1960 |
 | `SpouseBenefitsReductionFactor`, `SurvivorBenefitFRATable` | Spousal benefit reduction by months claimed early, survivor full retirement age by birth year |
 | `StandardDeduction` | 2026 federal standard deduction by filing status, plus the extra amount at 65 |
 | `RMDStartAge` | Age at which required withdrawals from retirement accounts start |
@@ -123,10 +123,10 @@ Which values apply to each family. Ages, states, filing status, salaries and acc
 
 | Family | State, filing status | Values that apply |
 |---|---|---|
-| Timothy & Melanie Weah | CA, married filing jointly. Two salaries, both born after 1959 | Social Security and Medicare rates; wage base per person; Additional Medicare `marriedJointly` threshold; standard deduction `MARRIED_JOINTLY`; full retirement age `default` row; spouse and survivor tables; RMD start age; Medicare and IRMAA married columns from 65. California income tax applies (brackets not in the sample) |
-| Michael Carter | TX, single. One salary, born after 1959 | Social Security and Medicare rates; wage base; Additional Medicare `single` threshold; standard deduction `SINGLE`; full retirement age `default` row; RMD start age; Medicare and IRMAA single columns from 65. Texas has no state income tax |
-| Daniel & Emily Johnson | CO, married filing jointly. Two salaries, both born after 1959 | As for the Weahs. Colorado income tax applies (brackets not in the sample) |
-| Samantha Lewis | FL, single. One salary, born after 1959 | As for Michael. Florida has no state income tax |
+| Timothy & Melanie Weah | CA, married filing jointly. Two salaries, both born after 1960 | Social Security and Medicare rates; wage base per person; Additional Medicare `marriedJointly` threshold; standard deduction `MARRIED_JOINTLY`; full retirement age `default` row; spouse and survivor tables; RMD start age; Medicare and IRMAA married columns from 65. California income tax applies (brackets not in the sample) |
+| Michael Carter | TX, single. One salary, born after 1960 | Social Security and Medicare rates; wage base; Additional Medicare `single` threshold; standard deduction `SINGLE`; full retirement age `default` row; RMD start age; Medicare and IRMAA single columns from 65. Texas has no state income tax |
+| Daniel & Emily Johnson | CO, married filing jointly. Two salaries, both born after 1960 | As for the Weahs. Colorado income tax applies (brackets not in the sample) |
+| Samantha Lewis | FL, single. One salary, born after 1960 | As for Michael. Florida has no state income tax |
 
 The QCD limit does not apply to any of the four today: all are under 70½.
 
