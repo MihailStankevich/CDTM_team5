@@ -1,0 +1,1312 @@
+{
+  "FICATaxSS": {
+    "employedTopRange": {
+      "value": 176100,
+      "source": "SSA contribution and benefit base 2025 (ssa.gov/oact/cola/cbb.html)"
+    },
+    "employedTaxRate": {
+      "value": 0.062,
+      "source": "26 U.S.C. 3101(a) / 1401(a): Social Security tax rate"
+    },
+    "employedYear": {
+      "value": 2025,
+      "source": "SSA contribution and benefit base 2025 (ssa.gov/oact/cola/cbb.html)"
+    },
+    "selfEmployedTopRange": {
+      "value": 176100,
+      "source": "SSA contribution and benefit base 2025 (ssa.gov/oact/cola/cbb.html)"
+    },
+    "selfEmployedTaxRate": {
+      "value": 0.124,
+      "source": "26 U.S.C. 3101(a) / 1401(a): Social Security tax rate"
+    },
+    "selfEmployedYear": {
+      "value": 2025,
+      "source": "SSA contribution and benefit base 2025 (ssa.gov/oact/cola/cbb.html)"
+    }
+  },
+  "FICATaxMedicare": {
+    "employedTaxRate": {
+      "value": 0.0145,
+      "source": "26 U.S.C. 3101(b)(1) / 1401(b)(1): Medicare tax rate"
+    },
+    "employedYear": {
+      "value": 2023,
+      "source": "26 U.S.C. 3101(b)(1) / 1401(b)(1): Medicare tax rate"
+    },
+    "selfEmployedTaxRate": {
+      "value": 0.029,
+      "source": "26 U.S.C. 3101(b)(1) / 1401(b)(1): Medicare tax rate"
+    },
+    "selfEmployedYear": {
+      "value": 2023,
+      "source": "26 U.S.C. 3101(b)(1) / 1401(b)(1): Medicare tax rate"
+    }
+  },
+  "FICATaxAdditionalMedicare": {
+    "singleTopRange": {
+      "value": 200000,
+      "source": "26 U.S.C. 3101(b)(2): Additional Medicare Tax (thresholds not indexed)"
+    },
+    "singleTaxRate": {
+      "value": 0.009,
+      "source": "26 U.S.C. 3101(b)(2): Additional Medicare Tax (thresholds not indexed)"
+    },
+    "marriedSeparatelyTopRange": {
+      "value": 125000,
+      "source": "26 U.S.C. 3101(b)(2): Additional Medicare Tax (thresholds not indexed)"
+    },
+    "marriedSeparatelyTaxRate": {
+      "value": 0.009,
+      "source": "26 U.S.C. 3101(b)(2): Additional Medicare Tax (thresholds not indexed)"
+    },
+    "marriedJointlyTopRange": {
+      "value": 250000,
+      "source": "26 U.S.C. 3101(b)(2): Additional Medicare Tax (thresholds not indexed)"
+    },
+    "marriedJointlyTaxRate": {
+      "value": 0.009,
+      "source": "26 U.S.C. 3101(b)(2): Additional Medicare Tax (thresholds not indexed)"
+    },
+    "headTopRange": {
+      "value": 200000,
+      "source": "26 U.S.C. 3101(b)(2): Additional Medicare Tax (thresholds not indexed)"
+    },
+    "headTaxRate": {
+      "value": 0.009,
+      "source": "26 U.S.C. 3101(b)(2): Additional Medicare Tax (thresholds not indexed)"
+    }
+  },
+  "SpouseBenefitsReductionFactor": {
+    "months_0": {
+      "value": 0,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_1": {
+      "value": 0.00694444444444444,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_2": {
+      "value": 0.0138888888888889,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_3": {
+      "value": 0.0208333333333333,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_4": {
+      "value": 0.0277777777777778,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_5": {
+      "value": 0.0347222222222222,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_6": {
+      "value": 0.0416666666666667,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_7": {
+      "value": 0.0486111111111111,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_8": {
+      "value": 0.0555555555555556,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_9": {
+      "value": 0.0625,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_10": {
+      "value": 0.0694444444444444,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_11": {
+      "value": 0.0763888888888889,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_12": {
+      "value": 0.0833333333333333,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_13": {
+      "value": 0.0902777777777778,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_14": {
+      "value": 0.0972222222222222,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_15": {
+      "value": 0.104166666666667,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_16": {
+      "value": 0.111111111111111,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_17": {
+      "value": 0.118055555555556,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_18": {
+      "value": 0.125,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_19": {
+      "value": 0.131944444444444,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_20": {
+      "value": 0.138888888888889,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_21": {
+      "value": 0.145833333333333,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_22": {
+      "value": 0.152777777777778,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_23": {
+      "value": 0.159722222222222,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_24": {
+      "value": 0.166666666666667,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_25": {
+      "value": 0.173611111111111,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_26": {
+      "value": 0.180555555555556,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_27": {
+      "value": 0.1875,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_28": {
+      "value": 0.194444444444444,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_29": {
+      "value": 0.201388888888889,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_30": {
+      "value": 0.208333333333333,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_31": {
+      "value": 0.215277777777778,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_32": {
+      "value": 0.222222222222222,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_33": {
+      "value": 0.229166666666667,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_34": {
+      "value": 0.236111111111111,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_35": {
+      "value": 0.243055555555556,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_36": {
+      "value": 0.25,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_37": {
+      "value": 0.254166666666667,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_38": {
+      "value": 0.258333333333333,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_39": {
+      "value": 0.2625,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_40": {
+      "value": 0.266666666666667,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_41": {
+      "value": 0.270833333333333,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_42": {
+      "value": 0.275,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_43": {
+      "value": 0.279166666666667,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_44": {
+      "value": 0.283333333333333,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_45": {
+      "value": 0.2875,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_46": {
+      "value": 0.291666666666667,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_47": {
+      "value": 0.295833333333333,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_48": {
+      "value": 0.3,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_49": {
+      "value": 0.304166666666667,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_50": {
+      "value": 0.308333333333333,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_51": {
+      "value": 0.3125,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_52": {
+      "value": 0.316666666666667,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_53": {
+      "value": 0.320833333333333,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_54": {
+      "value": 0.325,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_55": {
+      "value": 0.329166666666667,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_56": {
+      "value": 0.333333333333333,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_57": {
+      "value": 0.3375,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_58": {
+      "value": 0.341666666666667,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_59": {
+      "value": 0.345833333333333,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    },
+    "months_60": {
+      "value": 0.35,
+      "source": "20 CFR 404.410: spousal benefit reduction (25/36 of 1% per month for 36 months, 5/12 of 1% after)"
+    }
+  },
+  "SurvivorBenefitFRATable": {
+    "row_0_maxBirthYear": {
+      "value": 1956,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_0_fraAge": {
+      "value": 66,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_0_fraExtraMonths": {
+      "value": 0,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_0_benefitAt60Pct": {
+      "value": 0.715,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_1_maxBirthYear": {
+      "value": 1957,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_1_fraAge": {
+      "value": 66,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_1_fraExtraMonths": {
+      "value": 2,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_1_benefitAt60Pct": {
+      "value": 0.711,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_2_maxBirthYear": {
+      "value": 1958,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_2_fraAge": {
+      "value": 66,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_2_fraExtraMonths": {
+      "value": 4,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_2_benefitAt60Pct": {
+      "value": 0.707,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_3_maxBirthYear": {
+      "value": 1959,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_3_fraAge": {
+      "value": 66,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_3_fraExtraMonths": {
+      "value": 6,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_3_benefitAt60Pct": {
+      "value": 0.704,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_4_maxBirthYear": {
+      "value": 1960,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_4_fraAge": {
+      "value": 66,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_4_fraExtraMonths": {
+      "value": 8,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_4_benefitAt60Pct": {
+      "value": 0.7,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_5_maxBirthYear": {
+      "value": 1961,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_5_fraAge": {
+      "value": 66,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_5_fraExtraMonths": {
+      "value": 10,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_5_benefitAt60Pct": {
+      "value": 0.697,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_6_maxBirthYear": {
+      "value": "Infinity",
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_6_fraAge": {
+      "value": 67,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_6_fraExtraMonths": {
+      "value": 0,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    },
+    "row_6_benefitAt60Pct": {
+      "value": 0.675,
+      "source": "SSA survivor benefits: full retirement age and reduction at 60 by year of birth"
+    }
+  },
+  "FullRetirementAgeByBirthdate": {
+    "year_1961_SSWB": {
+      "value": 4800,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1961_NAWI": {
+      "value": 4086.76,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1962_SSWB": {
+      "value": 4800,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1962_NAWI": {
+      "value": 4291.4,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1963_SSWB": {
+      "value": 4800,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1963_NAWI": {
+      "value": 4396.64,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1964_SSWB": {
+      "value": 4800,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1964_NAWI": {
+      "value": 4576.32,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1965_SSWB": {
+      "value": 4800,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1965_NAWI": {
+      "value": 4658.72,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1966_SSWB": {
+      "value": 6600,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1966_NAWI": {
+      "value": 4938.36,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1967_SSWB": {
+      "value": 6600,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1967_NAWI": {
+      "value": 5213.44,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1968_SSWB": {
+      "value": 7800,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1968_NAWI": {
+      "value": 5571.76,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1969_SSWB": {
+      "value": 7800,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1969_NAWI": {
+      "value": 5893.76,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1970_SSWB": {
+      "value": 7800,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1970_NAWI": {
+      "value": 6186.24,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1971_SSWB": {
+      "value": 7800,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1971_NAWI": {
+      "value": 6497.08,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1972_SSWB": {
+      "value": 9000,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1972_NAWI": {
+      "value": 7133.8,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1973_SSWB": {
+      "value": 10800,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1973_NAWI": {
+      "value": 7580.16,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1974_SSWB": {
+      "value": 13200,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1974_NAWI": {
+      "value": 8030.76,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1975_SSWB": {
+      "value": 14100,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1975_NAWI": {
+      "value": 8630.92,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1976_SSWB": {
+      "value": 15300,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1976_NAWI": {
+      "value": 9226.48,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1977_SSWB": {
+      "value": 16500,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1977_NAWI": {
+      "value": 9779.44,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1978_SSWB": {
+      "value": 17700,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1978_NAWI": {
+      "value": 10556.03,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1979_SSWB": {
+      "value": 22900,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1979_NAWI": {
+      "value": 11479.46,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1980_SSWB": {
+      "value": 25900,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1980_NAWI": {
+      "value": 12513.46,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1981_SSWB": {
+      "value": 29700,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1981_NAWI": {
+      "value": 13773.1,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1982_SSWB": {
+      "value": 32400,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1982_NAWI": {
+      "value": 14531.34,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1983_SSWB": {
+      "value": 35700,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1983_NAWI": {
+      "value": 15239.24,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1984_SSWB": {
+      "value": 37800,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1984_NAWI": {
+      "value": 16135.07,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1985_SSWB": {
+      "value": 39600,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1985_NAWI": {
+      "value": 16822.51,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1986_SSWB": {
+      "value": 42000,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1986_NAWI": {
+      "value": 17321.82,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1987_SSWB": {
+      "value": 43800,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1987_NAWI": {
+      "value": 18426.51,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1988_SSWB": {
+      "value": 45000,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1988_NAWI": {
+      "value": 19334.04,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1989_SSWB": {
+      "value": 48000,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1989_NAWI": {
+      "value": 20099.55,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1990_SSWB": {
+      "value": 51300,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1990_NAWI": {
+      "value": 21027.98,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1991_SSWB": {
+      "value": 53400,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1991_NAWI": {
+      "value": 21811.6,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1992_SSWB": {
+      "value": 55500,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1992_NAWI": {
+      "value": 22935.42,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1993_SSWB": {
+      "value": 57600,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1993_NAWI": {
+      "value": 23132.67,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1994_SSWB": {
+      "value": 60600,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1994_NAWI": {
+      "value": 23753.53,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1995_SSWB": {
+      "value": 61200,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1995_NAWI": {
+      "value": 24705.66,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1996_SSWB": {
+      "value": 62700,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1996_NAWI": {
+      "value": 25913.9,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1997_SSWB": {
+      "value": 65400,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1997_NAWI": {
+      "value": 27426,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1998_SSWB": {
+      "value": 68400,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1998_NAWI": {
+      "value": 28861.44,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_1999_SSWB": {
+      "value": 72600,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_1999_NAWI": {
+      "value": 30469.84,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2000_SSWB": {
+      "value": 76200,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2000_NAWI": {
+      "value": 32154.82,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2001_SSWB": {
+      "value": 80400,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2001_NAWI": {
+      "value": 32921.92,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2002_SSWB": {
+      "value": 84900,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2002_NAWI": {
+      "value": 33252.09,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2003_SSWB": {
+      "value": 87000,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2003_NAWI": {
+      "value": 34064.95,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2004_SSWB": {
+      "value": 87900,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2004_NAWI": {
+      "value": 35648.55,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2005_SSWB": {
+      "value": 90000,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2005_NAWI": {
+      "value": 36952.94,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2006_SSWB": {
+      "value": 94200,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2006_NAWI": {
+      "value": 38651.41,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2007_SSWB": {
+      "value": 97500,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2007_NAWI": {
+      "value": 40405.48,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2008_SSWB": {
+      "value": 102000,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2008_NAWI": {
+      "value": 41334.97,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2009_SSWB": {
+      "value": 106800,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2009_NAWI": {
+      "value": 40711.61,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2010_SSWB": {
+      "value": 106800,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2010_NAWI": {
+      "value": 41673.83,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2011_SSWB": {
+      "value": 106800,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2011_NAWI": {
+      "value": 42979.61,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2012_SSWB": {
+      "value": 110100,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2012_NAWI": {
+      "value": 44321.67,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2013_SSWB": {
+      "value": 113700,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2013_NAWI": {
+      "value": 44888.16,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2014_SSWB": {
+      "value": 117000,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2014_NAWI": {
+      "value": 46481.52,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2015_SSWB": {
+      "value": 118500,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2015_NAWI": {
+      "value": 48098.63,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2016_SSWB": {
+      "value": 118500,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2016_NAWI": {
+      "value": 48642.15,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2017_SSWB": {
+      "value": 127200,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2017_NAWI": {
+      "value": 50321.89,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2018_SSWB": {
+      "value": 128400,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2018_NAWI": {
+      "value": 52145.8,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2019_SSWB": {
+      "value": 132900,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2019_NAWI": {
+      "value": 54099.99,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2020_SSWB": {
+      "value": 137700,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2020_NAWI": {
+      "value": 55628.6,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2021_SSWB": {
+      "value": 142800,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2021_NAWI": {
+      "value": 60575.07,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2022_SSWB": {
+      "value": 147000,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2022_NAWI": {
+      "value": 63795.13,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2023_SSWB": {
+      "value": 160200,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2023_NAWI": {
+      "value": 66621.8,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2024_SSWB": {
+      "value": 168600,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2024_NAWI": {
+      "value": 69846.57,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2025_SSWB": {
+      "value": 176100,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2025_NAWI": {
+      "value": 72800.33,
+      "source": "SSA national average wage index series (ssa.gov/oact/cola/AWI.html)"
+    },
+    "year_2026_SSWB": {
+      "value": 184500,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "year_2027_SSWB": {
+      "value": 192300,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    }
+  },
+  "FullRetirementAgeByYearOfBirth": {
+    "default_FRA": {
+      "value": 67,
+      "source": "SSA: full retirement age and benefit reduction by year of birth (42 U.S.C. 416(l), 20 CFR 404.410); delayed retirement credits (20 CFR 404.313)"
+    },
+    "default_62": {
+      "value": 0.7,
+      "source": "SSA: full retirement age and benefit reduction by year of birth (42 U.S.C. 416(l), 20 CFR 404.410); delayed retirement credits (20 CFR 404.313)"
+    },
+    "default_63": {
+      "value": 0.75,
+      "source": "SSA: full retirement age and benefit reduction by year of birth (42 U.S.C. 416(l), 20 CFR 404.410); delayed retirement credits (20 CFR 404.313)"
+    },
+    "default_64": {
+      "value": 0.8,
+      "source": "SSA: full retirement age and benefit reduction by year of birth (42 U.S.C. 416(l), 20 CFR 404.410); delayed retirement credits (20 CFR 404.313)"
+    },
+    "default_65": {
+      "value": 0.86666666,
+      "source": "SSA: full retirement age and benefit reduction by year of birth (42 U.S.C. 416(l), 20 CFR 404.410); delayed retirement credits (20 CFR 404.313)"
+    },
+    "default_66": {
+      "value": 0.93333333,
+      "source": "SSA: full retirement age and benefit reduction by year of birth (42 U.S.C. 416(l), 20 CFR 404.410); delayed retirement credits (20 CFR 404.313)"
+    },
+    "default_67": {
+      "value": 1,
+      "source": "SSA: full retirement age and benefit reduction by year of birth (42 U.S.C. 416(l), 20 CFR 404.410); delayed retirement credits (20 CFR 404.313)"
+    },
+    "default_68": {
+      "value": 1.08,
+      "source": "SSA: full retirement age and benefit reduction by year of birth (42 U.S.C. 416(l), 20 CFR 404.410); delayed retirement credits (20 CFR 404.313)"
+    },
+    "default_69": {
+      "value": 1.16,
+      "source": "SSA: full retirement age and benefit reduction by year of birth (42 U.S.C. 416(l), 20 CFR 404.410); delayed retirement credits (20 CFR 404.313)"
+    },
+    "default_70": {
+      "value": 1.24,
+      "source": "SSA: full retirement age and benefit reduction by year of birth (42 U.S.C. 416(l), 20 CFR 404.410); delayed retirement credits (20 CFR 404.313)"
+    }
+  },
+  "SSWageBaseByYear": {
+    "2023": {
+      "value": 160200,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "2024": {
+      "value": 168600,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "2025": {
+      "value": 176100,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "2026": {
+      "value": 184500,
+      "source": "SSA contribution and benefit base (ssa.gov/oact/cola/cbb.html)"
+    },
+    "2027": {
+      "value": 192300,
+      "source": "SSA contribution and benefit base 2027: $192,300 (https://www.ssa.gov/oact/cola/cbb.html; 2027 COLA fact sheet https://www.ssa.gov/news/en/cola/factsheets/2027.html)"
+    }
+  },
+  "QCDLimitByYear": {
+    "2024": {
+      "value": 105000,
+      "source": "IRC 408(d)(8): qualified charitable distribution limit, indexed by SECURE 2.0 §307"
+    },
+    "2025": {
+      "value": 108000,
+      "source": "IRC 408(d)(8): qualified charitable distribution limit, indexed by SECURE 2.0 §307 (IRS Rev. Proc. 2024-40)"
+    },
+    "2026": {
+      "value": 111000,
+      "source": "IRC 408(d)(8): qualified charitable distribution limit, indexed by SECURE 2.0 §307"
+    }
+  },
+  "StandardDeduction": {
+    "baseYear": {
+      "value": 2026,
+      "source": "IRS Rev. Proc. 2025-32 sec. 4.14: 2026 standard deduction"
+    },
+    "SINGLE": {
+      "value": 16100,
+      "source": "IRS Rev. Proc. 2025-32 sec. 4.14: 2026 standard deduction"
+    },
+    "MARRIED_JOINTLY": {
+      "value": 32200,
+      "source": "IRS Rev. Proc. 2025-32 sec. 4.14: 2026 standard deduction"
+    },
+    "MARRIED_SEPARATELY": {
+      "value": 16100,
+      "source": "IRS Rev. Proc. 2025-32 sec. 4.14: 2026 standard deduction"
+    },
+    "HEAD_OF_HOUSEHOLD": {
+      "value": 24150,
+      "source": "IRS Rev. Proc. 2025-32 sec. 4.14: 2026 standard deduction"
+    },
+    "QUALIFYING_WIDOW": {
+      "value": 32200,
+      "source": "IRS Rev. Proc. 2025-32 sec. 4.14: 2026 standard deduction"
+    },
+    "agedAdditionalMarried": {
+      "value": 1650,
+      "source": "IRS Rev. Proc. 2025-32 sec. 4.14(3): additional standard deduction for age 65 or older (IRC 63(f))"
+    },
+    "agedAdditionalUnmarried": {
+      "value": 2050,
+      "source": "IRS Rev. Proc. 2025-32 sec. 4.14(3): additional standard deduction for age 65 or older (IRC 63(f))"
+    },
+    "agedAdditionalAge": {
+      "value": 65,
+      "source": "IRC 63(f)(1)"
+    }
+  },
+  "RMDStartAge": {
+    "bornBefore_1951": {
+      "value": 72,
+      "source": "SECURE Act §114 (IRC 401(a)(9)(C)): required beginning age 72"
+    },
+    "bornBefore_1960": {
+      "value": 73,
+      "source": "SECURE 2.0 §107 (IRC 401(a)(9)(C)(v)): required beginning age"
+    },
+    "otherwise": {
+      "value": 75,
+      "source": "SECURE 2.0 §107 (IRC 401(a)(9)(C)(v)): required beginning age"
+    }
+  },
+  "MedicarePremiums": {
+    "year": {
+      "value": 2026,
+      "source": "CMS 2026 Medicare Parts A & B premiums and deductibles fact sheet"
+    },
+    "partBBaseMonthly": {
+      "value": 202.9,
+      "source": "CMS 2026 Medicare Parts A & B premiums and deductibles fact sheet"
+    },
+    "partDBaseMonthly": {
+      "value": 38.99,
+      "source": "CMS 2026 Part D national base beneficiary premium"
+    }
+  },
+  "IRMAATiers": {
+    "year": {
+      "value": 2026,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_0_singleMin": {
+      "value": 0,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_0_singleMax": {
+      "value": 109000,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_0_marriedMin": {
+      "value": 0,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_0_marriedMax": {
+      "value": 218000,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_0_partBSurcharge": {
+      "value": 0,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_0_partDSurcharge": {
+      "value": 0,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_1_singleMin": {
+      "value": 109001,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_1_singleMax": {
+      "value": 137000,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_1_marriedMin": {
+      "value": 218001,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_1_marriedMax": {
+      "value": 274000,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_1_partBSurcharge": {
+      "value": 81.2,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_1_partDSurcharge": {
+      "value": 14.5,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_2_singleMin": {
+      "value": 137001,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_2_singleMax": {
+      "value": 171000,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_2_marriedMin": {
+      "value": 274001,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_2_marriedMax": {
+      "value": 342000,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_2_partBSurcharge": {
+      "value": 202.9,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_2_partDSurcharge": {
+      "value": 37.5,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_3_singleMin": {
+      "value": 171001,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_3_singleMax": {
+      "value": 205000,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_3_marriedMin": {
+      "value": 342001,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_3_marriedMax": {
+      "value": 410000,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_3_partBSurcharge": {
+      "value": 324.6,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_3_partDSurcharge": {
+      "value": 60.4,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_4_singleMin": {
+      "value": 205001,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_4_singleMax": {
+      "value": 500000,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_4_marriedMin": {
+      "value": 410001,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_4_marriedMax": {
+      "value": 750000,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_4_partBSurcharge": {
+      "value": 446.3,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_4_partDSurcharge": {
+      "value": 83.3,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_5_singleMin": {
+      "value": 500001,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_5_singleMax": {
+      "value": "Infinity",
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_5_marriedMin": {
+      "value": 750001,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_5_marriedMax": {
+      "value": "Infinity",
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_5_partBSurcharge": {
+      "value": 487,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "standard_5_partDSurcharge": {
+      "value": 91,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "marriedSeparately_0_min": {
+      "value": 0,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "marriedSeparately_0_max": {
+      "value": 109000,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "marriedSeparately_0_partBSurcharge": {
+      "value": 0,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "marriedSeparately_0_partDSurcharge": {
+      "value": 0,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "marriedSeparately_1_min": {
+      "value": 109001,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "marriedSeparately_1_max": {
+      "value": 390999,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "marriedSeparately_1_partBSurcharge": {
+      "value": 446.3,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "marriedSeparately_1_partDSurcharge": {
+      "value": 83.3,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "marriedSeparately_2_min": {
+      "value": 391000,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "marriedSeparately_2_max": {
+      "value": "Infinity",
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "marriedSeparately_2_partBSurcharge": {
+      "value": 487,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    },
+    "marriedSeparately_2_partDSurcharge": {
+      "value": 91,
+      "source": "SSA/CMS 2026 IRMAA brackets and monthly adjustments (20 CFR 418.2115, 418.2120)"
+    }
+  }
+}
