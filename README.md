@@ -24,7 +24,7 @@
 **[CDTM VLC Hacks x Sherpas Wealth on Discord](https://discord.gg/mCHYWRhFw)** is where the day happens. Scan the code or click the link:
 
 - **Announcements and rules**: accept the rules in #welcome to see the rest
-- **Your team's private channels**: one of you runs `/team create`, then `/team add` for each teammate
+- **Your team's private channels**: in #welcome press **I have a team code** and paste the code from CDTM's team email (or type `/join`); no code? accept the rules, then one of you runs `/team create` and `/team add` for each teammate
 - **Questions**: the #help forum, or `/mentor` in your team channel to call the Sherpas mentor
 - **Your idea** with `/idea`, and the **hand-in** with `/submit` (type `/help` for all commands)
 
