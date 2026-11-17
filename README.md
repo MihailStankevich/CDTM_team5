@@ -1,20 +1,21 @@
 <p align="center">
-  <img src="assets/banner.png" alt="First to know, first to tell. Sherpas x CDTM VLC Hacks, Saturday 21 November 2026, Valencia" width="100%">
+  <img src="assets/banner.png" alt="First to know, first to tell. Sherpas challenge at CDTM Valencia Hacks 2026, Saturday 21 November, The Terminal Hub, Valencia" width="100%">
 </p>
 
 # First to know, first to tell
 
 **Sherpas challenge at CDTM Valencia Hacks 2026. Saturday 21 November 2026, The Terminal Hub, Valencia**
 
+[CDTM Valencia Hacks](https://vlc.hacks.cdtm.com/) is a one-day hackathon by CDTM Valencia (UPV and Universitat de València) with cases from several companies. Sherpas is one of the main sponsors; this page is everything you need for the Sherpas case.
+
 > **TODO (organisers, delete this block before sharing):**
-> 1. Exact hours: start, hand-in deadline, pitches.
+> 1. Hand-in deadline (CDTM agenda: pitches from 17:00).
 > 2. Pitch length and jury questions.
-> 3. Team size (the Discord bot allows up to 5 per team now).
-> 4. Repo visibility: it is a private template now; make it public on the day so teams can use the template (or invite them).
-> 5. CDTM emails on the case login, and what the access page shows CDTM teams (no AI key).
-> 6. Jury criteria and weights: sign-off.
-> 7. Which rule change teams get at the start.
-> 8. Legal values through the MCP: tool not live yet.
+> 3. Repo visibility: it is a private template now; make it public on the day so teams can use the template (or invite them).
+> 4. CDTM emails on the case login, and what the access page shows CDTM teams (no AI key).
+> 5. Jury criteria and weights: sign-off.
+> 6. Which rule change teams get at the start.
+> 7. Legal values through the MCP: tool not live yet.
 
 ## Join the Discord first
 
@@ -104,7 +105,7 @@ All amounts are US dollars.
 
 ## Legal values
 
-[`legal/legal-dataset-sample.json`](legal/legal-dataset-sample.json) is a sample of the legal values Sherpas uses to build plans: public law figures, each with its official source. Same shape as in the product: tables of `key: { "value", "source" }`.
+[`legal/legal-dataset-sample.json`](legal/legal-dataset-sample.json) holds the five legal tables that touch every family: public law figures, each with its official source, in the same shape Sherpas uses to build plans (`key: { "value", "source" }`).
 
 ```json
 "SSWageBaseByYear": {
@@ -115,28 +116,22 @@ All amounts are US dollars.
 
 | Table | What it holds |
 |---|---|
-| `FICATaxSS`, `FICATaxMedicare`, `FICATaxAdditionalMedicare` | Payroll tax rates and the Additional Medicare thresholds by filing status |
-| `SSWageBaseByYear` | Social Security wage base by year, 2023 to 2027 |
-| `FullRetirementAgeByBirthdate` | SSA wage base (`SSWB`) and national average wage index (`NAWI`) by year, used to index earnings |
-| `FullRetirementAgeByYearOfBirth` | Full retirement age (67) and the benefit factor for claiming at 62 to 70; the `default` row covers everyone born after 1960 |
-| `SpouseBenefitsReductionFactor`, `SurvivorBenefitFRATable` | Spousal benefit reduction by months claimed early, survivor full retirement age by birth year |
-| `StandardDeduction` | 2026 federal standard deduction by filing status, plus the extra amount at 65 |
-| `RMDStartAge` | Age at which required withdrawals from retirement accounts start |
-| `QCDLimitByYear` | Most a person 70½ or older can give to charity straight from an IRA |
-| `MedicarePremiums`, `IRMAATiers` | 2026 Medicare Part B and D base premiums, and the income tiers that add a surcharge |
+| `SSWageBaseByYear` | Social Security wage base by year, 2023 to 2027: salary above it pays no Social Security tax |
+| `FICATaxSS` | Social Security tax rate (6.2% for employees). Use `SSWageBaseByYear` for the limit of each year |
+| `FICATaxMedicare` | Medicare tax rate (1.45% for employees), on all wages, no limit |
+| `FICATaxAdditionalMedicare` | Extra 0.9% Medicare tax on wages above a threshold by filing status ($200,000 single, $250,000 married filing jointly) |
+| `StandardDeduction` | 2026 federal standard deduction by filing status |
 
-Not in this sample yet: federal and state income tax brackets and contribution limits (TODO).
+Each family's salaries, ages, state and filing status are in its `financial-health.json`. With today's salaries, 2026 values:
 
-Which values apply to each family. Ages, states, filing status, salaries and accounts are in each `financial-health.json`:
+| Family | Salaries | Social Security tax (6.2% up to the wage base) | Additional Medicare | Standard deduction |
+|---|---|---|---|---|
+| Timothy & Melanie Weah, CA, married filing jointly | $150,000 and $120,000 | Both under the base: $9,300 and $7,440 | $270,000 together, $20,000 over $250,000: $180 | $32,200 |
+| Michael Carter, TX, single | $180,000 | Under the base: $11,160 | Under $200,000: none | $16,100 |
+| Daniel & Emily Johnson, CO, married filing jointly | $160,000 and $120,000 | Both under the base: $9,920 and $7,440 | $280,000 together, $30,000 over: $270 | $32,200 |
+| Samantha Lewis, FL, single | $250,000 | Capped at $184,500: $11,439 | $50,000 over $200,000: $450 | $16,100 |
 
-| Family | State, filing status | Values that apply |
-|---|---|---|
-| Timothy & Melanie Weah | CA, married filing jointly. Two salaries, both born after 1960 | Social Security and Medicare rates; wage base per person; Additional Medicare `marriedJointly` threshold; standard deduction `MARRIED_JOINTLY`; full retirement age `default` row; spouse and survivor tables; RMD start age; Medicare and IRMAA married columns from 65. California income tax applies (brackets not in the sample) |
-| Michael Carter | TX, single. One salary, born after 1960 | Social Security and Medicare rates; wage base; Additional Medicare `single` threshold; standard deduction `SINGLE`; full retirement age `default` row; RMD start age; Medicare and IRMAA single columns from 65. Texas has no state income tax |
-| Daniel & Emily Johnson | CO, married filing jointly. Two salaries, both born after 1960 | As for the Weahs. Colorado income tax applies (brackets not in the sample) |
-| Samantha Lewis | FL, single. One salary, born after 1960 | As for Michael. Florida has no state income tax |
-
-The QCD limit does not apply to any of the four today: all are under 70½.
+All six earners are covered by the wage base, but only Samantha earns above it, so only her tax moves when it changes. The wage base and the Social Security rate apply per person; the Additional Medicare threshold applies to the couple's combined wages.
 
 ## Your tools
 
@@ -153,9 +148,14 @@ The QCD limit does not apply to any of the four today: all are under 70½.
 
 | When | What |
 |---|---|
-| Sat 21 Nov, TODO | **Kick-off**: the challenge and the rule change |
-| TODO | **Hand-in**, one per team, on Discord with `/submit` from your team channel (resubmit any time; the last one before the deadline counts) |
-| TODO | **Pitches**: a live demo on the projector, TODO minutes per team, then the prize |
+| 08:30 | **Kick-off and case briefing** at The Terminal Hub: the challenge and the rule change of the day |
+| 10:00 | **Hacking time**, with mentor rounds |
+| 13:30 | **Lunch** (30 minutes) |
+| 14:00 | **Working time**: final push on the prototype and the pitch |
+| Before the pitches (TODO exact time) | **Hand-in**, one per team, on Discord with `/submit` from your team channel (resubmit any time; the last one before the deadline counts) |
+| 17:00 to 19:00 | **Pitches and awards**: a live demo on the projector, TODO minutes per team |
+
+Teams have up to five people; CDTM matches you with your team. Agenda from [vlc.hacks.cdtm.com](https://vlc.hacks.cdtm.com/).
 
 What you hand in:
 
