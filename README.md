@@ -8,13 +8,6 @@
 
 [CDTM Valencia Hacks](https://vlc.hacks.cdtm.com/) is a one-day hackathon by CDTM Valencia (UPV and Universitat de València) with cases from several companies. Sherpas is one of the main sponsors; this page is everything you need for the Sherpas case.
 
-> **TODO (organisers, delete this block before sharing):**
-> 1. Jury questions.
-> 2. Repo visibility: it is a private template now; make it public on the day so teams can use the template (or invite them).
-> 3. CDTM emails on the case login, and what the access page shows CDTM teams (no AI key).
-> 4. Jury criteria and weights: sign-off.
-> 5. Legal values through the MCP: tool not live yet.
-
 ## Join the Discord first
 
 <a href="https://discord.gg/mCHYWRhFw"><img src="assets/discord-qr.png" alt="QR code: join the Discord" width="160" align="right"></a>
@@ -193,7 +186,7 @@ What you hand in:
 
 ## How the jury scores
 
-Five questions, 100 points (TODO: sign-off).
+Five questions, 100 points.
 
 | Points | Criterion | The jury asks |
 |---|---|---|
@@ -225,7 +218,7 @@ The address is for code and AI tools, not a web page: opened in a browser it sho
 
 ### 1. Get your MCP token
 
-Open [your access page](https://mcp-hackathon.sherpaswealth.com/personal-token) and log in with **the email you registered with**. We send you a 6-digit code (check spam too); it works for 10 minutes. Your token lasts 72 hours, and each login replaces the previous one. Each teammate has their own. (TODO: CDTM emails on the list, and the page's labels for CDTM.)
+Open [your access page](https://mcp-hackathon.sherpaswealth.com/personal-token) and log in with **the email you registered with**. We send you a 6-digit code (check spam too); it works for 10 minutes. Your token lasts 72 hours, and each login replaces the previous one. Each teammate has their own.
 
 Save it in a `.env` file at the root of your repo. This repo's `.gitignore` already keeps `.env` out of git. Never commit it or show it in browser code, screenshots or demos.
 
@@ -297,7 +290,7 @@ console.log(JSON.parse(r.content[0].text).value.summary_main);
 
 ### 4. Legal values through the MCP
 
-TODO: not live yet. Planned tool `get_legal_values`, with `{}` for every table, `{"table":"SSWageBaseByYear"}` for one table, or `{"caseId":"samantha-lewis"}` for the values that apply to one family. Until then, read [`legal/legal-dataset-sample.json`](legal/legal-dataset-sample.json).
+Not available through the MCP. Read the legal values from [`legal/legal-dataset-sample.json`](legal/legal-dataset-sample.json).
 
 ### Troubleshooting
 
