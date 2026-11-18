@@ -76,7 +76,7 @@ Pick the problems you believe in. Four parts of an answer, as examples; build on
 | **Content library** | What do we already have to say about this: to reassure, to explain, to check in, to celebrate? |
 | **Communications** | Who hears what, when, and how does the advisor approve 30 personal messages in minutes, not hours? |
 
-What matters most to us: **communications and the advisor's approval at scale** first, then **profiling** (knowing what each person cares about and already knows). A content library is a plus, not a must. Format, channel and stack are yours. You will not build everything in one day, and you do not need to.
+**The core is communication that feels personal, approved by the advisor at scale, built on profiling and an event tracker.** Profiling tells you what each person cares about and already knows; the tracker connects events to their plan. A content library is an optional plus and counts least. Format, channel and stack are yours. You will not build everything in one day, and you do not need to.
 
 ### What already exists (do not rebuild it)
 
@@ -129,27 +129,7 @@ Not in the data: employers' names and social profiles. Simulate them and say so 
 
 A rule change is one of the moments. [`legal/legal-dataset-sample.json`](legal/legal-dataset-sample.json) holds the tax and legal values that touch these families, each with its official source, in the shape Sherpas uses to build plans (`key: { "value", "source" }`). The Social Security and Medicare tables come from Sherpas' legal dataset; the federal brackets, standard deduction and child tax credit for 2026 and 2027 come from the IRS releases cited in each value.
 
-### What changes in 2027, and who it touches
-
-| Value | 2026 | 2027 | Who it touches among the four families |
-|---|---|---|---|
-| Social Security wage base (salary above it pays no Social Security tax, per person) | $184,500 | $192,300 | Only Samantha, who earns above it: about $484 more tax a year. Everyone else earns below it |
-| Standard deduction | $32,200 couples, $16,100 single | $33,200 couples, $16,600 single | Every family: a little less taxable income |
-| Federal tax brackets | 2026 brackets | Widened for inflation | Every family, worth more to higher earners |
-| Child tax credit, per child under 17 | $2,200 | $2,300 | Timothy and Melanie, and the Johnsons (two children each). Samantha's income phases it out; Michael has no children |
-
-Same rules, a different message for each family. Most of it is good news, and still worth telling: it shows the family their advisor is on it. This is an illustration, not a tax projection.
-
-### The tables
-
-| Table | What it holds |
-|---|---|
-| `SSWageBaseByYear` | Social Security wage base by year, 2023 to 2027: salary above it pays no Social Security tax (per person) |
-| `FICATaxSS`, `FICATaxMedicare` | Employee rates: 6.2% Social Security (use `SSWageBaseByYear` for each year's limit), 1.45% Medicare on all wages |
-| `FICATaxAdditionalMedicare` | Extra 0.9% Medicare tax on wages above $200,000 single or $250,000 for a couple's combined wages (not indexed, so no 2027 change) |
-| `StandardDeductionByYear` | 2026 and 2027 standard deduction by filing status |
-| `FederalIncomeTaxBracketsByYear` | 2026 and 2027 federal brackets, single and married filing jointly (`upTo` is the top of each bracket) |
-| `ChildTaxCreditByYear` | Credit per child under 17 and the income where it starts to shrink |
+Use it if regulation is relevant to the problems you choose. Market events, life changes and helping a family prepare for a decision are equally valid starting points. You do not have to build a regulatory alert system.
 
 Each family's salaries, ages, children, state and filing status are in its `financial-health.json`.
 
@@ -181,7 +161,7 @@ Teams of three; CDTM matches you with your team. Everything happens in English: 
 What you hand in:
 
 1. **GitHub repo link** with your code and a README: the problems you chose, what you built, how to run it, what it uses, and which parts are simulated.
-2. **A working MVP** that runs on the supplied families. It can cover one part (profiling, tracker, content library, communications) or several; show at least one family going from something that happens to what the family and the advisor see.
+2. **A working MVP** that runs on the supplied families. It can cover one part (profiling, tracker, content library, communications) or several; show how your chosen part helps at least one family or their advisor. You do not need to build the whole chain.
 3. **A live demo** on the projector during your 5-minute pitch, showing what the family and the advisor experience.
 
 ## How the jury scores
@@ -194,7 +174,7 @@ Five questions, 100 points.
 | 25 | Ahead of the family | Does the family hear it first, from their advisor, before they worry or have to ask? |
 | 20 | Feels personal | Would this family feel like their advisor's only client: their numbers, their topics, what they already know, how they take risk? |
 | 15 | Works for 150 families | Could one advisor run this for 150 families: see why each message exists, and approve or edit it in seconds? |
-| 10 | It works, live | Does the live demo show real families, from an event to what they and the advisor see? |
+| 10 | It works, live | Does the live demo work on the supplied synthetic families and show clearly what your chosen part helps the family or advisor do? |
 
 Teams that pick different parts of the problem are scored on the same questions. Exact figures carry little weight: Sherpas already gets them right inside the product.
 
