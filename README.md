@@ -53,7 +53,7 @@ Sherpas already collects the data and builds the plan. Your challenge is the day
 What happens in the family's head:
 
 1. **They hear it from the news first.** A tax rule changes: *"What does this mean for us? Do we have to change anything? Our advisor hasn't said a word. Do I have to ask?"* Every time they have to ask, they trust their advisor a little less.
-2. **Markets fall and they panic alone.** A big tech stock falls 30% in two weeks, or the market drops 20%: *"Is the bubble bursting? Do we sell? Can we still buy the beach house? Should we buy now?"* What they need first is someone telling them this is normal and the plan was built for it, then what it means for them.
+2. **Markets fall and they panic alone.** Nvidia falls 30% in two weeks, or the market drops 20%: *"Is the bubble bursting? Do we sell? Can we still buy the beach house? Should we buy now?"* What they need first is someone telling them this is normal and the plan was built for it, then what it means for them.
 3. **They feel like a number.** *"Our advisor has clients with two or three million. We have $150,000, but it is our $150,000."* Silence reads as "nobody is watching".
 4. **Their life moves and nobody connects it to the plan.** A promotion (and the risk of spending all of the raise), layoffs at their company, a child turning 11 with seven years to college, a child about to lose the family's health cover at 26, a house they are thinking about.
 5. **Generic content.** The same newsletter for every family: it explains what an annuity is to someone who already holds one, and skips the topics they actually care about.
@@ -74,9 +74,11 @@ Pick the problems you believe in. Four parts of an answer, as examples; build on
 | **Profiling** | Who is this person? Which topics matter to them, what do they already know, how do they decide and react to risk? |
 | **Tracker** | What just happened to this family, their employer, the market or the law, and does it touch their plan? |
 | **Content library** | What do we already have to say about this: to reassure, to explain, to check in, to celebrate? |
-| **Communications** | Who hears what, when, and how does the advisor approve 30 personal messages in minutes, not hours? |
+| **Communications** | Who hears what, when, and how does the advisor approve 30 personal messages in minutes: an inbox, a conversation ("seven messages today, this one because..."), or something new? |
 
 **The core is communication that feels personal, approved by the advisor at scale, built on profiling and an event tracker.** Profiling tells you what each person cares about and already knows; the tracker connects events to their plan. A content library is an optional plus and counts least. Format, channel and stack are yours. You will not build everything in one day, and you do not need to.
+
+Four families are supplied. You can simulate more to demonstrate scale; label them in your README.
 
 ### What already exists (do not rebuild it)
 
@@ -166,17 +168,17 @@ What you hand in:
 
 ## How the jury scores
 
-Five questions, 100 points.
+Five questions, 100 points, applied to the part each team chose.
 
 | Points | Criterion | The jury asks |
 |---|---|---|
-| 30 | Creativity and innovation | Is it something new: a format, channel, moment or idea we had not thought of, built well enough to work live? |
-| 25 | Ahead of the family | Does the family hear it first, from their advisor, before they worry or have to ask? |
-| 20 | Feels personal | Would this family feel like their advisor's only client: their numbers, their topics, what they already know, how they take risk? |
-| 15 | Works for 150 families | Could one advisor run this for 150 families: see why each message exists, and approve or edit it in seconds? |
+| 30 | Creativity and innovation | Is it new: a format, channel, moment or idea we had not thought of? |
+| 25 | The advisor, always first | Does the family hear it from their advisor first, before they worry or ask? |
+| 20 | Feels personal | Does it know this family (their numbers, topics, what they already know, how they take risk) and leave them calmer or readier to act? |
+| 15 | Nurturing at scale | Would each of 150 families feel close to their advisor, with one advisor approving every message in seconds? |
 | 10 | It works, live | Does the live demo work on the supplied synthetic families and show clearly what your chosen part helps the family or advisor do? |
 
-Teams that pick different parts of the problem are scored on the same questions. Exact figures carry little weight: Sherpas already gets them right inside the product.
+A team that builds one part is scored on how far that part moves these outcomes; the whole system is not required. Creativity counts most. Exact figures carry little weight: Sherpas already gets them right inside the product.
 
 ## Prize
 
