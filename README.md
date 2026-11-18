@@ -9,7 +9,7 @@
 [CDTM Valencia Hacks](https://vlc.hacks.cdtm.com/) is a one-day hackathon by CDTM Valencia (UPV and Universitat de València) with cases from several companies. Sherpas is one of the main sponsors; this page is everything you need for the Sherpas case.
 
 > **TODO (organisers, delete this block before sharing):**
-> 1. Pitch length and jury questions.
+> 1. Jury questions.
 > 2. Repo visibility: it is a private template now; make it public on the day so teams can use the template (or invite them).
 > 3. CDTM emails on the case login, and what the access page shows CDTM teams (no AI key).
 > 4. Jury criteria and weights: sign-off.
@@ -181,7 +181,7 @@ Each family's salaries, ages, children, state and filing status are in its `fina
 | 13:30 | **Lunch** (30 minutes) |
 | 14:00 | **Working time**: final push on the prototype and the pitch |
 | Before 17:00 | **Hand-in**, one per team, on Discord with `/submit` from your team channel (resubmit any time; the last one before the deadline counts) |
-| 17:00 to 19:00 | **Pitches and awards**: a live demo on the projector, TODO minutes per team |
+| 17:00 to 19:00 | **Pitches and awards**: 5 minutes per team, with a live demo on the projector |
 
 Teams of three; CDTM matches you with your team. Everything happens in English: code, README and pitch. Agenda from [vlc.hacks.cdtm.com](https://vlc.hacks.cdtm.com/).
 
@@ -189,7 +189,7 @@ What you hand in:
 
 1. **GitHub repo link** with your code and a README: the problems you chose, what you built, how to run it, what it uses, and which parts are simulated.
 2. **A working MVP** that runs on the supplied families. It can cover one part (profiling, tracker, content library, communications) or several; show at least one family going from something that happens to what the family and the advisor see.
-3. **A live demo** on the projector during your pitch, showing what the family and the advisor experience.
+3. **A live demo** on the projector during your 5-minute pitch, showing what the family and the advisor experience.
 
 ## How the jury scores
 
