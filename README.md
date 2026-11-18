@@ -9,13 +9,11 @@
 [CDTM Valencia Hacks](https://vlc.hacks.cdtm.com/) is a one-day hackathon by CDTM Valencia (UPV and Universitat de València) with cases from several companies. Sherpas is one of the main sponsors; this page is everything you need for the Sherpas case.
 
 > **TODO (organisers, delete this block before sharing):**
-> 1. Hand-in deadline (CDTM agenda: pitches from 17:00).
-> 2. Pitch length and jury questions.
-> 3. Repo visibility: it is a private template now; make it public on the day so teams can use the template (or invite them).
-> 4. CDTM emails on the case login, and what the access page shows CDTM teams (no AI key).
-> 5. Jury criteria and weights: sign-off.
-> 6. Which rule change teams get at the start.
-> 7. Legal values through the MCP: tool not live yet.
+> 1. Pitch length and jury questions.
+> 2. Repo visibility: it is a private template now; make it public on the day so teams can use the template (or invite them).
+> 3. CDTM emails on the case login, and what the access page shows CDTM teams (no AI key).
+> 4. Jury criteria and weights: sign-off.
+> 5. Legal values through the MCP: tool not live yet.
 
 ## Join the Discord first
 
@@ -49,39 +47,53 @@ Sherpas Wealth is an AI platform for financial advisors in the United States ([s
 | 2 | **Build the plan** | Solved by Sherpas: a narrated plan with an overview, advice area by area, a living map of their finances year by year, and concrete strategies |
 | 3 | **Keep the family close**: after the plan, the relationship goes on for years | **This is your challenge** |
 
-## The challenge
+## The challenge: nurturing at scale
 
-**A tax or legal rule changes. Turn it into a closer relationship between a financial advisor and the families they look after:** find who it affects, explain what it means for each of them, and design the follow-up that helps them act.
+**A financial advisor looks after around 150 families. Each one wants to feel like the only one.**
 
-After the plan, life and rules keep changing. When a tax limit or legal value changes, a general announcement does not tell a family whether it affects them, how much, or what to do. Working that out family by family and writing to each one takes the advisor time they do not have, so most changes go unexplained.
+The plan is not a once-a-year relationship. Between meetings, laws change, markets move, careers and families change, and every family wants to know that their advisor is on it: that if something matters to them, they will hear it first, from their advisor, in their own terms. And that if they hear nothing, it is because nothing needs doing.
 
-Sherpas already keeps its planning values up to date with their sources. Updating a number and explaining its impact to an existing family are two different jobs. The second one is your challenge.
+Sherpas already collects the data and builds the plan. Your challenge is the day-to-day relationship after it: **how do you make every family feel looked after, personally and ahead of time, when one advisor has 150 of them?**
 
-What your build should make possible:
+### The problems
 
-- **Find who is affected, and how.** Connect the rule's conditions to each family's data. Explain the effect on their money, or say what is missing before it can be calculated.
-- **Tell their own story.** Each affected family understands the change in terms of their own money and goals, with no finance background.
-- **Design the follow-up.** The sequence, timing and channel, and how it changes if the family reads, ignores, replies or asks for a meeting.
-- **Keep the advisor in control.** The advisor sees why each family was picked and approves before anything reaches a family.
+What happens in the family's head:
 
-Format, channel and stack are yours: an agent, a workflow, a message sequence, or something we have not thought of. No voice interface, chatbot or separate app is required.
+1. **They hear it from the news first.** A tax rule changes: *"What does this mean for us? Do we have to change anything? Our advisor hasn't said a word. Do I have to ask?"* Every time they have to ask, they trust their advisor a little less.
+2. **Markets fall and they panic alone.** A big tech stock falls 30% in two weeks, or the market drops 20%: *"Is the bubble bursting? Do we sell? Can we still buy the beach house? Should we buy now?"* What they need first is someone telling them this is normal and the plan was built for it, then what it means for them.
+3. **They feel like a number.** *"Our advisor has clients with two or three million. We have $150,000, but it is our $150,000."* Silence reads as "nobody is watching".
+4. **Their life moves and nobody connects it to the plan.** A promotion (and the risk of spending all of the raise), layoffs at their company, a child turning 11 with seven years to college, a child about to lose the family's health cover at 26, a house they are thinking about.
+5. **Generic content.** The same newsletter for every family: it explains what an annuity is to someone who already holds one, and skips the topics they actually care about.
+6. **Big decisions take more than one message.** A Roth conversion: first they need to understand what it is, then why it suits them, then accept it, then feel ready to act. People need to hear about something four or five times before it feels familiar.
 
-### An example rule change
+What happens on the advisor's side:
 
-You get the rule change for the day at the start: the change, its effective date and its official source (TODO: which change). Here is how one change plays out.
+7. **Nobody can watch everything for everyone.** Regulation, markets, each family's employer, their LinkedIn, the dates already in their plan, for 150 families, every week.
+8. **Knowing each person takes time.** What they care about, what they already know, how they react to risk: in a couple, one may shrug at a market drop while the other panics.
+9. **Every message needs the advisor's approval.** AI should not write to a client on its own yet: the advisor approves first. With 30 personal drafts a day, approving them one by one is the whole morning.
 
-The US Social Security wage base rises from **$184,500 (2026) to $192,300 (2027)**; the employee rate is 6.2% ([SSA](https://www.ssa.gov/oact/cola/cbb.html)). If each salary stays the same and is all covered employee wages:
+### Where you could start
 
-| Family member | Salary | Effect of this change alone | |
-|---|---|---|---|
-| Samantha | $250,000 | $7,800 more taxable band, so about $484 more Social Security tax a year ($40 a month) | Worth a message |
-| Michael | $180,000 | Below both limits, so it costs him nothing | No message needed |
+Pick the problems you believe in. Four parts of an answer, as examples; build one, several, or something else:
 
-Same rule, different families, different answers. That is the difference between an announcement and advice. This is an illustration, not a full tax projection. A wage limit applies per person, so use each person's own salary, not the family total.
+| Part | The question it answers |
+|---|---|
+| **Profiling** | Who is this person? Which topics matter to them, what do they already know, how do they decide and react to risk? |
+| **Tracker** | What just happened to this family, their employer, the market or the law, and does it touch their plan? |
+| **Content library** | What do we already have to say about this: to reassure, to explain, to check in, to celebrate? |
+| **Communications** | Who hears what, when, and how does the advisor approve 30 personal messages in minutes, not hours? |
+
+We care most about **communications and the advisor's approval at scale**. Format, channel and stack are yours. You will not build everything in one day, and you do not need to.
+
+### What already exists (do not rebuild it)
+
+- **The plan:** for every family, Sherpas collects the data and builds a narrated plan (overview, advice by area, a living map year by year).
+- **Tax and legal values:** every value behind a plan carries its official source; when a rule changes, Sherpas publishes the new value and new plans recalculate with it. Knowing that a number changed is solved; what it means for each family, and telling them, is not.
+- **Emails around the plan:** the questionnaire invitation and reminders, an invitation to book a meeting, access to the plan. Once the plan is delivered, nothing more goes out.
 
 ## The cases
 
-Four synthetic households, true to life, built for this event. Every team gets all four. Each has a complete Sherpas plan.
+Four synthetic households, true to life, built for this event. Every team gets all four. Each has a complete Sherpas plan and a client profile: how each person takes risk and decides, what drives and worries them, and the dates already in their plan.
 
 | Family | Who they are | Their story | Plan in the app | Files |
 |---|---|---|---|---|
@@ -98,14 +110,14 @@ Each family folder contains:
 |---|---|
 | `financial-health.json` | Who the family is (ages, state, tax filing status), their score and why, incomes, accounts, debts, insurance, goals, key metrics, written analysis and yearly projection |
 | `investment-analysis.json` | Accounts and holdings, key metrics and the written investment analysis |
-| `persona.md` | The family as clients: how they take risk and decide, what drives and worries them (sections **D0 to D6**, concerns **O1, O2...**, tensions **T1, T2...**). Its figures match the plan |
+| `persona.md` | The client profile: wealth, life stage, risk per person (stated, revealed and inferred), how they decide, what drives them, upcoming transitions, concerns **O1, O2...** and tensions **T1, T2...** (sections **D0 to D6**). Its figures match the plan. A starting point for profiling |
 | `report.pdf` | The client report, for Timothy and Melanie, Michael, and Daniel and Emily. Samantha's is not included |
 
 All amounts are US dollars.
 
-## Legal values
+## Legal values (one possible source)
 
-[`legal/legal-dataset-sample.json`](legal/legal-dataset-sample.json) holds the legal values that touch these families, each with its official source, in the shape Sherpas uses to build plans (`key: { "value", "source" }`). The Social Security and Medicare tables come from Sherpas' legal dataset; the federal brackets, standard deduction and child tax credit for 2026 and 2027 come from the IRS releases cited in each value.
+Regulation is one of the things that changes a family's plan. [`legal/legal-dataset-sample.json`](legal/legal-dataset-sample.json) holds the legal values that touch these families, each with its official source, in the shape Sherpas uses to build plans (`key: { "value", "source" }`). The Social Security and Medicare tables come from Sherpas' legal dataset; the federal brackets, standard deduction and child tax credit for 2026 and 2027 come from the IRS releases cited in each value.
 
 ### What changes in 2027, and what it means for each family per year
 
@@ -119,7 +131,7 @@ Same salaries in both years, all wages, standard deduction, no other income or c
 | Child tax credit: $2,200 to $2,300 per child under 17 | +$200 (two children) | $0 (no children) | +$200 (two children) | $0 (her income phases it out) |
 | **Net change per year** | **+$918** | **+$359** | **+$918** | **+$439** |
 
-One family loses on one rule and still gains overall; two families gain from a credit the others cannot get; the same bracket update is worth $763 to Samantha and $239 to Michael. That is the difference between a general announcement and advice. Illustration only, not a full tax return: state tax, retirement contributions and other credits are left out.
+One family loses on one rule and still gains overall; two families gain from a credit the others cannot get; the same bracket update is worth $763 to Samantha and $239 to Michael. Most of this is good news, and still worth telling: it shows the family their advisor is on it. Illustration only, not a full tax return: state tax, retirement contributions and other credits are left out.
 
 ### The tables
 
@@ -140,44 +152,44 @@ Each family's salaries, ages, children, state and filing status are in its `fina
 |---|---|
 | **4 cases through the MCP** | Read-only access to the four families and their plans, with an email login. See [Connect to the cases](#connect-to-the-cases) |
 | **Files in this repo** | The same case data in [`cases/`](cases/) and the legal values in [`legal/`](legal/) |
+| **The outside world** | Any public source you choose: news, market data, company announcements. Simulate what you cannot reach (a LinkedIn post, a layoff) and say so in your README |
 | **AI models** | Bring your own. There are no AI credits for this event: use any model or tool your team already has |
 | **Mentor** | A Sherpas mentor on the day for product and data questions |
 
-**Ground rules:** use only the supplied synthetic families and public sources; send no real messages; keep keys on your backend, never in browser code.
+**Ground rules:** use only the supplied synthetic families and public sources; do not scrape real people's profiles; send no real messages; keep keys on your backend, never in browser code.
 
 ## Your day, and what you hand in
 
 | When | What |
 |---|---|
-| 08:30 | **Kick-off and case briefing** at The Terminal Hub: the challenge and the rule change of the day |
+| 08:30 | **Kick-off and case briefing** at The Terminal Hub: Sherpas, the families and the challenge |
 | 10:00 | **Hacking time**, with mentor rounds |
 | 13:30 | **Lunch** (30 minutes) |
 | 14:00 | **Working time**: final push on the prototype and the pitch |
-| Before the pitches (TODO exact time) | **Hand-in**, one per team, on Discord with `/submit` from your team channel (resubmit any time; the last one before the deadline counts) |
+| Before 17:00 | **Hand-in**, one per team, on Discord with `/submit` from your team channel (resubmit any time; the last one before the deadline counts) |
 | 17:00 to 19:00 | **Pitches and awards**: a live demo on the projector, TODO minutes per team |
 
-Teams have up to five people; CDTM matches you with your team. Agenda from [vlc.hacks.cdtm.com](https://vlc.hacks.cdtm.com/).
+Teams of three; CDTM matches you with your team. Everything happens in English: code, README and pitch. Agenda from [vlc.hacks.cdtm.com](https://vlc.hacks.cdtm.com/).
 
 What you hand in:
 
-1. **GitHub repo link** with your code and a README: how to run it, what it uses, and which parts are simulated.
-2. **A working MVP** that checks all four families against the supplied rule change and takes at least one affected family through the whole flow: their message, the advisor's approval, and at least one follow-up (a reply, no reply, or a meeting request).
+1. **GitHub repo link** with your code and a README: the problems you chose, what you built, how to run it, what it uses, and which parts are simulated.
+2. **A working MVP** that runs on the supplied families. It can cover one part (profiling, tracker, content library, communications) or several; show at least one family going from something that happens to what the family and the advisor see.
 3. **A live demo** on the projector during your pitch, showing what the family and the advisor experience.
 
 ## How the jury scores
 
-Six questions, 100 points (TODO: sign-off).
+Five questions, 100 points (TODO: sign-off).
 
 | Points | Criterion | The jury asks |
 |---|---|---|
-| 30 | Creativity and innovation | What did it add that we did not ask for? Is it something new: a format, channel or moment we had not thought of? |
-| 25 | Motivation to act | Does each family know the next step and want to take it, and does the follow-up adapt if they reply, ignore it or ask for a meeting? |
-| 20 | Their own story | Would each family understand what it means for their money and goals, with no finance background? |
-| 10 | Advisor in control | Can the advisor see why each family was picked, and approve before anything is sent? |
-| 10 | The whole flow, live | Does the live demo go from the rule change to a family taking a step? |
-| 5 | The right families | Does it message the families the change affects and leave the others alone? |
+| 30 | Creativity and innovation | Is it something new: a format, channel, moment or idea we had not thought of, built well enough to work live? |
+| 25 | Ahead of the family | Does the family hear it first, from their advisor, before they worry or have to ask? |
+| 20 | Feels personal | Would this family feel like their advisor's only client: their numbers, their topics, what they already know, how they take risk? |
+| 15 | Works for 150 families | Could one advisor run this for 150 families: see why each message exists, and approve or edit it in seconds? |
+| 10 | It works, live | Does the live demo show real families, from an event to what they and the advisor see? |
 
-Exact figures carry little weight: Sherpas already gets them right inside the product. A new idea, built well, counts most.
+Teams that pick different parts of the problem are scored on the same questions. Exact figures carry little weight: Sherpas already gets them right inside the product.
 
 ## Prize
 
