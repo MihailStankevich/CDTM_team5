@@ -115,23 +115,37 @@ Each family folder contains:
 
 All amounts are US dollars.
 
+## Where to find the signals
+
+Everything below is already in each family's files. Use it to know a family, or to see how something that happens touches them.
+
+| Moment | What to look at | Where | Example |
+|---|---|---|---|
+| **Markets fall** | How this family's own portfolio did in 11 past market shocks | `investment-analysis.json`: `key_metrics.performanceAnalysis.perEventDrawdowns`, `analysis.events` | Tariff announcement, 2 Apr 2025: Samantha's portfolio fell 9.9%, Timothy and Melanie's 7.1% |
+| **Markets fall** | What they hold, and how much of it is tech | `positions`, `key_metrics.concentrationAndDiversification.sectorConcentration` | Technology is 36% of the Johnsons' shares (through VTI, VWELX and VWO) |
+| **Life moves** | Dated goals | `financial-health.json`: `goals.chartGoals` | Michael's home in January 2027, Ava's college in August 2028, Oliver's in August 2033 |
+| **Life moves** | Who is in the family, and their ages | `case.household` | Oliver is 11, Ethan 18, Josh 3 |
+| **Life moves** | Who earns what, and until when | `profile.incomes` | Each salary with its owner and end year |
+| **Profiling** | Risk per person, how they decide, what worries them | `case.household[].risk_profile`; `persona.md` D4 to D6, concerns and tensions | Timothy is Growth, Melanie is Moderate |
+| **A big decision** | What the plan recommends, and how each step moves the score | `score.top_moves`, `narrative.summary_recommendations` | Each move with its score before and after |
+| **A rule changes** | Tax and legal values with official sources | [`legal/legal-dataset-sample.json`](legal/legal-dataset-sample.json) | Social Security wage base 2027: $192,300 |
+
+Not in the data: employers' names and social profiles. Simulate them and say so in your README.
+
 ## Legal values (one possible source)
 
-Regulation is one of the things that changes a family's plan. [`legal/legal-dataset-sample.json`](legal/legal-dataset-sample.json) holds the legal values that touch these families, each with its official source, in the shape Sherpas uses to build plans (`key: { "value", "source" }`). The Social Security and Medicare tables come from Sherpas' legal dataset; the federal brackets, standard deduction and child tax credit for 2026 and 2027 come from the IRS releases cited in each value.
+A rule change is one of the moments. [`legal/legal-dataset-sample.json`](legal/legal-dataset-sample.json) holds the tax and legal values that touch these families, each with its official source, in the shape Sherpas uses to build plans (`key: { "value", "source" }`). The Social Security and Medicare tables come from Sherpas' legal dataset; the federal brackets, standard deduction and child tax credit for 2026 and 2027 come from the IRS releases cited in each value.
 
-### What changes in 2027, and what it means for each family per year
+### What changes in 2027, and who it touches
 
-Same salaries in both years, all wages, standard deduction, no other income or credits. Plus is money the family keeps, minus is money it pays.
+| Value | 2026 | 2027 | Who it touches among the four families |
+|---|---|---|---|
+| Social Security wage base (salary above it pays no Social Security tax, per person) | $184,500 | $192,300 | Only Samantha, who earns above it: about $484 more tax a year. Everyone else earns below it |
+| Standard deduction | $32,200 couples, $16,100 single | $33,200 couples, $16,600 single | Every family: a little less taxable income |
+| Federal tax brackets | 2026 brackets | Widened for inflation | Every family, worth more to higher earners |
+| Child tax credit, per child under 17 | $2,200 | $2,300 | Timothy and Melanie, and the Johnsons (two children each). Samantha's income phases it out; Michael has no children |
 
-| Change from 2026 to 2027 | Weah (CA, couple, $270,000) | Carter (TX, single, $180,000) | Johnson (CO, couple, $280,000) | Lewis (FL, single, $250,000) |
-|---|---|---|---|---|
-| Social Security wage base: $184,500 to $192,300 | $0 (both under it) | $0 (under it) | $0 (both under it) | **-$484** (earns above it: $7,800 more taxed at 6.2%) |
-| Standard deduction: $32,200 to $33,200 (couples), $16,100 to $16,600 (single) | +$240 (24% bracket) | +$120 (24% bracket) | +$240 (24% bracket) | +$160 (32% bracket) |
-| Federal brackets widened for inflation | +$478 | +$239 | +$478 | +$763 |
-| Child tax credit: $2,200 to $2,300 per child under 17 | +$200 (two children) | $0 (no children) | +$200 (two children) | $0 (her income phases it out) |
-| **Net change per year** | **+$918** | **+$359** | **+$918** | **+$439** |
-
-One family loses on one rule and still gains overall; two families gain from a credit the others cannot get; the same bracket update is worth $763 to Samantha and $239 to Michael. Most of this is good news, and still worth telling: it shows the family their advisor is on it. Illustration only, not a full tax return: state tax, retirement contributions and other credits are left out.
+Same rules, a different message for each family. Most of it is good news, and still worth telling: it shows the family their advisor is on it. This is an illustration, not a tax projection.
 
 ### The tables
 
