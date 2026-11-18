@@ -83,7 +83,7 @@ Pick the problems you believe in. Four parts of an answer, as examples; build on
 | **Content library** | What do we already have to say about this: to reassure, to explain, to check in, to celebrate? |
 | **Communications** | Who hears what, when, and how does the advisor approve 30 personal messages in minutes, not hours? |
 
-We care most about **communications and the advisor's approval at scale**. Format, channel and stack are yours. You will not build everything in one day, and you do not need to.
+What matters most to us: **communications and the advisor's approval at scale** first, then **profiling** (knowing what each person cares about and already knows). A content library is a plus, not a must. Format, channel and stack are yours. You will not build everything in one day, and you do not need to.
 
 ### What already exists (do not rebuild it)
 
