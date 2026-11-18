@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="assets/banner.png" alt="Nurturing at scale. Sherpas challenge at CDTM Valencia Hacks 2026, Saturday 21 November, The Terminal Hub, Valencia" width="100%">
+  <img src="assets/banner.png" alt="First to know, first to tell. Sherpas challenge at CDTM Valencia Hacks 2026, Saturday 21 November, The Terminal Hub, Valencia" width="100%">
 </p>
 
-# Nurturing at scale
+# First to know, first to tell
 
 **Sherpas challenge at CDTM Valencia Hacks 2026. Saturday 21 November 2026, The Terminal Hub, Valencia**
 
@@ -47,7 +47,7 @@ Sherpas Wealth is an AI platform for financial advisors in the United States ([s
 | 2 | **Build the plan** | Solved by Sherpas: a narrated plan with an overview, advice area by area, a living map of their finances year by year, and concrete strategies |
 | 3 | **Keep the family close**: after the plan, the relationship goes on for years | **This is your challenge** |
 
-## The challenge
+## The challenge: nurturing at scale
 
 **A financial advisor looks after around 150 families. Each one wants to feel like the only one.**
 
