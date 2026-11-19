@@ -17,7 +17,7 @@
 - **Announcements and rules**: accept the rules in #welcome to see the rest
 - **Your team's private channels**: in #welcome press **I have a team code** and paste the code from CDTM's team email (or type `/join`); no code? accept the rules, then one of you runs `/team create` and `/team add` for each teammate
 - **Questions**: the #help forum, or `/mentor` in your team channel to call the Sherpas mentor
-- **Your idea** with `/idea`, and the **hand-in** with `/submit` (type `/help` for all commands)
+- **Your idea** with `/idea` (type `/help` for all commands). The official hand-in is on Polievalúa, see [Your day](#your-day-and-what-you-hand-in)
 
 Every team member should join before the kick-off on Saturday.
 
@@ -155,30 +155,27 @@ Each family's salaries, ages, children, state and filing status are in its `fina
 | 10:00 | **Hacking time**, with mentor rounds |
 | 13:30 | **Lunch** (30 minutes) |
 | 14:00 | **Working time**: final push on the prototype and the pitch |
-| Before 17:00 | **Hand-in**, one per team, on Discord with `/submit` from your team channel (resubmit any time; the last one before the deadline counts) |
-| 17:00 to 19:00 | **Pitches and awards**: 5 minutes per team, with a live demo on the projector |
+| Before 16:45 | **Hand-in**, one per team, on **Polievalúa**: pitch deck, GitHub repo link and demo video |
+| 17:00 to 19:00 | **Pitches and awards**: 3 minutes per team plus 2 minutes of questions |
 
 Teams of three; CDTM matches you with your team. Everything happens in English: code, README and pitch. Agenda from [vlc.hacks.cdtm.com](https://vlc.hacks.cdtm.com/).
 
 What you hand in:
 
-1. **GitHub repo link** with your code and a README: the problems you chose, what you built, how to run it, what it uses, and which parts are simulated.
-2. **A working MVP** that runs on the supplied families. It can cover one part (profiling, tracker, content library, communications) or several; show how your chosen part helps at least one family or their advisor. You do not need to build the whole chain.
-3. **A live demo** on the projector during your 5-minute pitch, showing what the family and the advisor experience.
+1. **Pitch deck** for your 3-minute pitch: the problem you chose, what you built, and why it matters to the family and the advisor.
+2. **GitHub repo** with your working MVP and a README: the problems you chose, what you built, how to run it, what it uses, and which parts are simulated. It runs on the supplied families and can cover one part (profiling, tracker, content library, communications) or several; you do not need to build the whole chain.
+3. **Demo video** showing what the family and the advisor experience with your MVP.
 
 ## How the jury scores
 
-Five questions, 100 points, applied to the part each team chose.
+The jury uses the common CDTM Valencia Hacks rubric, the same for every challenge:
 
-| Points | Criterion | The jury asks |
-|---|---|---|
-| 30 | Creativity and innovation | Is it new: a format, channel, moment or idea we had not thought of? |
-| 25 | The advisor, always first | Does the family hear it from their advisor first, before they worry or ask? |
-| 20 | Feels personal | Does it know this family (their numbers, topics, what they already know, how they take risk) and leave them calmer or readier to act? |
-| 15 | Nurturing at scale | Would each of 150 families feel close to their advisor, with one advisor approving every message in seconds? |
-| 10 | It works, live | Does the live demo work on the supplied synthetic families and show clearly what your chosen part helps the family or advisor do? |
-
-A team that builds one part is scored on how far that part moves these outcomes; the whole system is not required. Creativity counts most. Exact figures carry little weight: Sherpas already gets them right inside the product.
+| Weight | Criterion |
+|---|---|
+| 30% | Technical execution |
+| 25% | Solving the challenge |
+| 25% | Impact and business |
+| 20% | Pitch |
 
 ## Prize
 
@@ -186,7 +183,7 @@ A team that builds one part is scored on how far that part moves these outcomes;
   <img src="assets/join.png" alt="Sherpas wants you. Internship opportunities" width="100%">
 </p>
 
-**500 € for the winning team.** Sherpas is looking for talent: the best prize is building real things with us.
+**500 € in Amazon vouchers for the winning team.** Sherpas is looking for talent: the best prize is building real things with us.
 
 ## Connect to the cases
 
