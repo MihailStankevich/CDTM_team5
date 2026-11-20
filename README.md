@@ -106,26 +106,30 @@ Each family folder contains:
 | `financial-health.json` | Who the family is (ages, state, tax filing status), their score and why, incomes, accounts, debts, insurance, goals, key metrics, written analysis and yearly projection |
 | `investment-analysis.json` | Accounts and holdings, key metrics and the written investment analysis |
 | `persona.md` | The client profile: wealth, life stage, risk per person (stated, revealed and inferred), how they decide, what drives them, upcoming transitions, concerns **O1, O2...** and tensions **T1, T2...** (sections **D0 to D6**). Its figures match the plan. A starting point for profiling |
+| `signals.json` | Things that happen around the family for the day: a market fall, the 2027 tax changes and life or decision moments, each saying what it touches in their plan and where to look. Events marked `"simulated": true` are invented for the exercise |
+| `legal-values.json` | The same tax and legal values as [`legal/legal-dataset-sample.json`](legal/legal-dataset-sample.json), so you can read them through the MCP |
 | `report.pdf` | The client report, for Timothy and Melanie, Michael, and Daniel and Emily. Samantha's is not included |
 
 All amounts are US dollars.
 
 ## Where to find the signals
 
-Everything below is already in each family's files. Use it to know a family, or to see how something that happens touches them.
+Everything below is already in each family's files. Use it to know a family, or to see how something that happens touches them. To start from events, open the family's `signals.json`.
 
 | Moment | What to look at | Where | Example |
 |---|---|---|---|
 | **Markets fall** | How this family's own portfolio did in 11 past market shocks | `investment-analysis.json`: `key_metrics.performanceAnalysis.perEventDrawdowns`, `analysis.events` | Tariff announcement, 2 Apr 2025: Samantha's portfolio fell 9.9%, Timothy and Melanie's 7.1% |
+| **Markets fall** | How their current mix and the recommended one would have done in 8 named periods since 2007: the 2008 financial crisis, the 2018 sell-off, the COVID crash, the 2025 tariffs and more | `investment-analysis.json`: `key_metrics.portfolioAnalysis.marketEnvironments` (current), `key_metrics.targetAnalysis.marketEnvironments` (recommended) | Global Financial Crisis: Michael's current mix -19.2%, the recommended mix -11.1% |
 | **Markets fall** | What they hold, and how much of it is tech | `positions`, `key_metrics.concentrationAndDiversification.sectorConcentration` | Technology is 36% of the Johnsons' shares (through VTI, VWELX and VWO) |
 | **Life moves** | Dated goals | `financial-health.json`: `goals.chartGoals` | Michael's home in January 2027, Ava's college in August 2028, Oliver's in August 2033 |
 | **Life moves** | Who is in the family, and their ages | `case.household` | Oliver is 11, Ethan 18, Josh 3 |
 | **Life moves** | Who earns what, and until when | `profile.incomes` | Each salary with its owner and end year |
 | **Profiling** | Risk per person, how they decide, what worries them | `case.household[].risk_profile`; `persona.md` D4 to D6, concerns and tensions | Timothy is Growth, Melanie is Moderate |
 | **A big decision** | What the plan recommends, and how each step moves the score | `score.top_moves`, `narrative.summary_recommendations` | Each move with its score before and after |
-| **A rule changes** | Tax and legal values with official sources | [`legal/legal-dataset-sample.json`](legal/legal-dataset-sample.json) | Social Security wage base 2027: $192,300 |
+| **A rule changes** | Tax and legal values with official sources | [`legal/legal-dataset-sample.json`](legal/legal-dataset-sample.json), or `legal-values.json` in each family folder | Social Security wage base 2027: $192,300 |
+| **Something happens** | A market fall, the 2027 tax changes and life or decision moments, with what each touches in this family's plan | `signals.json` | Samantha's employer announces layoffs (simulated): she is the only earner, with 7.9 months of essential expenses in cash |
 
-Not in the data: employers' names and social profiles. Simulate them and say so in your README.
+Not in the data: employers' names and social profiles. Simulate them and say so in your README; `signals.json` has a few simulated ones to start from.
 
 ## Legal values (one possible source)
 
@@ -258,7 +262,7 @@ console.log(JSON.parse(r.content[0].text).value.summary_main);
 
 ### 4. Legal values through the MCP
 
-Not available through the MCP. Read the legal values from [`legal/legal-dataset-sample.json`](legal/legal-dataset-sample.json).
+Each family has a `legal-values` part with the same values as [`legal/legal-dataset-sample.json`](legal/legal-dataset-sample.json): `get_case` with `caseId` and `part: "legal-values"`, plus `section` for one table (for example `SSWageBaseByYear`). The day's events are the `signals` part.
 
 ### Troubleshooting
 

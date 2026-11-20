@@ -1,0 +1,86 @@
+{
+  "about": "Things that happen around this family, for the hackathon day (Saturday 21 November 2026). Each signal says which moment it is (market, rule, life or decision), whether it is simulated (invented for the exercise) or comes from the family's plan or an official source, what it touches in this family's plan, and where in the case data to look. Simulated events are not real news. Amounts are US dollars.",
+  "as_of": "2026-11-21",
+  "family": "samantha-lewis",
+  "signals": [
+    {
+      "id": "market-ai-chip-selloff",
+      "date": "2026-11-20",
+      "moment": "market",
+      "simulated": true,
+      "headline": "AI chip stocks sell off: Nvidia down 30% in two weeks",
+      "what_happened": "Simulated. Nvidia has fallen 30% in two weeks. Since 6 November the Nasdaq 100 is down 12% and the S&P 500 is down 8%. Commentators ask whether the AI bubble is bursting.",
+      "touches_this_family": [
+        "Technology is 30.6% of Samantha's stock holdings, mostly through VTI.",
+        "Closest past shock in the data: when the Liberation Day tariffs were announced (2 Apr 2025) this portfolio fell 9.9%, against 9.5% for a simple mix with the same stock share. A fall that size today would be about $41,000 on $415,000 of investments and cash.",
+        "Worst fall in the last three years: 12.0%, recovered in 78 days.",
+        "Longer history: in the Global Financial Crisis (Oct 2007 to Mar 2009) the current mix would have lost 17.9% and the recommended mix 10.6%; in the COVID crash (Feb to Mar 2020) 15.5% and 12.5%.",
+        "VTI, a total US stock market fund, is about 39% of her investments plus cash ($162,000 of $415,000) (persona D4b).",
+        "Ethan's next $12,500 college payment is due in August 2027; the children's custodial accounts are almost entirely stocks (persona D1, D4b)."
+      ],
+      "where_in_the_data": [
+        "investment-analysis.json: key_metrics.performanceAnalysis.perEventDrawdowns (11 shocks, 2023 to 2026)",
+        "investment-analysis.json: key_metrics.portfolioAnalysis.marketEnvironments (current mix, 8 periods since 2007)",
+        "investment-analysis.json: key_metrics.targetAnalysis.marketEnvironments (recommended mix, same periods)",
+        "investment-analysis.json: key_metrics.concentrationAndDiversification.sectorConcentration",
+        "investment-analysis.json: positions"
+      ]
+    },
+    {
+      "id": "rule-2027-tax-values",
+      "date": "2026-11-05",
+      "moment": "rule",
+      "simulated": false,
+      "headline": "2027 tax values published: standard deduction, brackets, child tax credit, Social Security wage base",
+      "what_happened": "The IRS published the 2027 inflation adjustments on 5 November 2026: standard deduction $16,600 single and $33,200 married filing jointly (from $16,100 and $32,200), brackets indexed, child tax credit $2,300 per child (from $2,200). The Social Security wage base rises to $192,300 for 2027 (from $184,500). They apply from 1 January 2027.",
+      "touches_this_family": [
+        "Single filer: standard deduction rises by $500, from $16,100 to $16,600.",
+        "Her $250,000 salary is above both wage bases, so her Social Security tax rises by about $484 in 2027 (6.2% on the extra $7,800 of wages).",
+        "On salary alone, the child tax credit phase-out ($50 per $1,000 above $200,000 for a single filer) removes the credit in both years."
+      ],
+      "where_in_the_data": [
+        "legal-values.json (same file as legal/legal-dataset-sample.json): StandardDeductionByYear, FederalIncomeTaxBracketsByYear, ChildTaxCreditByYear, SSWageBaseByYear",
+        "financial-health.json: case.tax_filing_status, profile.incomes, case.household"
+      ],
+      "sources": [
+        "IRS IR-2026-133, 5 Nov 2026 (Rev. Proc. 2026-35): https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2027-taxpayers-continue-to-benefit-from-the-working-families-tax-cuts",
+        "SSA contribution and benefit base 2027: $192,300 (https://www.ssa.gov/oact/cola/cbb.html; 2027 COLA fact sheet https://www.ssa.gov/news/en/cola/factsheets/2027.html)"
+      ]
+    },
+    {
+      "id": "life-employer-layoffs",
+      "date": "2026-11-18",
+      "moment": "life",
+      "simulated": true,
+      "headline": "News: layoffs announced at Samantha's employer",
+      "what_happened": "Simulated. A news alert says Samantha's employer will cut jobs in several divisions early next year. Whether her role is affected is not known. Her employer is not named in the data.",
+      "touches_this_family": [
+        "She is the only earner; all household income is her $250,000 salary (persona D1, D2).",
+        "Cash is $80,000, 7.9 months of essential expenses, or 6.1 months after the vacation and Ethan's next payment (persona D3).",
+        "Long-term disability pays $12,500 a month if she cannot work; it does not cover a job loss (persona D3).",
+        "Yearly cash flow is already $6,418 short (persona O2)."
+      ],
+      "where_in_the_data": [
+        "financial-health.json: profile.incomes",
+        "persona.md: D1, D3, O2"
+      ]
+    },
+    {
+      "id": "life-college-ahead",
+      "date": "2027-08-01",
+      "moment": "life",
+      "simulated": false,
+      "headline": "Ethan's next college payment in August 2027, Ava starts in August 2028",
+      "what_happened": "From the plan. Ethan started college in August 2026; his next $12,500 payment is due in August 2027. Ava (16) starts in August 2028. College costs $12,500 a year per child.",
+      "touches_this_family": [
+        "The plan counts $0 in 529 plans and shows $98,838 of the $100,000 total cost still needed (persona D3).",
+        "Decision style: validator, someone who checks and confirms (persona D5); motivation: duty to the children (persona D6)."
+      ],
+      "where_in_the_data": [
+        "financial-health.json: goals.chartGoals (College Ava, 2028-08-01)",
+        "financial-health.json: case.household",
+        "persona.md: D1, D3"
+      ]
+    }
+  ]
+}
