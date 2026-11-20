@@ -146,7 +146,7 @@ Each family's salaries, ages, children, state and filing status are in its `fina
 | **4 cases through the MCP** | Read-only access to the four families and their plans, with an email login. See [Connect to the cases](#connect-to-the-cases) |
 | **Files in this repo** | The same case data in [`cases/`](cases/) and the legal values in [`legal/`](legal/) |
 | **The outside world** | Any public source you choose: news, market data, company announcements. Simulate what you cannot reach (a LinkedIn post, a layoff) and say so in your README |
-| **AI models** | Bring your own. There are no AI credits for this event: use any model or tool your team already has |
+| **$50 per team in AI credits** | The same models as the UPV hackathon (text, voice, text to speech, speech to text), through the AI proxy with one team AI key, for Saturday 21 Nov. See [Call a model](#5-call-a-model). You can also use any model or tool your team already has |
 | **Mentor** | A Sherpas mentor on the day for product and data questions |
 
 **Ground rules:** use only the supplied synthetic families and public sources; do not scrape real people's profiles; send no real messages; keep keys on your backend, never in browser code.
@@ -180,23 +180,34 @@ What you hand in:
 
 ## Connect to the cases
 
-The MCP (Model Context Protocol) is a standard way for AI assistants and your own code to read data. Ours serves the four cases, read only. All the case data is also in [`cases/`](cases/), so you can build without it.
+The **MCP gives you case data**: log in with your email in an AI tool, or use your personal MCP token from code. The **AI proxy runs the models** with your team AI key. The MCP token does not pay for model calls, and the team AI key does not log you into the MCP. All the case data is also in [`cases/`](cases/), so you can build without the MCP.
 
 | Service | Address | Access |
 |---|---|---|
 | Case data (MCP) | `https://mcp-hackathon.sherpaswealth.com/mcp` | Email login in your AI tool, or your personal MCP token from code |
+| AI models (proxy) | `https://llm-hackathon.sherpaswealth.com` | Your team's AI key |
 
-The address is for code and AI tools, not a web page: opened in a browser it shows `405`, which is normal. The only page to open in a browser is [your access page](https://mcp-hackathon.sherpaswealth.com/personal-token).
+Both are addresses for code and AI tools, not web pages. Opened in a browser, the proxy shows `{"detail":"Not Found"}` and the MCP shows `405`: that is normal. The only page to open in a browser is [your access page](https://mcp-hackathon.sherpaswealth.com/personal-token).
 
-### 1. Get your MCP token
+### 1. Get your access
 
-Open [your access page](https://mcp-hackathon.sherpaswealth.com/personal-token) and log in with **the email you registered with**. We send you a 6-digit code (check spam too); it works for 10 minutes. Your token lasts 72 hours, and each login replaces the previous one. Each teammate has their own.
+Open [your access page](https://mcp-hackathon.sherpaswealth.com/personal-token) and log in with **the email you registered with**. We send you a 6-digit code (check spam too); it works for 10 minutes. The page shows (in Spanish if your browser prefers Spanish):
 
-Save it in a `.env` file at the root of your repo. This repo's `.gitignore` already keeps `.env` out of git. Never commit it or show it in browser code, screenshots or demos.
+| On the page | What it is |
+|---|---|
+| **Team AI key** (Clave de IA del equipo) | Your team's AI key: $50 of credit, the same key for the whole team |
+| **Cases MCP token** (Token del MCP de casos) | Your own MCP token, to read the cases from code. It lasts 72 hours, and each login replaces the previous one. Each teammate has their own |
+| **For your backend** (Para tu backend) | A `.env` block with `MCP_URL`, `MCP_TOKEN`, `LLM_PROXY_URL` and `TEAM_KEY` |
+
+If the page says your team has no key yet, try again a little later or ask the mentor.
+
+Copy the **For your backend** block into a file named `.env` at the root of your repo. This repo's `.gitignore` already keeps `.env` out of git. Never commit it, and never put its values in browser code, screenshots or demos.
 
 ```
 MCP_URL=https://mcp-hackathon.sherpaswealth.com/mcp
 MCP_TOKEN=your-personal-token
+LLM_PROXY_URL=https://llm-hackathon.sherpaswealth.com
+TEAM_KEY=your-team-ai-key
 ```
 
 ### 2. Use the cases in your AI assistant (optional, no code)
@@ -264,6 +275,55 @@ console.log(JSON.parse(r.content[0].text).value.summary_main);
 
 Each family has a `legal-values` part with the same values as [`legal/legal-dataset-sample.json`](legal/legal-dataset-sample.json): `get_case` with `caseId` and `part: "legal-values"`, plus `section` for one table (for example `SSWageBaseByYear`). The worked examples are the `signals` part.
 
+### 5. Call a model
+
+The proxy speaks the OpenAI API: use any OpenAI SDK with the proxy address and your team key. Model names and prices are in [the table below](#models-and-usage-prices).
+
+Python (`pip install openai python-dotenv`):
+
+```python
+import os
+from dotenv import load_dotenv
+from openai import OpenAI
+
+load_dotenv()
+
+llm = OpenAI(base_url="https://llm-hackathon.sherpaswealth.com/v1", api_key=os.environ["TEAM_KEY"])
+reply = llm.chat.completions.create(model="gpt-5-mini", messages=[{"role": "user", "content": "Explain a 401(k) in two sentences."}])
+print(reply.choices[0].message.content)
+```
+
+JavaScript (`npm install openai`; Node 22 or later; run `node --env-file=.env app.mjs`):
+
+```js
+import OpenAI from "openai";
+const llm = new OpenAI({ baseURL: "https://llm-hackathon.sherpaswealth.com/v1", apiKey: process.env.TEAM_KEY });
+const reply = await llm.chat.completions.create({ model: "gpt-5-mini", messages: [{ role: "user", content: "Explain a 401(k) in two sentences." }] });
+console.log(reply.choices[0].message.content);
+```
+
+Each request uses a small amount of your team's credits.
+
+**Put the two together.** The proxy does not fetch the case for you: your backend fetches a case section through the MCP (or reads its JSON file here), puts it in the model's messages, and asks the model what you need.
+
+### 6. Check your AI credits
+
+Check your team's recorded spend and allowance. On macOS or Linux:
+
+```bash
+export TEAM_KEY=paste-your-team-key
+curl https://llm-hackathon.sherpaswealth.com/key/info -H "Authorization: Bearer $TEAM_KEY"
+```
+
+On Windows PowerShell:
+
+```powershell
+$env:TEAM_KEY = "paste-your-team-key"
+curl.exe https://llm-hackathon.sherpaswealth.com/key/info -H "Authorization: Bearer $env:TEAM_KEY"
+```
+
+Look for `info.spend` and `info.max_budget`, both in USD. Close voice sessions before checking their final usage.
+
 ### Troubleshooting
 
 - **405 when opening `/mcp`:** normal. Use the URL in your MCP client settings.
@@ -271,7 +331,40 @@ Each family has a `legal-values` part with the same values as [`legal/legal-data
 - **"Este correo no está en la lista de participantes"** (this email is not on the participant list): use the email you registered with; if it still fails, ask the mentor.
 - **MCP access stops working:** log in again for a new token, or reconnect your AI tool.
 - **Cases missing:** use the JSON files in `cases/` and tell the mentor which case and section failed.
-- **A token leaked** (pushed to GitHub, shown on screen): tell the mentor and log in again for a new one.
+- **Model access rejected:** check that you used the team key, the proxy address and a model name from [the table](#models-and-usage-prices). If the key's budget is used up, tell the mentor.
+- **429 Too many requests:** keep within 60 requests per minute and 4 concurrent requests or sessions per team.
+- **An empty `gpt-5-mini` answer:** omit `max_tokens` or use at least 1,000; a very low limit can be consumed by reasoning.
+- **A key or token leaked** (pushed to GitHub, shown on screen): tell the mentor and we replace it.
+
+## Models and usage prices
+
+These are the model names to use with the hackathon proxy. Prices below are the proxy's configured usage rates, checked 11 November 2026, in US dollars. They are charged against your team's credits. Input is what you send; output is what the model generates.
+
+| Model | Mode | Price (input / output per 1 million tokens, unless stated) |
+|---|---|---|
+| `deepseek-flash` | Text | $0.30 / $1.20 |
+| `gemini-3.5-flash-lite` | Text | $0.30 / $2.50 |
+| `gpt-5-mini` | Text | $0.25 / $2.00 |
+| `gpt-realtime-2.1-mini` | Voice | $10 / $20 for audio; $0.60 / $2.40 for text |
+| `gpt-realtime-2.1` | Voice | $32 / $64 for audio; $4 / $24 for text |
+| `gemini-3.8-live` | Voice | $3 / $12 for audio; $0.75 / $4.50 for text |
+| `gpt-live-1` | Voice | $0.05 per minute of session time |
+| `eleven-flash-v2.5` | Text to speech (ElevenLabs) | $0.04 per 1,000 characters |
+| `eleven-multilingual-v2` | Text to speech (ElevenLabs) | $0.08 per 1,000 characters |
+| `eleven-v3` | Text to speech (ElevenLabs) | $0.08 per 1,000 characters |
+| `scribe-v2` | Speech to text (ElevenLabs) | $0.22 per hour of audio |
+
+Token counts differ across models, so these rates do not directly compare the cost of an identical conversation. Cached input may have a different rate. Start with a small test and check your team's usage.
+
+- **Text:** OpenAI-compatible `POST /v1/chat/completions` at the proxy address.
+- **Realtime voice:** WebSocket `/v1/realtime?model=MODEL_NAME`, for the Realtime models and Gemini Live.
+- **GPT Live:** WebSocket `/v1/live/sessions`, with a different protocol from Realtime.
+- **ElevenLabs speech:** OpenAI-compatible `POST /v1/audio/speech` (for example `client.audio.speech.create(...)` in the OpenAI SDK). `voice` takes an OpenAI voice name (`alloy`, `echo`…) or any ElevenLabs `voice_id`.
+- **ElevenLabs transcription:** OpenAI-compatible `POST /v1/audio/transcriptions` with `scribe-v2`.
+- **ElevenLabs budget:** ElevenLabs is shared by every team, so **$1.40 of your team's $50 can go to ElevenLabs** (speech and `scribe-v2` transcription together): about 40 minutes of `eleven-flash-v2.5` speech, or 20 of the other two. When it runs out, ElevenLabs calls are refused and every other model keeps working. Prefer `eleven-flash-v2.5`: it costs half as much and is the least likely to be busy.
+- **Team limits:** 60 requests per minute and 4 concurrent requests or sessions.
+- **Budget:** the proxy records spend in USD. Your issued team key sets the spending allowance. Check usage through the authenticated `/key/info` endpoint, which returns `info.spend` and `info.max_budget`.
+- **Voice sessions:** close them when finished. Voice usage is recorded when a session closes, so a long session can exceed the remaining allowance before the limit takes effect.
 
 ## A few terms
 
