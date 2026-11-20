@@ -15,7 +15,7 @@
 **[CDTM VLC Hacks x Sherpas Wealth on Discord](https://discord.gg/mCHYWRhFw)** is where the day happens. Scan the code or click the link:
 
 - **Announcements and rules**: accept the rules in #welcome to see the rest
-- **Your team's private channels**: in #welcome press **I have a team code** and paste the code from CDTM's team email (or type `/join`); no code? accept the rules, then one of you runs `/team create` and `/team add` for each teammate
+- **Your team's private channels**: accept the rules in #welcome, then one of you runs `/team create` and `/team add` for each teammate. If the organisers give you a team code, press **I have a team code** instead (or type `/join`)
 - **Questions**: the #help forum, or `/mentor` in your team channel to call the Sherpas mentor
 - **Your idea** with `/idea` (type `/help` for all commands). The official hand-in is on Polievalúa, see [Your day](#your-day-and-what-you-hand-in)
 
@@ -118,7 +118,7 @@ Everything below is already in each family's files. Use it to know a family, or 
 
 | Moment | What to look at | Where | Example |
 |---|---|---|---|
-| **Markets fall** | How this family's own portfolio did in 11 past market shocks | `investment-analysis.json`: `key_metrics.performanceAnalysis.perEventDrawdowns`, `analysis.events` | Tariff announcement, 2 Apr 2025: Samantha's portfolio fell 9.9%, Timothy and Melanie's 7.1% |
+| **Markets fall** | How this family's own portfolio did in 11 past market shocks | `investment-analysis.json`: `key_metrics.performanceAnalysis.perEventDrawdowns`, `analysis.events` | Tariff announcement, 2 Apr 2025: today's holdings, back-tested, would have fallen 9.9% at the worst point for Samantha and 7.1% for Timothy and Melanie |
 | **Markets fall** | How their current mix and the recommended one would have done in 8 named periods since 2007: the 2008 financial crisis, the 2018 sell-off, the COVID crash, the 2025 tariffs and more | `investment-analysis.json`: `key_metrics.portfolioAnalysis.marketEnvironments` (current), `key_metrics.targetAnalysis.marketEnvironments` (recommended) | Global Financial Crisis: Michael's current mix -19.2%, the recommended mix -11.1% |
 | **Markets fall** | What they hold, and how much of it is tech | `positions`, `key_metrics.concentrationAndDiversification.sectorConcentration` | Technology is 36% of the Johnsons' shares (through VTI, VWELX and VWO) |
 | **Life moves** | Dated goals | `financial-health.json`: `goals.chartGoals` | Michael's home in January 2027, Ava's college in August 2028, Oliver's in August 2033 |
@@ -155,14 +155,16 @@ Each family's salaries, ages, children, state and filing status are in its `fina
 
 | When | What |
 |---|---|
-| 08:30 | **Kick-off and case briefing** at The Terminal Hub: Sherpas, the families and the challenge |
+| 08:30 | **Registration and welcome** at The Terminal Hub: bring your ID |
+| 09:00 | **Kick-off and case briefing**: Sherpas, the families and the challenge |
 | 10:00 | **Hacking time**, with mentor rounds |
 | 13:30 | **Lunch** (30 minutes) |
 | 14:00 | **Working time**: final push on the prototype and the pitch |
-| Before 16:45 | **Hand-in**, one per team, on **Polievalúa**: pitch deck, GitHub repo link and demo video |
-| 17:00 to 19:00 | **Pitches and awards**: 3 minutes per team plus 2 minutes of questions |
+| 16:45 | **Hand-in deadline**, one per team, on **Polievalúa**: pitch deck, GitHub repo link and demo video. Hard cut-off |
+| 17:00 to 18:15 | **Pitches**: 3 minutes per team plus 2 minutes of questions |
+| 18:15 to 19:00 | **Jury deliberation, awards** and the group photo |
 
-Teams of five; CDTM matches you with your team. Everything happens in English: code, README and pitch. Agenda from [vlc.hacks.cdtm.com](https://vlc.hacks.cdtm.com/).
+Teams of five; CDTM matches you with your team. Everything happens in English: code, README and pitch. Agenda from CDTM's participant guidebook on [vlc.hacks.cdtm.com](https://vlc.hacks.cdtm.com/); if CDTM changes a time on the day, theirs wins.
 
 What you hand in:
 
@@ -176,7 +178,7 @@ What you hand in:
   <img src="assets/join.png" alt="Sherpas wants you. Internship opportunities" width="100%">
 </p>
 
-**500 € in Amazon vouchers for the winning team.** Sherpas is looking for talent: the best prize is building real things with us.
+**500 € in Amazon vouchers for the winning team: a 100 € Amazon gift card for each of its five members.** Sherpas is looking for talent: the best prize is building real things with us.
 
 ## Connect to the cases
 
@@ -257,7 +259,7 @@ async def main():
 asyncio.run(main())
 ```
 
-JavaScript (`npm install @modelcontextprotocol/sdk`; save as `app.mjs`, run `node --env-file=.env app.mjs`):
+JavaScript (`npm install @modelcontextprotocol/sdk`; Node 22 or later; save as `app.mjs`, run `node --env-file=.env app.mjs`):
 
 ```js
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
@@ -329,10 +331,11 @@ Look for `info.spend` and `info.max_budget`, both in USD. Close voice sessions b
 - **405 when opening `/mcp`:** normal. Use the URL in your MCP client settings.
 - **No login email:** check spam and that you used the email you registered with; request a fresh code if the first expired.
 - **"Este correo no está en la lista de participantes"** (this email is not on the participant list): use the email you registered with; if it still fails, ask the mentor.
+- **429 from the MCP:** the MCP allows 120 requests a minute per network, and the venue Wi-Fi is shared. Wait a minute, fetch only the parts and sections you need, cache what you fetched, or read the same data from `cases/`.
 - **MCP access stops working:** log in again for a new token, or reconnect your AI tool.
 - **Cases missing:** use the JSON files in `cases/` and tell the mentor which case and section failed.
 - **Model access rejected:** check that you used the team key, the proxy address and a model name from [the table](#models-and-usage-prices). If the key's budget is used up, tell the mentor.
-- **429 Too many requests:** keep within 60 requests per minute and 4 concurrent requests or sessions per team.
+- **429 from the AI proxy:** keep within 60 requests per minute and 4 concurrent requests or sessions per team.
 - **An empty `gpt-5-mini` answer:** omit `max_tokens` or use at least 1,000; a very low limit can be consumed by reasoning.
 - **A key or token leaked** (pushed to GitHub, shown on screen): tell the mentor and we replace it.
 
