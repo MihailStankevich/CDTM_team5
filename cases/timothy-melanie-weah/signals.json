@@ -1,36 +1,35 @@
 {
-  "about": "Things that happen around this family, for the hackathon day (Saturday 21 November 2026). Each signal says which moment it is (market, rule, life or decision), whether it is simulated (invented for the exercise) or comes from the family's plan or an official source, what it touches in this family's plan, and where in the case data to look. Simulated events are not real news. Amounts are US dollars.",
-  "as_of": "2026-11-21",
+  "about": "Examples of what a tracker could pick up for this family, to show one possible structure: what happened, which moment it is (market, rule, life or decision), what it touches in this family's plan, and where in the case data to look. All examples are real: a past market shock already in the family's data, the official 2027 tax changes, and a dated moment from the family's plan. They are not today's news and not a list of what to build: what to watch, and from which sources, is up to you. Amounts are US dollars.",
   "family": "timothy-melanie-weah",
   "signals": [
     {
-      "id": "market-ai-chip-selloff",
-      "date": "2026-11-20",
+      "id": "market-liberation-day-tariffs",
+      "date": "2025-04-02",
       "moment": "market",
-      "simulated": true,
-      "headline": "AI chip stocks sell off: Nvidia down 30% in two weeks",
-      "what_happened": "Simulated. Nvidia has fallen 30% in two weeks. Since 6 November the Nasdaq 100 is down 12% and the S&P 500 is down 8%. Commentators ask whether the AI bubble is bursting.",
+      "source": "Past market event in this family's investment analysis",
+      "headline": "Liberation Day tariffs announced: the S&P 500 lost 10% in two days",
+      "what_happened": "The US announced broad reciprocal tariffs (a 10% baseline, 34% on China, 20% on the EU). The S&P 500 lost 10% in two days. Full description in analysis.events.",
       "touches_this_family": [
-        "Technology is 30.0% of Timothy and Melanie's stock holdings, mostly through VTI.",
-        "Closest past shock in the data: when the Liberation Day tariffs were announced (2 Apr 2025) this portfolio fell 7.1%, against 6.2% for a simple mix with the same stock share. A fall that size today would be about $25,600 on $360,000 of investments and cash.",
+        "This portfolio fell 7.1%, against 6.2% for a simple mix with the same stock share. On today's $360,000 of investments and cash, a fall that size is about $25,600.",
         "Worst fall in the last three years: 9.2%, recovered in 37 days.",
         "Longer history: in the Global Financial Crisis (Oct 2007 to Mar 2009) the current mix would have lost 16.8% and the recommended mix 6.1%; in the COVID crash (Feb to Mar 2020) 11.2% and 7.7%.",
-        "Timothy's Roth IRA holds $12,740 of UPRO, a leveraged fund that aims for three times the daily move of the S&P 500, so it falls much faster in a drop (persona D4b).",
+        "Technology is 30.0% of Timothy and Melanie's stock holdings, mostly through VTI.",
+        "Timothy's Roth IRA holds $12,740 of UPRO, a leveraged fund that aims for three times the daily move of the S&P 500 (persona D4b).",
         "$150,000 of the total is cash, which does not fall with the market."
       ],
       "where_in_the_data": [
         "investment-analysis.json: key_metrics.performanceAnalysis.perEventDrawdowns (11 shocks, 2023 to 2026)",
+        "investment-analysis.json: analysis.events (what each shock was)",
         "investment-analysis.json: key_metrics.portfolioAnalysis.marketEnvironments (current mix, 8 periods since 2007)",
         "investment-analysis.json: key_metrics.targetAnalysis.marketEnvironments (recommended mix, same periods)",
-        "investment-analysis.json: key_metrics.concentrationAndDiversification.sectorConcentration",
-        "investment-analysis.json: positions"
+        "investment-analysis.json: key_metrics.concentrationAndDiversification.sectorConcentration, positions"
       ]
     },
     {
       "id": "rule-2027-tax-values",
       "date": "2026-11-05",
       "moment": "rule",
-      "simulated": false,
+      "source": "Official: IRS and SSA",
       "headline": "2027 tax values published: standard deduction, brackets, child tax credit, Social Security wage base",
       "what_happened": "The IRS published the 2027 inflation adjustments on 5 November 2026: standard deduction $16,600 single and $33,200 married filing jointly (from $16,100 and $32,200), brackets indexed, child tax credit $2,300 per child (from $2,200). The Social Security wage base rises to $192,300 for 2027 (from $184,500). They apply from 1 January 2027.",
       "touches_this_family": [
@@ -48,21 +47,18 @@
       ]
     },
     {
-      "id": "decision-cash-question",
-      "date": "2026-11-20",
+      "id": "decision-card-from-cash",
+      "date": null,
       "moment": "decision",
-      "simulated": true,
-      "headline": "Melanie emails: buy the dip with our cash, or pay off the card?",
-      "what_happened": "Simulated. Melanie writes: \"With the market falling, should we move some of our cash into stocks now, or finally pay off the card? Timothy wants to buy, I am not sure.\"",
+      "source": "This family's plan",
+      "headline": "The plan's first move: pay down the 18% card from cash",
+      "what_happened": "The card carries $18,000 at 18% with $300 a month paid, about $270 of it interest; at that pace it is paid off in September 2039. The plan's first move pays it down from cash.",
       "touches_this_family": [
         "Accessible cash is $150,800, about 16 months of essential expenses against a recommended 8 to 9 months; cash above the reserve and the yearly vacation is $60,222.50 (persona D3).",
-        "The card carries $18,000 at 18% with $300 a month paid, about $270 of it interest; at that pace it is paid off in September 2039 (persona D3).",
-        "The plan's first move is paying down the card from cash (financial-health.json: score.top_moves).",
         "Timothy is Growth and Melanie is Moderate; a plan should be explained so both can follow it (case.household, persona D5)."
       ],
       "where_in_the_data": [
-        "financial-health.json: score.top_moves",
-        "financial-health.json: case.household (risk_profile)",
+        "financial-health.json: score.top_moves, case.household (risk_profile)",
         "persona.md: D3, D4, D5"
       ]
     }

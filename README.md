@@ -106,7 +106,7 @@ Each family folder contains:
 | `financial-health.json` | Who the family is (ages, state, tax filing status), their score and why, incomes, accounts, debts, insurance, goals, key metrics, written analysis and yearly projection |
 | `investment-analysis.json` | Accounts and holdings, key metrics and the written investment analysis |
 | `persona.md` | The client profile: wealth, life stage, risk per person (stated, revealed and inferred), how they decide, what drives them, upcoming transitions, concerns **O1, O2...** and tensions **T1, T2...** (sections **D0 to D6**). Its figures match the plan. A starting point for profiling |
-| `signals.json` | Things that happen around the family for the day: a market fall, the 2027 tax changes and life or decision moments, each saying what it touches in their plan and where to look. Events marked `"simulated": true` are invented for the exercise |
+| `signals.json` | Real examples of one possible structure for a tracker: a past market shock, the 2027 tax changes and a dated moment from the plan, each with what it touches in this family's plan and where to look. Not a list of what to build |
 | `legal-values.json` | The same tax and legal values as [`legal/legal-dataset-sample.json`](legal/legal-dataset-sample.json), so you can read them through the MCP |
 | `report.pdf` | The client report, for Timothy and Melanie, Michael, and Daniel and Emily. Samantha's is not included |
 
@@ -114,7 +114,7 @@ All amounts are US dollars.
 
 ## Where to find the signals
 
-Everything below is already in each family's files. Use it to know a family, or to see how something that happens touches them. To start from events, open the family's `signals.json`.
+Everything below is already in each family's files. Use it to know a family, or to see how something that happens touches them. For worked examples of an event and what it touches, open the family's `signals.json`.
 
 | Moment | What to look at | Where | Example |
 |---|---|---|---|
@@ -127,9 +127,9 @@ Everything below is already in each family's files. Use it to know a family, or 
 | **Profiling** | Risk per person, how they decide, what worries them | `case.household[].risk_profile`; `persona.md` D4 to D6, concerns and tensions | Timothy is Growth, Melanie is Moderate |
 | **A big decision** | What the plan recommends, and how each step moves the score | `score.top_moves`, `narrative.summary_recommendations` | Each move with its score before and after |
 | **A rule changes** | Tax and legal values with official sources | [`legal/legal-dataset-sample.json`](legal/legal-dataset-sample.json), or `legal-values.json` in each family folder | Social Security wage base 2027: $192,300 |
-| **Something happens** | A market fall, the 2027 tax changes and life or decision moments, with what each touches in this family's plan | `signals.json` | Samantha's employer announces layoffs (simulated): she is the only earner, with 7.9 months of essential expenses in cash |
+| **Something happens** | Real examples of an event and what it touches in this family's plan | `signals.json` | The 2027 wage base: Samantha's Social Security tax rises by about $484 |
 
-Not in the data: employers' names and social profiles. Simulate them and say so in your README; `signals.json` has a few simulated ones to start from.
+Not in the data: employers' names and social profiles. Simulate them and say so in your README.
 
 ## Legal values (one possible source)
 
@@ -262,7 +262,7 @@ console.log(JSON.parse(r.content[0].text).value.summary_main);
 
 ### 4. Legal values through the MCP
 
-Each family has a `legal-values` part with the same values as [`legal/legal-dataset-sample.json`](legal/legal-dataset-sample.json): `get_case` with `caseId` and `part: "legal-values"`, plus `section` for one table (for example `SSWageBaseByYear`). The day's events are the `signals` part.
+Each family has a `legal-values` part with the same values as [`legal/legal-dataset-sample.json`](legal/legal-dataset-sample.json): `get_case` with `caseId` and `part: "legal-values"`, plus `section` for one table (for example `SSWageBaseByYear`). The worked examples are the `signals` part.
 
 ### Troubleshooting
 
