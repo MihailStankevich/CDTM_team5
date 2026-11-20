@@ -166,17 +166,6 @@ What you hand in:
 2. **GitHub repo** with your working MVP and a README: the problems you chose, what you built, how to run it, what it uses, and which parts are simulated. It runs on the supplied families and can cover one part (profiling, tracker, content library, communications) or several; you do not need to build the whole chain.
 3. **Demo video** showing what the family and the advisor experience with your MVP.
 
-## How the jury scores
-
-The jury uses the common CDTM Valencia Hacks rubric, the same for every challenge:
-
-| Weight | Criterion |
-|---|---|
-| 30% | Technical execution |
-| 25% | Solving the challenge |
-| 25% | Impact and business |
-| 20% | Pitch |
-
 ## Prize
 
 <p align="center">
