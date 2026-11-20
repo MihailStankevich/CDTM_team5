@@ -158,7 +158,7 @@ Each family's salaries, ages, children, state and filing status are in its `fina
 | Before 16:45 | **Hand-in**, one per team, on **Polievalúa**: pitch deck, GitHub repo link and demo video |
 | 17:00 to 19:00 | **Pitches and awards**: 3 minutes per team plus 2 minutes of questions |
 
-Teams of three; CDTM matches you with your team. Everything happens in English: code, README and pitch. Agenda from [vlc.hacks.cdtm.com](https://vlc.hacks.cdtm.com/).
+Teams of five; CDTM matches you with your team. Everything happens in English: code, README and pitch. Agenda from [vlc.hacks.cdtm.com](https://vlc.hacks.cdtm.com/).
 
 What you hand in:
 
