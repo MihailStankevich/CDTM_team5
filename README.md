@@ -15,7 +15,7 @@
 **[CDTM VLC Hacks x Sherpas Wealth on Discord](https://discord.gg/mCHYWRhFw)** is where the day happens. Scan the code or click the link:
 
 - **Announcements and rules**: accept the rules in #welcome to see the rest
-- **Your team's private channels**: accept the rules in #welcome, then one of you runs `/team create` and `/team add` for each teammate. If the organisers give you a team code, press **I have a team code** instead (or type `/join`)
+- **Your team's private channels**: in #welcome press **Join my team** and type the email you registered with for CDTM Valencia Hacks. You go straight into your team's private text and voice channels, which only your team, the mentors and the organisers can see
 - **Questions**: the #help forum, or `/mentor` in your team channel to call the Sherpas mentor
 - **Your idea** with `/idea` (type `/help` for all commands). The official hand-in is on Polievalúa, see [Your day](#your-day-and-what-you-hand-in)
 
