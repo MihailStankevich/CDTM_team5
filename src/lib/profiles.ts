@@ -38,13 +38,17 @@ function parsePersona(md: string): PersonaHooks {
   const anchorMatch = md.match(/## D6: Motivational anchor\s*\n\n([^\n]+)/i);
 
   const concerns: string[] = [];
-  for (const m of md.matchAll(/\*\*(O\d+[^*]*)\*\*/g)) {
-    concerns.push(m[1].replace(/\s+/g, " ").trim());
+  for (const m of md.matchAll(/\*\*(O\d+[^*]*)\*\*\s*([^\n]*)/g)) {
+    const label = m[1].replace(/\s+/g, " ").trim();
+    const rest = m[2].replace(/\s+/g, " ").trim();
+    concerns.push(rest ? `${label} ${rest}` : label);
   }
 
   const tensions: string[] = [];
-  for (const m of md.matchAll(/\*\*(T\d+[^*]*)\*\*/g)) {
-    tensions.push(m[1].replace(/\s+/g, " ").trim());
+  for (const m of md.matchAll(/\*\*(T\d+[^*]*)\*\*\s*([^\n]*)/g)) {
+    const label = m[1].replace(/\s+/g, " ").trim();
+    const rest = m[2].replace(/\s+/g, " ").trim();
+    tensions.push(rest ? `${label} ${rest}` : label);
   }
 
   return {

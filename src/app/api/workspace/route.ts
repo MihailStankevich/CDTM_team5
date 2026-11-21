@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { allMessages, readInbox } from "@/lib/inbox/state";
 import { THREADS } from "@/lib/inbox/seed";
+import { mapPool, writeClientNote } from "@/lib/draft/generator";
 import { buildNurture } from "@/lib/nurture/build";
 import { loadAllProfiles } from "@/lib/profiles";
 
@@ -12,6 +13,22 @@ export async function GET() {
   const nurture = buildNurture(profiles).filter(
     (n) => !inbox.dismissedIds.includes(n.id) && !inbox.approvedIds.includes(n.id),
   );
+
+  await mapPool(nurture, 3, async (item) => {
+    const profile = profiles.find((p) => p.slug === item.slug);
+    const name =
+      profile?.members.find((m) => m.role === "client")?.firstName ?? item.displayName;
+    const written = await writeClientNote({
+      cacheKey: `${item.id}:${item.why}`,
+      clientName: name,
+      voice: item.tone,
+      situation: item.title,
+      facts: [item.why, ...item.body.split("\n").filter((line) => line && !line.startsWith("Hi "))],
+    });
+    if (!written) return;
+    item.subject = written.subject;
+    item.body = written.body;
+  });
   const messages = allMessages();
   const threads = THREADS.map((t) => {
     const profile = profiles.find((p) => p.slug === t.slug);
@@ -41,31 +58,5 @@ export async function GET() {
     nurture,
     threads,
     counts,
-    sources: [
-      {
-        name: "News",
-        status: "Live wires",
-        detail:
-          "Headlines pulled now from Yahoo Finance, CNBC, and Google News on rates, technology, trade, and tax. A story stays on the desk only if it touches a fund or a rule on a plan. Past shocks in the case files are optional.",
-      },
-      {
-        name: "Funds & holdings",
-        status: "From the plan",
-        detail:
-          "Tickers, sectors, and past drawdowns come from investment-analysis.json. We do not scrape live fund NAVs.",
-      },
-      {
-        name: "LinkedIn",
-        status: "Simulated",
-        detail:
-          "Employer, title, and posts are simulated per family. The challenge forbids scraping real people.",
-      },
-      {
-        name: "Chats",
-        status: "Simulated inbox",
-        detail:
-          "WhatsApp, email, and Telegram threads are demo conversations in one advisor inbox. Inbound text updates the client record the same way a meeting transcript does.",
-      },
-    ],
   });
 }

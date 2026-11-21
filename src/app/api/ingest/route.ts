@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  const store = await ingest("rss");
+  const store = await ingest("replay");
   return NextResponse.json({
     ok: true,
     meta: store.meta,

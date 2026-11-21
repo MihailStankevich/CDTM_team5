@@ -1,24 +1,20 @@
-import { generateDraft, maybePolishWithLlm } from "./draft/generator";
+import { composeDraft, generateDraft, mapPool } from "./draft/generator";
 import { matchSignalToFamilies } from "./match/scorer";
 import { fetchRssSignals } from "./news/rss";
-import { loadHoldingSignals } from "./news/holdings";
 import { loadReplaySignals, loadRuleSignal } from "./news/replay";
 import { loadAllProfiles } from "./profiles";
-import type { FamilyImpact, IngestResult, MessageDraft, NewsSignal } from "./types";
+import type { ClientProfile, FamilyImpact, IngestResult, MessageDraft, NewsSignal } from "./types";
 
 export type IngestMode = "replay" | "rss" | "both";
 
-export async function runPipeline(mode: IngestMode = "rss"): Promise<IngestResult> {
+export async function runPipeline(mode: IngestMode = "replay"): Promise<IngestResult> {
   const profiles = loadAllProfiles();
   const signals: NewsSignal[] = [];
 
-  // The book and the published 2027 tax tables are always on the desk.
-  signals.push(...loadHoldingSignals(profiles));
-  signals.push(loadRuleSignal());
-
-  // Past shocks already written into the case files. Not today's news.
+  // Past shocks written into the case files, plus the 2027 tax tables.
   if (mode === "replay" || mode === "both") {
     signals.push(...loadReplaySignals(8));
+    signals.push(loadRuleSignal());
   }
 
   let feeds: { label: string; ok: boolean; count: number }[] = [];
@@ -44,6 +40,8 @@ export async function runPipeline(mode: IngestMode = "rss"): Promise<IngestResul
   const drafts: MessageDraft[] = [];
   const allMatched: FamilyImpact[] = [];
 
+  const pending: { signal: NewsSignal; profile: ClientProfile; draft: MessageDraft }[] = [];
+
   for (const signal of unique) {
     const matched = matchSignalToFamilies(signal, profiles);
     impactsBySignal[signal.id] = matched;
@@ -51,11 +49,17 @@ export async function runPipeline(mode: IngestMode = "rss"): Promise<IngestResul
 
     for (const impact of matched) {
       const profile = profiles.find((p) => p.slug === impact.slug)!;
-      let draft = generateDraft(signal, impact, profile);
-      draft = await maybePolishWithLlm(draft, signal);
+      const draft = generateDraft(signal, impact, profile);
       drafts.push(draft);
+      pending.push({ signal, profile, draft });
     }
   }
+
+  await mapPool(pending, 3, async (job) => {
+    const written = await composeDraft(job.draft, job.signal, job.profile);
+    job.draft.subject = written.subject;
+    job.draft.body = written.body;
+  });
 
   drafts.sort((a, b) => b.impactScore - a.impactScore);
 

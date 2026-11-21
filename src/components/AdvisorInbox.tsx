@@ -48,7 +48,7 @@ export default function AdvisorInbox() {
   const [store, setStore] = useState<AdvisorStore | null>(null);
   const [selectedSignalId, setSelectedSignalId] = useState<string | null>(null);
   const [selectedDraftId, setSelectedDraftId] = useState<string | null>(null);
-  const [includeHistory, setIncludeHistory] = useState(false);
+  const [desk, setDesk] = useState<"replay" | "rss">("replay");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const [editBody, setEditBody] = useState("");
@@ -80,14 +80,15 @@ export default function AdvisorInbox() {
   }, []);
 
   const runIngest = useCallback(
-    (withHistory: boolean) => {
+    (next: "replay" | "rss") => {
+      setDesk(next);
       setError(null);
       startTransition(async () => {
         try {
           const res = await fetch("/api/ingest", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mode: withHistory ? "both" : "rss" }),
+            body: JSON.stringify({ mode: next }),
           });
           const data = await res.json();
           if (!data.ok) throw new Error(data.error || "Ingest failed");
@@ -101,7 +102,7 @@ export default function AdvisorInbox() {
   );
 
   useEffect(() => {
-    runIngest(false);
+    runIngest("replay");
   }, [runIngest]);
 
   const selectedSignal = useMemo(
@@ -178,22 +179,33 @@ export default function AdvisorInbox() {
             </p>
           </div>
           <div className="flex flex-col items-start gap-2 sm:items-end">
-            <button
-              type="button"
-              disabled={pending}
-              onClick={() => runIngest(includeHistory)}
-              className="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-deep disabled:opacity-60"
-            >
-              {pending ? "Reading the wires…" : "Pull live headlines"}
-            </button>
-            <label className="flex items-center gap-2 text-xs text-muted">
-              <input
-                type="checkbox"
-                checked={includeHistory}
-                onChange={(e) => setIncludeHistory(e.target.checked)}
-              />
-              Also show past shocks already saved in the plans
-            </label>
+            <div className="inline-flex rounded-lg border border-line bg-paper p-0.5">
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => runIngest("replay")}
+                className={`rounded-md px-3 py-1.5 text-sm font-semibold disabled:opacity-60 ${
+                  desk === "replay" ? "bg-ink text-paper" : "text-ink-soft"
+                }`}
+              >
+                {pending && desk === "replay" ? "Loading shocks…" : "Past shocks"}
+              </button>
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => runIngest("rss")}
+                className={`rounded-md px-3 py-1.5 text-sm font-semibold disabled:opacity-60 ${
+                  desk === "rss" ? "bg-ink text-paper" : "text-ink-soft"
+                }`}
+              >
+                {pending && desk === "rss" ? "Reading the wires…" : "Live headlines"}
+              </button>
+            </div>
+            <p className="max-w-xs text-right text-xs text-muted">
+              {desk === "replay"
+                ? "Liberation Day, the Fed, DeepSeek, Iran, and the other shocks saved on each plan."
+                : "Yahoo Finance, CNBC, and Google News, pulled now. A story stays only if it touches a fund or a rule."}
+            </p>
           </div>
         </div>
       </header>
@@ -226,7 +238,9 @@ export default function AdvisorInbox() {
           <div className="rounded-xl border border-dashed border-line bg-white/50 px-6 py-16 text-center">
             <p className="display text-xl text-ink">No signals yet</p>
             <p className="mt-2 text-sm text-muted">
-              Pull live headlines. We only keep a story when it touches a fund or a tax rule on a plan.
+              {desk === "rss"
+                ? "No live story touched a fund or a tax rule on a plan."
+                : "Past shocks from the plans will show here."}
             </p>
           </div>
         ) : (
@@ -289,7 +303,7 @@ export default function AdvisorInbox() {
                                     ? "Live headline"
                                     : signal.source === "rule"
                                       ? "Tax tables"
-                                      : "Past example"}
+                                      : "Past shock"}
                               </span>
                               <span className="rounded-full bg-paper-2 px-2 py-0.5 text-[10px] font-medium">
                                 {drafts.length} {drafts.length === 1 ? "family" : "families"}
@@ -472,7 +486,7 @@ export default function AdvisorInbox() {
                       {selectedDraft.status === "approved" && (
                         <div className="mt-5 rounded-lg border border-emerald-200 bg-emerald-50/80 p-4">
                           <p className="text-xs font-semibold uppercase tracking-wide text-ok">
-                            Client preview · ready to send (simulated)
+                            Ready to send
                           </p>
                           <p className="mt-2 text-sm font-semibold">{editSubject}</p>
                           <pre className="mt-2 whitespace-pre-wrap font-sans text-sm leading-relaxed text-ink-soft">
@@ -495,9 +509,10 @@ export default function AdvisorInbox() {
         <footer className="mt-10 border-t border-line pt-4 text-xs text-muted">
           {store?.meta && (
             <p>
-              Last pull: {new Date(store.meta.generatedAt).toLocaleString()}. Read{" "}
-              {store.meta.liveRead ?? 0} live headlines, kept {store.meta.liveKept ?? 0} that touch
-              a family. Messages are never auto-sent.
+              {store.meta.mode === "rss"
+                ? `Last pull: ${new Date(store.meta.generatedAt).toLocaleString()}. Read ${store.meta.liveRead ?? 0} live headlines, kept ${store.meta.liveKept ?? 0} that touch a family.`
+                : `Past shocks from the plans. Updated ${new Date(store.meta.generatedAt).toLocaleString()}.`}{" "}
+              Messages are never auto-sent.
               {store.meta.feeds && store.meta.feeds.length > 0 && (
                 <span className="mt-1 block">
                   {store.meta.feeds

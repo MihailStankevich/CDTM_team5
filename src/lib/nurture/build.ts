@@ -109,9 +109,15 @@ function careerCopy(profile: ClientProfile): NurtureItem | null {
 
   const voice = voiceFor(profile);
   const name = firstName(profile);
+  const company = linked.company
+    .replace(/\s*\(\s*simulated\s*\)/gi, "")
+    .replace(/\s*[—–-]+\s*simulated\b/gi, "")
+    .replace(/\bsimulated\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
   const fromChat = chat
-    ? "They already told you in chat."
-    : "Simulated LinkedIn shows a title above the role assumed in the plan.";
+    ? "They already told you."
+    : "Title looks higher than the role the plan assumed.";
 
   return {
     id: `career-${profile.slug}`,
@@ -121,7 +127,7 @@ function careerCopy(profile: ClientProfile): NurtureItem | null {
     channel: voice.channel,
     tone: voice.label,
     title: "Pay may have stepped up — offer a plan update",
-    why: `${fromChat} Title on file: ${linked.title} at ${linked.company}.`,
+    why: `${fromChat} ${linked.title} at ${company}.`,
     subject: `${name}, if the raise is real we should rebase the plan`,
     body: [
       `Hi ${name},`,

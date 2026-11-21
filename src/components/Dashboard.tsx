@@ -4,32 +4,15 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Channel, NurtureItem } from "@/lib/types";
 
-interface ThreadCard {
-  slug: string;
-  channel: Channel;
-  displayName: string;
-  waiting: boolean;
-  count: number;
-  last?: { body: string; direction: "in" | "out"; at: string };
-}
-
-interface Source {
-  name: string;
-  status: string;
-  detail: string;
-}
-
 interface Workspace {
   nurture: NurtureItem[];
-  threads: ThreadCard[];
-  counts: { waiting: number; nurture: number; email: number; whatsapp: number; telegram: number };
-  sources: Source[];
+  counts: { waiting: number; nurture: number };
 }
 
 const KIND = {
   market_calm: { label: "Calm the drop", blurb: "They should hear it from you, not from the headline." },
   milestone: { label: "Life dates", blurb: "Birthdays and ages already in the plan." },
-  career: { label: "Pay & role", blurb: "Chat or simulated LinkedIn says income may have changed." },
+  career: { label: "Pay & role", blurb: "Income or title looks different from the plan." },
   chat: { label: "From chat", blurb: "Something they already told you." },
 } as const;
 
@@ -66,13 +49,6 @@ export default function Dashboard() {
       .filter((g) => g.items.length);
   }, [data]);
 
-  const byChannel = useMemo(() => {
-    const threads = data?.threads ?? [];
-    return (["whatsapp", "email", "telegram"] as Channel[])
-      .map((channel) => ({ channel, threads: threads.filter((t) => t.channel === channel) }))
-      .filter((g) => g.threads.length);
-  }, [data]);
-
   async function act(action: "approve" | "dismiss" | "sync", nurtureId?: string) {
     setBusy(nurtureId ?? action);
     setError(null);
@@ -91,7 +67,7 @@ export default function Dashboard() {
             : "Chats read — no new life events this pass.",
         );
       }
-      if (action === "approve") setNote("Approved. It now sits in their channel thread as sent (simulated).");
+      if (action === "approve") setNote("Approved. It is in their inbox.");
       load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed");
@@ -105,10 +81,9 @@ export default function Dashboard() {
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-xs uppercase tracking-[0.18em] text-muted">Advisor workspace</p>
-          <h1 className="display mt-1 text-3xl font-semibold tracking-tight">Today</h1>
+          <h1 className="display mt-1 text-3xl font-semibold tracking-tight">Life and pay</h1>
           <p className="mt-2 max-w-xl text-sm text-muted">
-            One queue for what to say, grouped by why — a drop, a birthday, a raise — and one inbox
-            for every channel they already use.
+            Dates and pay changes worth a note. Market messages stay on Markets.
           </p>
         </div>
         <div className="flex gap-2">
@@ -140,12 +115,10 @@ export default function Dashboard() {
         </p>
       )}
 
-      <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <section className="mt-6 grid grid-cols-2 gap-3">
         {[
           { label: "Waiting on you", value: data?.counts.waiting ?? "—" },
-          { label: "Drafts to approve", value: data?.counts.nurture ?? "—" },
-          { label: "WhatsApp", value: data?.counts.whatsapp ?? "—" },
-          { label: "Email + Telegram", value: data ? data.counts.email + data.counts.telegram : "—" },
+          { label: "Notes to approve", value: data?.counts.nurture ?? "—" },
         ].map((s) => (
           <div key={s.label} className="rounded-xl border border-line bg-white px-4 py-3">
             <p className="text-[11px] uppercase tracking-wide text-muted">{s.label}</p>
@@ -156,7 +129,7 @@ export default function Dashboard() {
 
       <section className="mt-8">
         <div className="mb-3 flex items-baseline justify-between">
-          <h2 className="display text-xl font-semibold">Life and pay</h2>
+          <h2 className="display text-xl font-semibold">Notes to approve</h2>
           <Link href="/" className="text-sm font-medium text-accent hover:underline">
             Market, sector, and legislation drafts are on Markets →
           </Link>
@@ -224,54 +197,6 @@ export default function Dashboard() {
             ))}
           </div>
         )}
-      </section>
-
-      <section className="mt-10">
-        <h2 className="display text-xl font-semibold">Conversations, one place</h2>
-        <p className="mt-1 text-xs text-muted">
-          WhatsApp, email, and Telegram stay in their channel, but you read them together.
-        </p>
-        <div className="mt-3 grid gap-4 lg:grid-cols-3">
-          {byChannel.map((group) => (
-            <div key={group.channel} className="rounded-xl border border-line bg-white p-4">
-              <h3 className="text-sm font-semibold">{CHANNEL_LABEL[group.channel]}</h3>
-              <ul className="mt-3 space-y-3">
-                {group.threads.map((t) => (
-                  <li key={t.slug}>
-                    <Link href={`/inbox?slug=${t.slug}`} className="block">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-sm font-medium">{t.displayName}</span>
-                        {t.waiting && (
-                          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-900">
-                            reply
-                          </span>
-                        )}
-                      </div>
-                      <p className="mt-1 line-clamp-2 text-xs text-muted">
-                        {t.last?.body ?? "No messages yet"}
-                      </p>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-10 mb-6">
-        <h2 className="display text-xl font-semibold">Where the facts come from</h2>
-        <ul className="mt-3 grid gap-3 sm:grid-cols-2">
-          {(data?.sources ?? []).map((s) => (
-            <li key={s.name} className="rounded-xl border border-line bg-white px-4 py-3">
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-sm font-semibold">{s.name}</p>
-                <span className="text-[10px] uppercase tracking-wide text-muted">{s.status}</span>
-              </div>
-              <p className="mt-1 text-xs leading-relaxed text-muted">{s.detail}</p>
-            </li>
-          ))}
-        </ul>
       </section>
     </div>
   );

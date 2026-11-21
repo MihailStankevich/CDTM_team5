@@ -144,7 +144,7 @@ export default function UnifiedInbox() {
             <header className="flex items-center justify-between border-b border-line bg-white px-5 py-3">
               <div>
                 <p className="text-sm font-semibold">{active.displayName}</p>
-                <p className="text-xs text-muted">{CHANNEL_LABEL[active.channel]} · simulated</p>
+                <p className="text-xs text-muted">{CHANNEL_LABEL[active.channel]}</p>
               </div>
               <Link href={`/clients/${active.slug}`} className="text-xs font-semibold text-accent hover:underline">
                 Open profile

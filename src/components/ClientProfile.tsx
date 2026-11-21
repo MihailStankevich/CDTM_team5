@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition, type ReactNode } from "react";
 import type { ClientCrmState, ClientProfile as Profile, LinkedInSim } from "@/lib/types";
 
 interface HouseholdMember {
@@ -18,6 +18,33 @@ interface Payload {
   crm: ClientCrmState;
   linkedIn: LinkedInSim;
   household: HouseholdMember[];
+}
+
+function filing(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function plainOrg(value: string) {
+  return value
+    .replace(/\s*\(\s*simulated\s*\)/gi, "")
+    .replace(/\s*[—–-]+\s*simulated\b/gi, "")
+    .replace(/\bsimulated\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="rounded-xl border border-line bg-white">
+      <h2 className="border-b border-line px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-muted">
+        {title}
+      </h2>
+      <div className="px-4 py-3">{children}</div>
+    </section>
+  );
 }
 
 const EVENT_LABEL: Record<string, string> = {
@@ -153,331 +180,318 @@ export default function ClientProfileView({ slug }: { slug: string }) {
   }
 
   if (!data) {
-    return (
-      <div className="mx-auto max-w-7xl px-5 py-16 text-sm text-muted">
-        {error || "Loading client…"}
-      </div>
-    );
+    return <div className="px-6 py-16 text-sm text-muted">{error || "Loading…"}</div>;
   }
 
   const { profile, crm, linkedIn, household } = data;
+  const money = (n: number) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
+  const pct = (n: number) => `${(n * 100).toFixed(1)}%`;
+  const updates = crm.updates.filter(
+    (u, i, all) => all.findIndex((other) => other.summary === u.summary) === i,
+  );
+  const sectors = [...profile.sectors].sort((a, b) => b.weight - a.weight);
+  const shocks = [...profile.drawdowns].sort((a, b) => a.drawdownPct - b.drawdownPct);
 
   return (
-    <div className="mx-auto max-w-7xl px-5 py-8">
+    <div className="mx-auto max-w-6xl px-6 py-8">
       <Link href="/clients" className="text-xs font-medium text-accent hover:underline">
-        ← All clients
+        Clients
       </Link>
-
-      <header className="animate-rise mt-3 flex flex-col gap-4 border-b border-line pb-6 sm:flex-row sm:items-end sm:justify-between">
+      <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-muted">Client profile</p>
-          <h1 className="display mt-1 text-3xl font-semibold sm:text-4xl">{profile.displayName}</h1>
+          <h1 className="display text-3xl font-semibold">{profile.displayName}</h1>
           <p className="mt-1 text-sm text-muted">
-            {profile.city}, {profile.state} · {profile.taxFilingStatus.replace(/_/g, " ")} · score{" "}
+            {profile.city}, {profile.state} · {filing(profile.taxFilingStatus)} · score{" "}
             {profile.score}
           </p>
           {crm.tags.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {crm.tags.map((t) => (
-                <span
-                  key={t}
-                  className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-900"
-                >
-                  {t}
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {crm.tags.map((tag) => (
+                <span key={tag} className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-900">
+                  {tag}
                 </span>
               ))}
             </div>
           )}
         </div>
-        <Link
-          href="/"
-          className="rounded-md border border-accent px-3 py-2 text-sm font-semibold text-accent hover:bg-accent hover:text-white"
-        >
-          News for this book →
+        <Link href="/" className="text-sm font-semibold text-accent">
+          Markets
         </Link>
-      </header>
+      </div>
 
-      {error && (
-        <p className="mt-4 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-900">
-          {error}
-        </p>
-      )}
-      {lastResult && (
-        <p className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
-          {lastResult}
-        </p>
-      )}
+      <dl className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {[
+          ["Salary", money(profile.salaryTotal)],
+          ["Invested", money(Math.round(profile.investableApprox))],
+          ["Equity sleeve", money(Math.round(profile.equityValue))],
+          ["2027 wage base", profile.aboveSsWageBase2027 ? "Above" : "Below"],
+        ].map(([label, value]) => (
+          <div key={label} className="rounded-xl border border-line bg-white px-3 py-3">
+            <dt className="text-[11px] uppercase tracking-wide text-muted">{label}</dt>
+            <dd className="mt-1 text-sm font-semibold">{value}</dd>
+          </div>
+        ))}
+      </dl>
 
-      <div className="mt-6 grid gap-5 lg:grid-cols-12">
-        {/* Left: personal + household */}
-        <section className="animate-rise space-y-4 lg:col-span-4">
-          <div className="rounded-xl border border-line bg-white p-5 shadow-sm">
-            <h2 className="display text-lg font-semibold">Household</h2>
-            <ul className="mt-3 space-y-2">
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        <Section title="Household">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-[11px] uppercase tracking-wide text-muted">
+                <th className="pb-2 font-medium">Name</th>
+                <th className="pb-2 font-medium">Age</th>
+                <th className="pb-2 font-medium">Role</th>
+                <th className="pb-2 font-medium">Risk</th>
+              </tr>
+            </thead>
+            <tbody>
               {household.map((m) => (
-                <li
-                  key={`${m.source}-${m.firstName}-${m.role}`}
-                  className="flex items-start justify-between gap-2 border-b border-line/60 pb-2 text-sm last:border-0"
-                >
-                  <div>
-                    <p className="font-medium text-ink">
-                      {m.firstName}{" "}
-                      <span className="text-xs font-normal text-muted">({m.role})</span>
-                    </p>
-                    {m.note && <p className="mt-0.5 text-xs text-muted">{m.note}</p>}
+                <tr key={`${m.source}-${m.firstName}-${m.role}`} className="border-t border-line">
+                  <td className="py-2 font-medium">
+                    {m.firstName}
+                    {m.note ? <span className="mt-0.5 block text-xs font-normal text-muted">{m.note}</span> : null}
+                  </td>
+                  <td className="py-2 tabular-nums">{m.age ?? "—"}</td>
+                  <td className="py-2 capitalize">{m.role.replace(/_/g, " ")}</td>
+                  <td className="py-2 text-ink-soft">{m.riskProfile || "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Section>
+
+        <Section title="Work">
+          <p className="text-sm font-semibold">{linkedIn.title}</p>
+          <p className="mt-0.5 text-sm text-muted">
+            {plainOrg(linkedIn.company)} · {linkedIn.location}
+          </p>
+          <p className="mt-2 text-sm text-ink-soft">{linkedIn.about}</p>
+          <p className="mt-2 text-xs text-muted">{linkedIn.skills.join(" · ")}</p>
+          <ul className="mt-3 space-y-2 border-t border-line pt-3">
+            {linkedIn.recentActivity.map((post) => (
+              <li key={post.date + post.text} className="text-sm">
+                <span className="text-xs text-muted">{post.date}</span>
+                <p>{post.text}</p>
+                {post.signal && <p className="text-xs text-ink-soft">{post.signal}</p>}
+              </li>
+            ))}
+          </ul>
+        </Section>
+
+        <Section title="Holdings">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-[11px] uppercase tracking-wide text-muted">
+                <th className="pb-2 font-medium">Ticker</th>
+                <th className="pb-2 font-medium">Name</th>
+                <th className="pb-2 text-right font-medium">Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {profile.holdings.map((h) => (
+                <tr key={`${h.ticker}-${h.account}`} className="border-t border-line">
+                  <td className="py-1.5 font-medium">{h.ticker}</td>
+                  <td className="py-1.5 text-ink-soft">
+                    {h.name}
+                    <span className="block text-xs text-muted">
+                      {h.type}
+                      {h.category ? ` · ${h.category}` : ""} · {h.account}
+                    </span>
+                  </td>
+                  <td className="py-1.5 text-right tabular-nums">{money(h.value)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Section>
+
+        <div className="space-y-4">
+          <Section title="Sectors">
+            <ul className="space-y-2">
+              {sectors.map((s) => (
+                <li key={s.sector}>
+                  <div className="flex items-baseline justify-between gap-3 text-sm">
+                    <span>{s.sector}</span>
+                    <span className="tabular-nums text-muted">{pct(s.weight)}</span>
                   </div>
-                  <div className="text-right text-xs text-muted">
-                    {m.age !== undefined && <div>age {m.age}</div>}
-                    <div
-                      className={
-                        m.source === "meeting" ? "font-medium text-accent" : ""
-                      }
-                    >
-                      {m.source === "meeting" ? "from meeting" : m.riskProfile || "plan"}
-                    </div>
+                  <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-paper-2">
+                    <div className="h-full rounded-full bg-accent" style={{ width: `${Math.min(100, s.weight * 100)}%` }} />
                   </div>
+                  <p className="mt-0.5 text-xs text-muted">
+                    {s.severity}
+                    {s.driver ? ` · ${s.driver}` : ""}
+                  </p>
                 </li>
               ))}
             </ul>
-          </div>
-
-          <div className="rounded-xl border border-line bg-white p-5 shadow-sm">
-            <h2 className="display text-lg font-semibold">How they decide</h2>
-            <dl className="mt-3 space-y-2 text-sm">
-              <div>
-                <dt className="text-xs uppercase tracking-wide text-muted">Style</dt>
-                <dd className="text-ink-soft">{profile.persona.decisionStyle}</dd>
-              </div>
-              <div>
-                <dt className="text-xs uppercase tracking-wide text-muted">Risk</dt>
-                <dd className="text-ink-soft">{profile.persona.riskOrientation}</dd>
-              </div>
-              <div>
-                <dt className="text-xs uppercase tracking-wide text-muted">Anchor</dt>
-                <dd className="text-ink-soft">{profile.persona.motivationalAnchor || "—"}</dd>
-              </div>
-            </dl>
-            <h3 className="mt-4 text-xs font-semibold uppercase tracking-wide text-muted">
-              Open concerns
-            </h3>
-            <ul className="mt-2 space-y-1.5 text-sm text-ink-soft">
-              {profile.persona.concerns.slice(0, 5).map((c) => (
-                <li key={c} className="flex gap-2">
-                  <span className="text-accent">▸</span>
-                  <span>{c}</span>
+          </Section>
+          <Section title="Goals">
+            <ul className="divide-y divide-line">
+              {profile.goals.map((g) => (
+                <li key={`${g.name}-${g.date}`} className="flex items-baseline justify-between gap-3 py-2 text-sm">
+                  <span>
+                    {g.name}
+                    <span className="block text-xs text-muted">{g.goalType.replace(/_/g, " ")}</span>
+                  </span>
+                  <span className="text-right text-xs text-muted">
+                    {g.date}
+                    <span className="block tabular-nums">{g.monthsAway} mo</span>
+                  </span>
                 </li>
               ))}
             </ul>
-          </div>
+          </Section>
+        </div>
 
-          <div className="rounded-xl border border-line bg-white p-5 shadow-sm">
-            <h2 className="display text-lg font-semibold">Advisor notes</h2>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              rows={4}
-              placeholder="Private notes — tone, family context, follow-ups…"
-              className="mt-2 w-full rounded-md border border-line bg-paper px-3 py-2 text-sm"
-            />
+        <Section title="How they decide">
+          <dl className="grid gap-3 text-sm sm:grid-cols-2">
+            <div>
+              <dt className="text-[11px] uppercase tracking-wide text-muted">Style</dt>
+              <dd>{profile.persona.decisionStyle}</dd>
+            </div>
+            <div>
+              <dt className="text-[11px] uppercase tracking-wide text-muted">Risk</dt>
+              <dd>{profile.persona.riskOrientation}</dd>
+            </div>
+          </dl>
+          <p className="mt-3 text-[11px] uppercase tracking-wide text-muted">Concerns</p>
+          <ul className="mt-1 list-disc space-y-1 pl-4 text-sm text-ink-soft">
+            {profile.persona.concerns.map((c) => (
+              <li key={c}>{c}</li>
+            ))}
+          </ul>
+          {profile.persona.tensions.length > 0 && (
+            <>
+              <p className="mt-3 text-[11px] uppercase tracking-wide text-muted">Tensions</p>
+              <ul className="mt-1 list-disc space-y-1 pl-4 text-sm text-ink-soft">
+                {profile.persona.tensions.map((t) => (
+                  <li key={t}>{t}</li>
+                ))}
+              </ul>
+            </>
+          )}
+          {profile.persona.motivationalAnchor && (
+            <p className="mt-3 text-sm">
+              <span className="text-[11px] uppercase tracking-wide text-muted">Anchor. </span>
+              {profile.persona.motivationalAnchor}
+            </p>
+          )}
+        </Section>
+
+        <Section title="Past shocks">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-[11px] uppercase tracking-wide text-muted">
+                <th className="pb-2 font-medium">Event</th>
+                <th className="pb-2 text-right font-medium">Drop</th>
+                <th className="pb-2 text-right font-medium">Recovery</th>
+              </tr>
+            </thead>
+            <tbody>
+              {shocks.map((e) => (
+                <tr key={e.eventTitle} className="border-t border-line">
+                  <td className="py-1.5">
+                    {e.eventTitle}
+                    <span className="block text-xs text-muted">{e.eventDate.slice(0, 10)}</span>
+                  </td>
+                  <td className="py-1.5 text-right tabular-nums">{pct(e.drawdownPct)}</td>
+                  <td className="py-1.5 text-right tabular-nums text-muted">
+                    {e.recoveryDays != null ? `${e.recoveryDays}d` : "—"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Section>
+      </div>
+
+      {(updates.length > 0 || crm.personalFacts.length > 0) && (
+        <div className="mt-4">
+          <Section title="Learned since the plan">
+            <ul className="space-y-2 text-sm">
+              {crm.personalFacts.map((fact) => (
+                <li key={fact}>{fact}</li>
+              ))}
+              {updates.map((u) => (
+                <li key={u.id}>
+                  <span className="font-medium">{EVENT_LABEL[u.eventType] || u.eventType}.</span> {u.summary}
+                </li>
+              ))}
+            </ul>
+          </Section>
+        </div>
+      )}
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        <Section title="Advisor note">
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={4}
+            placeholder="Private note"
+            className="w-full rounded-md border border-line bg-paper px-3 py-2 text-sm"
+          />
+          <button
+            type="button"
+            onClick={() => saveNotes().catch((e) => setError(e.message))}
+            className="mt-2 text-xs font-semibold text-accent"
+          >
+            Save note
+          </button>
+        </Section>
+
+        <Section title="Meetings">
+          {lastResult && <p className="mb-2 text-xs text-ok">{lastResult}</p>}
+          {error && <p className="mb-2 text-xs text-rose-800">{error}</p>}
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full rounded-md border border-line bg-paper px-3 py-1.5 text-sm"
+          />
+          <textarea
+            value={transcript}
+            onChange={(e) => setTranscript(e.target.value)}
+            rows={4}
+            placeholder="Paste what was said. A new child, a raise, or a house hunt updates this profile."
+            className="mt-2 w-full rounded-md border border-line bg-paper px-3 py-2 text-sm"
+          />
+          <div className="mt-2 flex flex-wrap items-center gap-2">
             <button
               type="button"
-              onClick={() => saveNotes().catch((e) => setError(e.message))}
-              className="mt-2 rounded-md border border-line px-3 py-1.5 text-sm font-medium hover:bg-paper-2"
+              disabled={pending || !transcript.trim()}
+              onClick={() => submitMeeting(false)}
+              className="rounded-md bg-accent px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-50"
             >
-              Save notes
+              {pending ? "Saving…" : "Save meeting"}
             </button>
+            <label className="cursor-pointer text-xs font-medium text-muted">
+              Upload audio
+              <input
+                type="file"
+                accept="audio/*,.mp3,.wav,.m4a,.webm"
+                className="hidden"
+                onChange={(e) => onAudio(e.target.files?.[0] ?? null)}
+              />
+            </label>
           </div>
-        </section>
-
-        {/* Center: LinkedIn + plan hooks */}
-        <section className="animate-rise-delay-1 space-y-4 lg:col-span-4">
-          <div className="rounded-xl border border-line bg-white p-5 shadow-sm">
-            <div className="flex items-center justify-between gap-2">
-              <h2 className="display text-lg font-semibold">Professional signal</h2>
-              <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-900">
-                Simulated LinkedIn
-              </span>
-            </div>
-            <p className="mt-2 text-sm font-semibold text-ink">{linkedIn.headline}</p>
-            <p className="text-sm text-muted">
-              {linkedIn.title} · {linkedIn.company}
-            </p>
-            <p className="mt-3 text-sm leading-relaxed text-ink-soft">{linkedIn.about}</p>
-            <h3 className="mt-4 text-xs font-semibold uppercase tracking-wide text-muted">
-              Recent activity
-            </h3>
-            <ul className="mt-2 space-y-3">
-              {linkedIn.recentActivity.map((a) => (
-                <li key={a.date + a.text} className="text-sm">
-                  <p className="text-[10px] uppercase tracking-wide text-muted">{a.date}</p>
-                  <p className="text-ink-soft">{a.text}</p>
-                  {a.signal && (
-                    <p className="mt-1 text-xs font-medium text-accent">→ {a.signal}</p>
-                  )}
+          {crm.meetings.length > 0 && (
+            <ul className="mt-3 space-y-2 border-t border-line pt-3">
+              {crm.meetings.map((m) => (
+                <li key={m.id} className="text-sm">
+                  <p className="font-medium">{m.title}</p>
+                  <p className="text-xs text-muted">
+                    {new Date(m.createdAt).toLocaleString()}
+                    {m.extractedEvents.length
+                      ? ` · ${m.extractedEvents.map((e) => EVENT_LABEL[e.eventType] || e.eventType).join(", ")}`
+                      : ""}
+                  </p>
+                  {m.transcript && <p className="mt-1 line-clamp-3 text-xs text-ink-soft">{m.transcript}</p>}
                 </li>
               ))}
             </ul>
-            <p className="mt-4 text-[11px] text-muted">{linkedIn.connectionsNote}</p>
-          </div>
-
-          <div className="rounded-xl border border-line bg-white p-5 shadow-sm">
-            <h2 className="display text-lg font-semibold">Plan hooks</h2>
-            <p className="mt-1 text-sm text-muted">
-              Salary ~$
-              {profile.salaryTotal.toLocaleString()} · investable ~
-              ${Math.round(profile.investableApprox).toLocaleString()} · tech{" "}
-              {(profile.techWeight * 100).toFixed(0)}% of equity
-            </p>
-            <ul className="mt-3 space-y-2 text-sm">
-              {profile.goals
-                .filter((g) => g.monthsAway >= 0 && g.monthsAway <= 60)
-                .slice(0, 6)
-                .map((g) => (
-                  <li key={g.name + g.date} className="flex justify-between gap-2 border-b border-line/50 pb-2">
-                    <span className="text-ink-soft">{g.name}</span>
-                    <span className="text-xs text-muted">
-                      {g.date} · {g.monthsAway}m
-                    </span>
-                  </li>
-                ))}
-            </ul>
-            {crm.personalFacts.length > 0 && (
-              <>
-                <h3 className="mt-4 text-xs font-semibold uppercase tracking-wide text-muted">
-                  Learned from meetings
-                </h3>
-                <ul className="mt-2 space-y-1.5 text-sm text-ink-soft">
-                  {crm.personalFacts.slice(0, 8).map((f) => (
-                    <li key={f} className="flex gap-2">
-                      <span className="text-accent">▸</span>
-                      <span>{f}</span>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
-          </div>
-
-          {crm.updates.length > 0 && (
-            <div className="rounded-xl border border-line bg-white p-5 shadow-sm">
-              <h2 className="display text-lg font-semibold">Profile updates</h2>
-              <ul className="mt-3 space-y-3">
-                {crm.updates.slice(0, 8).map((u) => (
-                  <li key={u.id} className="border-b border-line/50 pb-3 text-sm last:border-0">
-                    <div className="flex items-center gap-2">
-                      <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-900">
-                        {EVENT_LABEL[u.eventType] || u.eventType}
-                      </span>
-                      <span className="text-[10px] text-muted">
-                        {new Date(u.createdAt).toLocaleString()}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-ink-soft">{u.summary}</p>
-                    <p className="mt-1 text-[11px] text-muted">
-                      Fields: {u.fieldsChanged.join(", ") || "—"}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </div>
           )}
-        </section>
-
-        {/* Right: meetings */}
-        <section className="animate-rise-delay-2 space-y-4 lg:col-span-4">
-          <div className="rounded-xl border border-line bg-white p-5 shadow-sm">
-            <h2 className="display text-lg font-semibold">Meeting → CRM</h2>
-            <p className="mt-1 text-sm text-muted">
-              Upload audio or paste a transcript. We extract life events (baby, job, home…) and
-              update this household.
-            </p>
-
-            <label className="mt-4 block text-xs font-semibold uppercase tracking-wide text-muted">
-              Title
-            </label>
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="mt-1 w-full rounded-md border border-line bg-paper px-3 py-2 text-sm"
-            />
-
-            <label className="mt-3 block text-xs font-semibold uppercase tracking-wide text-muted">
-              Transcript
-            </label>
-            <textarea
-              value={transcript}
-              onChange={(e) => setTranscript(e.target.value)}
-              rows={8}
-              placeholder="Paste meeting notes or transcript…"
-              className="mt-1 w-full rounded-md border border-line bg-paper px-3 py-2 text-sm leading-relaxed"
-            />
-
-            <label className="mt-3 block text-xs font-semibold uppercase tracking-wide text-muted">
-              Audio (optional)
-            </label>
-            <input
-              type="file"
-              accept="audio/*,.mp3,.wav,.m4a,.webm"
-              onChange={(e) => onAudio(e.target.files?.[0] ?? null)}
-              className="mt-1 block w-full text-sm text-muted file:mr-3 file:rounded-md file:border-0 file:bg-paper-2 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-ink"
-            />
-
-            <div className="mt-4 flex flex-wrap gap-2">
-              <button
-                type="button"
-                disabled={pending || !transcript.trim()}
-                onClick={() => submitMeeting(false)}
-                className="rounded-md bg-accent px-3 py-2 text-sm font-semibold text-white hover:bg-accent-deep disabled:opacity-50"
-              >
-                {pending ? "Processing…" : "Transcribe & update"}
-              </button>
-              <button
-                type="button"
-                disabled={pending}
-                onClick={() => submitMeeting(true)}
-                className="rounded-md border border-accent px-3 py-2 text-sm font-semibold text-accent hover:bg-accent hover:text-white disabled:opacity-50"
-              >
-                Run demo meeting
-              </button>
-            </div>
-          </div>
-
-          <div className="rounded-xl border border-line bg-white p-5 shadow-sm">
-            <h2 className="display text-lg font-semibold">Past meetings</h2>
-            {crm.meetings.length === 0 ? (
-              <p className="mt-2 text-sm text-muted">
-                No meetings yet. Try <strong>Run demo meeting</strong> for a ready-made transcript.
-              </p>
-            ) : (
-              <ul className="mt-3 space-y-4">
-                {crm.meetings.map((m) => (
-                  <li key={m.id} className="border-b border-line/50 pb-4 last:border-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-sm font-semibold text-ink">{m.title}</p>
-                      <span className="text-[10px] text-muted">
-                        {m.transcriptSource}
-                        {m.audioFileName ? ` · ${m.audioFileName}` : ""}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-[10px] text-muted">
-                      {new Date(m.createdAt).toLocaleString()}
-                    </p>
-                    <p className="mt-2 line-clamp-3 text-xs text-ink-soft">{m.transcript}</p>
-                    {m.extractedEvents.length > 0 && (
-                      <ul className="mt-2 space-y-1">
-                        {m.extractedEvents.map((e, i) => (
-                          <li key={i} className="text-xs text-accent">
-                            → {EVENT_LABEL[e.eventType] || e.eventType}: {e.summary}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </section>
+        </Section>
       </div>
     </div>
   );
