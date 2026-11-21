@@ -1,0 +1,38 @@
+SOLUCIÓN HACKATHON - QUÉ TENEMOS QUE HACER
+==========================================
+
+Regla general: todo lo que reciba el cliente (mensajes, noticias, avisos)
+se adapta a
+  1) las necesidades y el perfil del cliente, y
+  2) la forma de hablar de su asesor.
+
+
+1. CONTEXTO (la base de todo)
+-----------------------------
+[ ] Construir el contexto de cada cliente y de cada asesor a partir de
+    transcripciones de reuniones, chats, etc.
+[ ] Con permiso del cliente, conectar sus redes sociales para detectar
+    cambios en su vida (boda, hijos, mudanza, nuevo trabajo...) y
+    ajustar su plan financiero.
+
+
+2. COMUNICACIÓN CON EL CLIENTE
+------------------------------
+[ ] Scraping de noticias y envío directo al cliente, filtradas según
+    sus preferencias.
+[ ] Mensajes para tranquilizar al cliente cuando el mercado cae.
+
+
+3. HERRAMIENTAS PARA EL ASESOR
+------------------------------
+[ ] Antes de cada reunión, enviar al asesor un resumen del contexto
+    del cliente.
+[ ] Vista del problema desde el lado del asesor: qué le preocupa y
+    qué necesita.
+[ ] Recomendaciones de acción: ¿hay que vender, recomprar o mover?
+
+
+4. DEMOSTRAR VALOR
+------------------
+[ ] Gráfica que muestre dónde el asesor ha ayudado al cliente a ganar
+    o gestionar su dinero.
