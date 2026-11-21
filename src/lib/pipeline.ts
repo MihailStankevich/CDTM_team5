@@ -52,8 +52,6 @@ async function finish(
   const drafts: MessageDraft[] = [];
   const allMatched: FamilyImpact[] = [];
 
-  const pending: { signal: NewsSignal; profile: ClientProfile; draft: MessageDraft }[] = [];
-
   for (const signal of unique) {
     const matched = matchSignalToFamilies(signal, profiles);
     impactsBySignal[signal.id] = matched;
@@ -61,18 +59,9 @@ async function finish(
 
     for (const impact of matched) {
       const profile = profiles.find((p) => p.slug === impact.slug)!;
-      const draft = generateDraft(signal, impact, profile);
-      drafts.push(draft);
-      pending.push({ signal, profile, draft });
+      drafts.push(generateDraft(signal, impact, profile));
     }
   }
-
-  pending.sort((a, b) => b.draft.impactScore - a.draft.impactScore);
-  await mapPool(pending, 3, async (job) => {
-    const written = await composeDraft(job.draft, job.signal, job.profile);
-    job.draft.subject = written.subject;
-    job.draft.body = written.body;
-  });
 
   drafts.sort((a, b) => b.impactScore - a.impactScore);
 
@@ -97,6 +86,43 @@ async function finish(
       feeds: origin.feeds,
     },
   };
+}
+
+/** The desk shows two decisions and five quiet notes. Only those are worth a model call. */
+function onScreen(signals: NewsSignal[], drafts: MessageDraft[]): MessageDraft[] {
+  const peak = (rows: MessageDraft[]) => rows.reduce((max, d) => Math.max(max, d.impactScore), 0);
+  const rows = signals
+    .map((signal) => ({ signal, drafts: drafts.filter((d) => d.signalId === signal.id) }))
+    .filter((row) => row.drafts.length > 0);
+  const needsAdvisor = (row: (typeof rows)[number]) => {
+    const score = peak(row.drafts);
+    return score >= 52 || (row.signal.severity === "high" && score >= 42);
+  };
+  const byImpact = (a: (typeof rows)[number], b: (typeof rows)[number]) => peak(b.drafts) - peak(a.drafts);
+  const review = rows.filter(needsAdvisor).sort(byImpact).slice(0, 2);
+  const quiet = rows.filter((row) => !needsAdvisor(row)).sort(byImpact).slice(0, 5);
+  return [...review, ...quiet].flatMap((row) => row.drafts);
+}
+
+/** Rewrites the notes on screen after the desk is already visible. Failures keep the first text. */
+export function polishOnScreen(
+  signals: NewsSignal[],
+  drafts: MessageDraft[],
+  profiles: ClientProfile[],
+): Promise<void> {
+  const jobs = onScreen(signals, drafts)
+    .map((draft) => {
+      const signal = signals.find((s) => s.id === draft.signalId);
+      const profile = profiles.find((p) => p.slug === draft.slug);
+      return signal && profile ? { draft, signal, profile } : null;
+    })
+    .filter((job): job is { draft: MessageDraft; signal: NewsSignal; profile: ClientProfile } => job !== null);
+
+  return mapPool(jobs, 4, async (job) => {
+    const written = await composeDraft(job.draft, job.signal, job.profile);
+    job.draft.subject = written.subject;
+    job.draft.body = written.body;
+  });
 }
 
 export function groupImpactsBySignal(

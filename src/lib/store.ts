@@ -1,5 +1,6 @@
 import type { AdvisorStore, DraftStatus, MessageDraft } from "./types";
-import { groupImpactsBySignal, rescoreSignals, runPipeline, type IngestMode } from "./pipeline";
+import { groupImpactsBySignal, polishOnScreen, rescoreSignals, runPipeline, type IngestMode } from "./pipeline";
+import { loadAllProfiles } from "./profiles";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -58,6 +59,7 @@ export async function ingest(mode: IngestMode = "replay"): Promise<AdvisorStore>
     meta: result.meta,
   };
   globalThis.__advisorStore = store;
+  void polishOnScreen(store.signals, store.drafts, loadAllProfiles()).catch(() => undefined);
   return store;
 }
 
@@ -73,6 +75,7 @@ export async function rescore(): Promise<AdvisorStore> {
     meta: result.meta,
   };
   globalThis.__advisorStore = store;
+  void polishOnScreen(store.signals, store.drafts, loadAllProfiles()).catch(() => undefined);
   return store;
 }
 

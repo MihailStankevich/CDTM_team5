@@ -33,13 +33,44 @@ The desk has three places.
 
 **Clients** is the household, structured: who they are, how they decide, what they hold, and the meetings that changed the file. Paste what was said, or upload the audio. A new child, a raise or a house hunt is written back onto the profile.
 
-A priority model scores the day behind that screen. It weighs how hard the news hits, how soon something is due, how this person decides, how long it has been since anyone spoke to them, and what the relationship is worth. The ranking is available at `/api/priority`. The screen the advisor uses stays the one above.
+A priority model scores the day behind that screen. The formula, the gates and the schedule are in the next section. The ranking itself is `GET /api/priority`. The screen the advisor uses stays the one above.
 
 ## How a note gets written
 
 A headline only reaches a family when it is about something they own. A bond story goes to the bond sleeve. An oil story goes to the foreign funds. An index move goes to the largest US-equity book, and mentions a leveraged fund only as a clause, not as the reason.
 
-The model then writes one note for that household. It has to use their names, their holdings and their way of deciding. Swap the names and the note should stop making sense. Quiet notes go out. A hard hit waits, with the text already written, until the advisor sends it or leaves it.
+The first text on screen is written from that card, so the desk does not wait on a language model. The model then rewrites only the notes that are actually showing: the two decisions and the five that already went out. It has to use their names, their holdings and their way of deciding. Swap the names and the note should stop making sense. A hard hit waits, with the text already written, until the advisor sends it or leaves it.
+
+## The priority model
+
+Every task is a vector of six factors in $[0, 1]$. The score is a convex combination, so it lives in $0$–$100$ and the weights are the whole policy:
+
+$$
+s = 100 \,(0.30\,I + 0.25\,U + 0.15\,S + 0.10\,G + 0.10\,C + 0.10\,V)
+$$
+
+| Factor | What it measures | How it is scaled |
+|---|---|---|
+| Impact $I$ | Dollars at stake over liquid wealth | Saturates at 10% of AUM, the size of a correction. Unknown dollars take the neutral value $0.5$. |
+| Urgency $U$ | Time left | $1$ if it is happening now or overdue, then $0.9 / 0.8 / 0.5 / 0.3$ at 7, 30, 60, 180 and 365 days. No date is $0.1$. |
+| Sensitivity $S$ | What kind of life this touches | Depletion, insurance and a home are $1$. Career and markets $0.8$, college $0.6$, tax and debt $0.3$. The family's anchor (protection, duty, freedom) adds $0.2$, and so does a market drop on a misaligned risk profile. |
+| Gravity $G$ | Severity already in the plan | Critical $1$, significant $0.75$, moderate $0.5$, minor $0.25$, info $0.1$. |
+| Contact $C$ | Silence | Days since the last conversation, capped at 90, one review cycle. |
+| Value $V$ | Relationship size | AUM capped at $500k, the emerging-client line. Wealth cannot outrank a real problem. |
+
+Bands are thresholds on that sum. Red is $80$ or above: impact, urgency and sensitivity have to agree. Amber is $60$. Anything from $40$ still belongs in this month. Under $40$ the score is mostly contact and value, and the task goes to the monthly recap.
+
+Automation is a first-match rule. A request, a recommendation to move money, a critical concern or a big decision is a conversation. A note that quotes their own numbers, a topic more delicate than a tax line (sensitivity above $0.3$), or a low tolerance for automatic messages, waits for the advisor. Everything else can go.
+
+Tolerance is a Beta belief. The prior comes from how they decide: a collaborator starts at $\mathrm{Beta}(3, 2)$, mean $0.6$. Reading a note without asking for a person is a success and increments $\alpha$. Asking for a human increments $\beta$. One such ask drops a collaborator to $0.5$, under the $0.6$ gate, and automation stops.
+
+Channel follows the same facts. In person, a red or amber item or a big decision is a meeting, otherwise a call. A change under $0.5\%$ of liquid wealth is one ordinary day of noise and joins the recap instead of earning its own message. A validator, or any note with personal numbers, gets email. An immediate, sensitive market move gets a text. Send windows stay inside 8:00–20:00 local.
+
+Inside a band, order is weighted shortest job first: score per advisor minute. Effort changes that order. The score stays the weighted sum above. One in-person conversation per family: anything else scoring $40$ or more is folded into that conversation's notes.
+
+The agenda is greedy list scheduling. In-person tasks go highest score first, into the first free slot before a latest date, which is the band's horizon or two weeks before a deadline, whichever is sooner. One conversation per family. At the size of a real morning, about thirty tasks, that greedy order is a close approximation of minimising the sum of score times lateness.
+
+The thresholds live in one config. `npm run test:priority` checks the worked scores, that the six contributions add up, that the gates fire in order, and that moving a weight by five points does not reshuffle the day.
 
 ## Run it
 

@@ -62,11 +62,11 @@ function withTimeout<T>(work: Promise<T>, ms: number): Promise<T> {
 
 async function readFeed(feed: (typeof FEEDS)[number]): Promise<{ feed: FeedResult; signals: NewsSignal[] }> {
   const parser = new Parser({
-    timeout: 3500,
+    timeout: 1800,
     headers: { "User-Agent": "SherpasHackathonNewsTracker/1.0" },
   });
   try {
-    const result = await withTimeout(parser.parseURL(feed.url), 4000);
+    const result = await withTimeout(parser.parseURL(feed.url), 2000);
     const signals: NewsSignal[] = [];
     for (const item of result.items.slice(0, 5)) {
       const headline = item.title?.trim();
