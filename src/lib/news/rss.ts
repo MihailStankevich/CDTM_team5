@@ -44,53 +44,73 @@ function slugify(s: string): string {
     .slice(0, 50);
 }
 
+function withTimeout<T>(work: Promise<T>, ms: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error("timeout")), ms);
+    work.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (err) => {
+        clearTimeout(timer);
+        reject(err);
+      },
+    );
+  });
+}
+
+async function readFeed(feed: (typeof FEEDS)[number]): Promise<{ feed: FeedResult; signals: NewsSignal[] }> {
+  const parser = new Parser({
+    timeout: 3500,
+    headers: { "User-Agent": "SherpasHackathonNewsTracker/1.0" },
+  });
+  try {
+    const result = await withTimeout(parser.parseURL(feed.url), 4000);
+    const signals: NewsSignal[] = [];
+    for (const item of result.items.slice(0, 5)) {
+      const headline = item.title?.trim();
+      if (!headline) continue;
+      const body =
+        item.contentSnippet?.trim() ||
+        item.content?.replace(/<[^>]+>/g, " ").trim() ||
+        headline;
+      const date = item.isoDate
+        ? item.isoDate.slice(0, 10)
+        : item.pubDate
+          ? new Date(item.pubDate).toISOString().slice(0, 10)
+          : new Date().toISOString().slice(0, 10);
+      signals.push(
+        enrichFromText(headline, body.slice(0, 600), {
+          id: `rss-${slugify(headline)}-${date}`,
+          date,
+          source: "rss",
+          sources: item.link ? [item.link, feed.label] : [feed.label],
+        }),
+      );
+    }
+    return { feed: { label: feed.label, ok: true, count: signals.length }, signals };
+  } catch {
+    return { feed: { label: feed.label, ok: false, count: 0 }, signals: [] };
+  }
+}
+
 export async function fetchRssSignals(limit = 24): Promise<{
   signals: NewsSignal[];
   feeds: FeedResult[];
 }> {
-  const parser = new Parser({
-    timeout: 8000,
-    headers: { "User-Agent": "SherpasHackathonNewsTracker/1.0" },
-  });
-
+  const batches = await Promise.all(FEEDS.map((feed) => readFeed(feed)));
   const collected: NewsSignal[] = [];
   const feeds: FeedResult[] = [];
   const seen = new Set<string>();
 
-  for (const feed of FEEDS) {
-    let count = 0;
-    try {
-      const result = await parser.parseURL(feed.url);
-      for (const item of result.items.slice(0, 5)) {
-        const headline = item.title?.trim();
-        if (!headline) continue;
-        const key = headline.toLowerCase();
-        if (seen.has(key)) continue;
-        seen.add(key);
-
-        const body =
-          item.contentSnippet?.trim() ||
-          item.content?.replace(/<[^>]+>/g, " ").trim() ||
-          headline;
-        const date = item.isoDate
-          ? item.isoDate.slice(0, 10)
-          : item.pubDate
-            ? new Date(item.pubDate).toISOString().slice(0, 10)
-            : new Date().toISOString().slice(0, 10);
-
-        collected.push(
-          enrichFromText(headline, body.slice(0, 600), {
-            id: `rss-${slugify(headline)}-${date}`,
-            date,
-            source: "rss",
-            sources: item.link ? [item.link, feed.label] : [feed.label],
-          }),
-        );
-        count += 1;
-      }
-      feeds.push({ label: feed.label, ok: true, count });
-    } catch {
-      feeds.push({ label: feed.label, ok: false, count: 0 });
+  for (const batch of batches) {
+    feeds.push(batch.feed);
+    for (const signal of batch.signals) {
+      const key = signal.headline.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      collected.push(signal);
     }
   }
 

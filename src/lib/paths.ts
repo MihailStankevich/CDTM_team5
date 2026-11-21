@@ -1,8 +1,8 @@
 import path from "path";
 
-export const REPO_ROOT = path.join(process.cwd());
-export const CASES_DIR = path.join(REPO_ROOT, "cases");
-export const LEGAL_PATH = path.join(REPO_ROOT, "legal", "legal-dataset-sample.json");
+export const REPO_ROOT = process.cwd();
+export const CASES_DIR = path.join(process.cwd(), "cases");
+export const LEGAL_PATH = path.join(process.cwd(), "legal", "legal-dataset-sample.json");
 
 export const FAMILY_SLUGS = [
   "michael-carter",

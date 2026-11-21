@@ -1,21 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
-import { approveAllForSignal, getStore, updateDraft } from "@/lib/store";
+import { approveAllForSignal, ensureStore, getStore, updateDraft } from "@/lib/store";
 import type { DraftStatus } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 export async function GET() {
-  const store = getStore();
-  return NextResponse.json({
-    ok: true,
-    meta: store.meta,
-    signals: store.signals,
-    drafts: store.drafts,
-    impactsBySignal: store.impactsBySignal,
-  });
+  try {
+    const store = await ensureStore();
+    return NextResponse.json({
+      ok: true,
+      meta: store.meta,
+      signals: store.signals,
+      drafts: store.drafts,
+      impactsBySignal: store.impactsBySignal,
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Desk failed";
+    return NextResponse.json({ ok: false, error: message, signals: [], drafts: [] }, { status: 500 });
+  }
 }
 
 export async function PATCH(req: NextRequest) {
+  await ensureStore();
   const body = (await req.json()) as {
     id?: string;
     status?: DraftStatus;

@@ -67,7 +67,8 @@ async function finish(
     }
   }
 
-  await mapPool(pending, 3, async (job) => {
+  const toWrite = [...pending].sort((a, b) => b.draft.impactScore - a.draft.impactScore).slice(0, 6);
+  await mapPool(toWrite, 4, async (job) => {
     const written = await composeDraft(job.draft, job.signal, job.profile);
     job.draft.subject = written.subject;
     job.draft.body = written.body;

@@ -22,6 +22,33 @@ export function getStore(): AdvisorStore {
   return globalThis.__advisorStore;
 }
 
+let filling: Promise<AdvisorStore> | null = null;
+
+/**
+ * A fresh Vercel instance has an empty desk. Load live headlines once, and
+ * fall back to the past shocks if every feed fails.
+ */
+export function ensureStore(): Promise<AdvisorStore> {
+  const current = getStore();
+  if (current.signals.length > 0) return Promise.resolve(current);
+  if (!filling) {
+    filling = fillColdStore().finally(() => {
+      filling = null;
+    });
+  }
+  return filling;
+}
+
+async function fillColdStore(): Promise<AdvisorStore> {
+  try {
+    const live = await ingest("rss");
+    if (live.signals.length > 0) return live;
+  } catch {
+    // Feeds or case files failed; the historical shocks still open the desk.
+  }
+  return ingest("replay");
+}
+
 export async function ingest(mode: IngestMode = "replay"): Promise<AdvisorStore> {
   const result = await runPipeline(mode);
   const store: AdvisorStore = {

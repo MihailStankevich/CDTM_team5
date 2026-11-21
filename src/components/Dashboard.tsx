@@ -61,19 +61,47 @@ export default function Dashboard() {
   const [scheduled, setScheduled] = useState<Record<string, string>>({});
   const [picking, setPicking] = useState<{ key: string; type: "llamada" | "reunion" } | null>(null);
   const [edits, setEdits] = useState<Record<string, string>>({});
+  const [ready, setReady] = useState(false);
+  const [deskError, setDeskError] = useState<string | null>(null);
   const notified = useRef(new Set<string>());
 
   const load = useCallback(async () => {
-    let d = await fetch("/api/drafts").then((r) => r.json());
-    if (!d.signals?.length) {
-      d = await fetch("/api/ingest", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode: "replay" }),
-      }).then((r) => r.json());
+    const read = async (res: Response) => {
+      const text = await res.text();
+      try {
+        return JSON.parse(text) as { ok?: boolean; error?: string; signals?: NewsSignal[]; drafts?: MessageDraft[] };
+      } catch {
+        return { ok: false, error: text.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 180) || `Request failed (${res.status})` };
+      }
+    };
+    try {
+      let d = await read(await fetch("/api/drafts"));
+      if (!d.signals?.length) {
+        d = await read(
+          await fetch("/api/ingest", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mode: "rss" }),
+          }),
+        );
+      }
+      if (!d.signals?.length) {
+        d = await read(
+          await fetch("/api/ingest", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mode: "replay" }),
+          }),
+        );
+      }
+      setSignals(d.signals ?? []);
+      setDrafts(d.drafts ?? []);
+      setDeskError(d.signals?.length ? null : String(d.error ?? "The desk did not load.").slice(0, 180));
+    } catch (err) {
+      setDeskError(err instanceof Error ? err.message : "The desk did not load.");
+    } finally {
+      setReady(true);
     }
-    setSignals(d.signals ?? []);
-    setDrafts(d.drafts ?? []);
   }, []);
 
   useEffect(() => {
@@ -170,6 +198,14 @@ export default function Dashboard() {
     );
     if (!pending.length) return;
     pending.forEach((row) => notified.current.add(row.s.id));
+    const ids = new Set(pending.map((row) => row.s.id));
+    setDrafts((prev) =>
+      prev.map((draft) =>
+        ids.has(draft.signalId) && (draft.status === "pending" || draft.status === "edited")
+          ? { ...draft, status: "approved" }
+          : draft,
+      ),
+    );
     Promise.all(
       pending.map((row) =>
         fetch("/api/drafts", {
@@ -178,13 +214,7 @@ export default function Dashboard() {
           body: JSON.stringify({ approveAllSignalId: row.s.id }),
         }),
       ),
-    ).then(() =>
-      fetch("/api/drafts")
-        .then((r) => r.json())
-        .then((d) => {
-          if (d.drafts) setDrafts(d.drafts);
-        }),
-    );
+    ).catch(() => {});
   }, [shown.auto]);
 
   const actions = useMemo(() => {
@@ -457,7 +487,13 @@ export default function Dashboard() {
               </li>
             ))}
             {shown.auto.length === 0 && (
-              <li className="text-xs text-ink/45">Nothing quiet enough to send on its own today.</li>
+              <li className="text-xs text-ink/45">
+                {!ready
+                  ? "Loading today's notes…"
+                  : deskError
+                    ? deskError
+                    : "Nothing quiet enough to send on its own today."}
+              </li>
             )}
           </ul>
         </details>

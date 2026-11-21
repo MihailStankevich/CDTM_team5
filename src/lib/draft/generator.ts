@@ -82,6 +82,7 @@ export async function writeClientNote(input: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${auth.key}`,
       },
+      signal: AbortSignal.timeout(1500),
       body: JSON.stringify({
         model: process.env.SHERPAS_LLM_MODEL || "gpt-4o-mini",
         temperature: 0.5,
