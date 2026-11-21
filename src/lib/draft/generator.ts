@@ -4,27 +4,72 @@ function firstName(profile: ClientProfile): string {
   return profile.members.find((m) => m.role === "client")?.firstName ?? profile.displayName;
 }
 
-function toneHint(profile: ClientProfile): { opener: string; closer: string } {
-  const style = profile.persona.decisionStyle.toLowerCase();
-  const risk = profile.persona.riskOrientation.toLowerCase();
+function partnerName(profile: ClientProfile): string | null {
+  return profile.members.find((m) => m.role === "co-client")?.firstName ?? null;
+}
 
-  if (style.includes("collaborator") || style.includes("low")) {
-    return {
-      opener: "I wanted to reach you first with a short note — nothing you need to act on today.",
-      closer:
-        "Happy to walk through what this means for your plan whenever it suits you. Just reply to this message.",
-    };
+function childNames(profile: ClientProfile): string[] {
+  return profile.members.filter((m) => m.role === "child").map((m) => m.firstName);
+}
+
+function nearestGoal(profile: ClientProfile) {
+  const goals = [...profile.goals].sort((a, b) => a.monthsAway - b.monthsAway);
+  return goals.find((g) => !/vacation/i.test(g.name)) ?? goals[0] ?? null;
+}
+
+/** Names or a goal word that must appear, so two notes cannot be swapped. */
+function requiredPhrases(profile: ClientProfile): string[] {
+  const partner = partnerName(profile);
+  const kids = childNames(profile);
+  if (partner && kids.length) return [partner, ...kids];
+  if (partner) return [partner];
+  if (kids.length) return kids;
+  const goal = nearestGoal(profile);
+  if (goal) return [goal.name];
+  return [profile.city];
+}
+
+function howToSound(profile: ClientProfile): string {
+  const style = profile.persona.decisionStyle.toLowerCase();
+  const partner = partnerName(profile);
+  const name = firstName(profile);
+  if (style.includes("validator")) {
+    return "Short. Lead with the dollar figure. She checks a number before she acts. End by asking her to confirm it. Do not offer a call.";
   }
-  if (risk.includes("conservative") || risk.includes("cautious")) {
-    return {
-      opener: "Markets moved in a way that often feels uncomfortable. Here is the calm version for your plan.",
-      closer: "Your plan already anticipates swings like this. Reply if you want a quick check-in.",
-    };
+  if (style.includes("dual") && partner) {
+    return `Plain enough for both ${name} and ${partner}. No jargon. Say what you would leave as it is.`;
   }
+  if (partner) {
+    return `Warm and unhurried. Use ${partner}'s name as someone who decides with ${name}. Do not say stay calm or stay the course.`;
+  }
+  return "Direct and short. One consequence for the plan. Do not offer a call.";
+}
+
+/** Facts that are true of this household and not of the others. */
+export function clientCard(profile: ClientProfile) {
   return {
-    opener: "A quick, personal update on something in the news that touches your plan.",
-    closer: "No action needed unless you want to review. Reply anytime.",
+    name: firstName(profile),
+    household: profile.displayName,
+    mustContain: requiredPhrases(profile),
+    howToSound: howToSound(profile),
   };
+}
+
+function personalFallback(profile: ClientProfile, touches: string[]): string {
+  const name = firstName(profile);
+  const partner = partnerName(profile);
+  const fact = (touches[0] ?? "This headline touches a fund on the plan.").replace(/\s+/g, " ").trim();
+  const style = profile.persona.decisionStyle.toLowerCase();
+  const who = requiredPhrases(profile).join(" and ");
+  let close = "Nothing changes unless you tell me you want it to.";
+  if (style.includes("validator")) {
+    close = "If the figure looks wrong, say so and I will pull the account before we touch anything.";
+  } else if (style.includes("dual") && partner) {
+    close = `Same note for you and ${partner}. I would leave the plan as it is.`;
+  } else if (partner) {
+    close = `No move tonight. You and ${partner} can look at it if you want.`;
+  }
+  return [`Hi ${name},`, "", `${fact} This one is about ${who}.`, "", close].join("\n");
 }
 
 const noteCache = new Map<string, { subject: string; body: string }>();
@@ -61,12 +106,12 @@ export function modelConfigured(): boolean {
   return llmAuth() !== null;
 }
 
-/** Writes the client note from facts. Returns null when no model key is set. */
+/** Writes one note for this household. Returns null when no model key is set or the call fails. */
 export async function writeClientNote(input: {
   cacheKey: string;
-  clientName: string;
-  voice: string;
   situation: string;
+  about: ReturnType<typeof clientCard>;
+  happened: string;
   facts: string[];
 }): Promise<{ subject: string; body: string } | null> {
   const cached = noteCache.get(input.cacheKey);
@@ -75,56 +120,77 @@ export async function writeClientNote(input: {
   const auth = llmAuth();
   if (!auth) return null;
 
-  try {
-    const res = await fetch(`${auth.url}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${auth.key}`,
-      },
-      signal: AbortSignal.timeout(1500),
-      body: JSON.stringify({
-        model: process.env.SHERPAS_LLM_MODEL || "gpt-4o-mini",
-        temperature: 0.5,
-        response_format: { type: "json_object" },
-        messages: [
-          {
-            role: "system",
-            content:
-              "You write the short note a US financial advisor would actually send this client. Use only the facts provided. Do not invent numbers, employers, or family events. Never say the data is simulated, synthetic, or a demo. 4 to 6 sentences, plain speech, no headings, no bullet labels, no sign-off that says draft. Match the voice. Return JSON {\"subject\":\"\",\"body\":\"\"}.",
-          },
-          {
-            role: "user",
-            content: JSON.stringify({
-              client: input.clientName,
-              voice: input.voice,
-              situation: input.situation,
-              facts: input.facts
-                .map((fact) => fact.replace(/\bsimulated\b/gi, "").replace(/\s+/g, " ").trim())
-                .filter(Boolean)
-                .slice(0, 5),
-            }),
-          },
-        ],
-      }),
-    });
-    if (!res.ok) return null;
-    const data = (await res.json()) as {
-      choices?: { message?: { content?: string } }[];
-    };
-    const raw = data.choices?.[0]?.message?.content;
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as { subject?: string; body?: string };
-    if (!parsed.body?.trim()) return null;
-    const written = {
-      subject: parsed.subject?.trim() || input.situation.slice(0, 80),
-      body: parsed.body.trim(),
-    };
-    noteCache.set(input.cacheKey, written);
-    return written;
-  } catch {
-    return null;
+  const facts = input.facts
+    .map((fact) => fact.replace(/\bsimulated\b/gi, "").replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .slice(0, 4);
+  let reminder = "";
+
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const res = await fetch(`${auth.url}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth.key}`,
+        },
+        signal: AbortSignal.timeout(12000),
+        body: JSON.stringify({
+          model: process.env.SHERPAS_LLM_MODEL || "gpt-4o-mini",
+          temperature: 0.4,
+          response_format: { type: "json_object" },
+          messages: [
+            {
+              role: "system",
+              content:
+                "You write one note to one household. Another client gets the same headline, so the note must become nonsense if the names are swapped. Use only the card and the holding facts. Do not add a vacation, a job, an age, or any amount that is not in the facts. Do not use a person's name unless it is the client or listed in mustContain. 4 to 6 sentences. No bullets. Work every mustContain string into a sentence about them, then explain the holding in words with the amounts given. The last sentence follows howToSound and nothing else. Do not write \"I wanted to\", \"feel free\", \"stay calm\", \"stay the course\", or \"long-term goals\". Never say simulated or demo. Return JSON {\"subject\":\"\",\"body\":\"\"}. Subject is for this person, not the headline.",
+            },
+            {
+              role: "user",
+              content: JSON.stringify({
+                about: input.about,
+                situation: input.situation,
+                whatHappened: input.happened.slice(0, 400),
+                holdingsThisTouches: facts,
+                reminder,
+              }),
+            },
+          ],
+        }),
+      });
+      if (!res.ok) return null;
+      const data = (await res.json()) as {
+        choices?: { message?: { content?: string } }[];
+      };
+      const raw = data.choices?.[0]?.message?.content;
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as { subject?: string; body?: string };
+      const body = parsed.body?.trim();
+      if (!body) return null;
+      const allowed = `${input.about.name} ${input.about.mustContain.join(" ")}`;
+      const strangers = ["Melanie", "Liam", "Josh", "Ethan", "Ava", "Emily", "Oliver", "Sophia", "Nora", "Michael", "Daniel", "Samantha", "Timothy"].filter(
+        (person) => body.includes(person) && !allowed.includes(person),
+      );
+      const missing = input.about.mustContain.filter((phrase) => !body.toLowerCase().includes(phrase.toLowerCase()));
+      if ((missing.length || strangers.length) && attempt === 0) {
+        const bits = [
+          missing.length ? `Include: ${missing.join(", ")}.` : "",
+          strangers.length ? `Remove ${strangers.join(", ")}. They are not this client.` : "",
+        ].filter(Boolean);
+        reminder = bits.join(" ");
+        continue;
+      }
+      const written = {
+        subject: parsed.subject?.trim() || `${input.about.name}: ${input.situation.slice(0, 72)}`,
+        body,
+      };
+      noteCache.set(input.cacheKey, written);
+      return written;
+    } catch {
+      return null;
+    }
   }
+  return null;
 }
 
 export async function mapPool<T>(items: T[], limit: number, worker: (item: T) => Promise<void>) {
@@ -145,15 +211,12 @@ export function generateDraft(
   profile: ClientProfile,
 ): MessageDraft {
   const name = firstName(profile);
-  const tone = toneHint(profile);
-  const bullets = impact.touches_this_family.slice(0, 3).map((t) => `• ${t}`);
-
   const subject =
     signal.moment === "rule"
       ? `${name}: what the 2027 tax updates mean for you`
       : `${name}: ${signal.headline.slice(0, 72)}${signal.headline.length > 72 ? "…" : ""}`;
 
-  const body = [`Hi ${name},`, "", ...bullets, "", tone.closer].join("\n");
+  const body = personalFallback(profile, impact.touches_this_family);
 
   return {
     id: `draft-${signal.id}-${impact.slug}`,
@@ -174,12 +237,11 @@ export async function composeDraft(
   signal: NewsSignal,
   profile: ClientProfile,
 ): Promise<MessageDraft> {
-  const name = firstName(profile);
   const written = await writeClientNote({
-    cacheKey: `${draft.id}:${signal.headline}:${draft.touches.join("|").slice(0, 160)}`,
-    clientName: name,
-    voice: toneHint(profile).opener,
+    cacheKey: `personal5:${draft.id}:${signal.headline}:${draft.touches.join("|").slice(0, 160)}`,
     situation: signal.headline,
+    about: clientCard(profile),
+    happened: signal.what_happened,
     facts: draft.touches,
   });
   if (!written) return draft;

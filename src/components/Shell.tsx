@@ -14,7 +14,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <div className="relative flex h-screen overflow-hidden bg-paper">
+    <div className="relative flex h-dvh flex-col overflow-hidden bg-paper md:flex-row">
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
         <div
           className="absolute -left-40 -top-40 h-[560px] w-[560px] rounded-full opacity-50 blur-[120px]"
@@ -26,7 +26,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         />
       </div>
 
-      <aside className="relative z-30 flex w-[84px] shrink-0 flex-col items-center py-5">
+      <aside className="relative z-30 hidden w-[84px] shrink-0 flex-col items-center py-5 md:flex">
         <Link
           href="/"
           title="First to know"
@@ -66,7 +66,38 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         </p>
       </aside>
 
-      <main className="relative z-10 min-h-0 min-w-0 flex-1 overflow-auto">{children}</main>
+      <div className="relative z-10 flex min-h-0 min-w-0 flex-1 flex-col">
+        <header className="flex items-center gap-2.5 px-4 pb-1 pt-[max(0.75rem,env(safe-area-inset-top))] md:hidden">
+          <Link href="/" className="glass flex h-9 w-9 items-center justify-center !rounded-xl text-sm font-bold text-ink">
+            S
+          </Link>
+          <p className="text-sm font-semibold">First to know</p>
+        </header>
+        <main className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto pb-[calc(4.75rem+env(safe-area-inset-bottom))] md:pb-0">
+          {children}
+        </main>
+      </div>
+
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-black/5 bg-white/85 px-2 backdrop-blur-xl md:hidden">
+        <div className="mx-auto flex max-w-lg pb-[env(safe-area-inset-bottom)]">
+          {LINKS.map((l) => {
+            const active = l.href === "/" ? pathname === "/" : pathname.startsWith(l.href);
+            const Icon = l.icon;
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                className={`flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-[10px] font-medium ${
+                  active ? "text-ink" : "text-ink/40"
+                }`}
+              >
+                <Icon size={20} strokeWidth={active ? 2.4 : 1.8} />
+                {l.label}
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 }

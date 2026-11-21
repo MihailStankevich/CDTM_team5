@@ -190,7 +190,7 @@ export default function ClientProfileView({ slug }: { slug: string }) {
 
   if (!data) {
     return (
-      <div className="mx-auto max-w-[1240px] space-y-4 px-8 py-8">
+      <div className="mx-auto max-w-[1240px] space-y-4 px-3 py-5 sm:px-6 sm:py-8">
         {error ? <Toast tone="error">{error}</Toast> : <div className="skeleton h-40" />}
         <div className="skeleton h-80" />
       </div>
@@ -207,17 +207,17 @@ export default function ClientProfileView({ slug }: { slug: string }) {
   const worst = shocks[0];
 
   return (
-    <div className="mx-auto max-w-[1240px] px-6 py-7 lg:px-8">
+    <div className="mx-auto max-w-[1240px] px-3 py-5 sm:px-6 sm:py-7 lg:px-8">
       <Link href="/clients" className="inline-flex items-center gap-1 text-xs font-medium text-lav hover:text-ink">
         <ChevronLeft size={14} /> Clients
       </Link>
 
       {/* ---------- hero ---------- */}
-      <section className="glass-strong animate-rise mt-3 p-6">
+      <section className="glass-strong animate-rise mt-3 p-4 sm:p-6">
         <div className="flex flex-wrap items-center gap-5">
           <Avatar name={profile.displayName} size={72} />
           <div className="min-w-0 flex-1">
-            <h1 className="text-2xl font-semibold tracking-tight">{profile.displayName}</h1>
+            <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">{profile.displayName}</h1>
             <p className="mt-1 text-sm text-ink/55">
               {profile.city}, {profile.state} · {filing(profile.taxFilingStatus)} · {household.length} in household
             </p>
@@ -235,6 +235,18 @@ export default function ClientProfileView({ slug }: { slug: string }) {
                 ))}
               </div>
             )}
+          </div>
+          <div className="grid w-full grid-cols-3 gap-2 sm:hidden">
+            {[
+              ["Invested", moneyShort(profile.investableApprox)],
+              ["Income", moneyShort(profile.salaryTotal)],
+              ["Equity", moneyShort(profile.equityValue)],
+            ].map(([k, v]) => (
+              <div key={k} className="rounded-2xl bg-black/[0.03] px-2 py-2">
+                <p className="text-sm font-semibold tabular-nums">{v}</p>
+                <p className="text-[10px] uppercase tracking-wider text-ink/40">{k}</p>
+              </div>
+            ))}
           </div>
           <div className="flex items-center gap-6">
             {[
@@ -272,9 +284,9 @@ export default function ClientProfileView({ slug }: { slug: string }) {
       )}
 
       {/* ---------- tabs ---------- */}
-      <nav className="glass mt-5 flex w-fit max-w-full gap-0.5 overflow-x-auto !rounded-full p-1">
+      <nav className="glass mt-5 flex max-w-full gap-0.5 overflow-x-auto !rounded-full p-1">
         {TABS.map((t) => (
-          <button key={t.id} className="tab" data-active={tab === t.id} onClick={() => setTab(t.id)}>
+          <button key={t.id} className="tab shrink-0 whitespace-nowrap" data-active={tab === t.id} onClick={() => setTab(t.id)}>
             {t.label}
           </button>
         ))}

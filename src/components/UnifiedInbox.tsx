@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronRight, Inbox, Send } from "lucide-react";
+import { ChevronLeft, ChevronRight, Inbox, Send } from "lucide-react";
 import type { Channel, ChatMessage, ClientCrmState, ClientProfile, LinkedInSim } from "@/lib/types";
 import { Avatar, CHANNEL, ChannelIcon, Empty, moneyShort, Toast } from "./ui";
 
@@ -43,6 +43,26 @@ function clientBrief(profile: ClientProfile, extraKids: number) {
   return { talk, family, markets, next };
 }
 
+function BriefFacts({ profile, extraKids }: { profile: ClientProfile; extraKids: number }) {
+  const b = clientBrief(profile, extraKids);
+  const rows = [
+    ["How to talk", b.talk],
+    ["Family", b.family],
+    ["Investing", b.markets],
+    b.next ? ["Next", `${b.next.name} · ${b.next.date}`] : null,
+  ].filter((row): row is [string, string] => row !== null);
+  return (
+    <dl className="space-y-3">
+      {rows.map(([k, v]) => (
+        <div key={k}>
+          <dt className="text-[10px] font-semibold uppercase tracking-[0.14em] text-ink/40">{k}</dt>
+          <dd className="mt-0.5 text-xs leading-snug text-ink/80">{v}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 export default function UnifiedInbox() {
   const params = useSearchParams();
   const router = useRouter();
@@ -54,6 +74,7 @@ export default function UnifiedInbox() {
   const [note, setNote] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<Channel | "all">("all");
+  const [openChat, setOpenChat] = useState(Boolean(params.get("slug")));
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -101,6 +122,7 @@ export default function UnifiedInbox() {
 
   function select(next: string) {
     setSlug(next);
+    setOpenChat(true);
     router.replace(`/inbox?slug=${next}`);
   }
 
@@ -124,9 +146,9 @@ export default function UnifiedInbox() {
   }
 
   return (
-    <div className="grid h-full min-h-0 grid-cols-[210px_minmax(0,1fr)_230px] gap-4 p-4 pl-0">
+    <div className="flex min-h-full flex-col p-3 lg:grid lg:h-full lg:min-h-0 lg:grid-cols-[210px_minmax(0,1fr)_230px] lg:gap-4 lg:p-4 lg:pl-0">
       {/* ---------- threads ---------- */}
-      <section className="glass flex min-h-0 flex-col overflow-hidden">
+      <section className={`${openChat ? "hidden lg:flex" : "flex"} glass min-h-0 flex-1 flex-col overflow-hidden`}>
         <div className="px-5 pb-3 pt-5">
           <h1 className="text-lg font-semibold">Inbox</h1>
           <div className="mt-3 flex flex-wrap gap-1">
@@ -171,29 +193,48 @@ export default function UnifiedInbox() {
       </section>
 
       {/* ---------- conversation ---------- */}
-      <section className="glass flex min-w-0 flex-1 flex-col overflow-hidden">
+      <section className={`${openChat ? "flex" : "hidden lg:flex"} glass min-h-[70dvh] min-w-0 flex-1 flex-col overflow-hidden lg:min-h-0`}>
         {active ? (
           <>
-            <header className="flex items-center gap-3 border-b border-black/10 px-6 py-4">
+            <header className="flex items-center gap-2 border-b border-black/10 px-3 py-3 sm:gap-3 sm:px-6 sm:py-4">
+              <button
+                type="button"
+                onClick={() => setOpenChat(false)}
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black/5 lg:hidden"
+                aria-label="All conversations"
+              >
+                <ChevronLeft size={18} />
+              </button>
               <Avatar name={active.displayName} size={38} />
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold">{active.displayName}</p>
+                <p className="truncate text-sm font-semibold">{active.displayName}</p>
                 <p className="flex items-center gap-1.5 text-[11px] text-ink/45">
                   <ChannelIcon channel={active.channel} size={11} /> {CHANNEL[active.channel].label}
                 </p>
               </div>
-              <Link href={`/clients/${active.slug}`} className="btn btn-ghost !py-1.5">
-                Profile <ChevronRight size={13} />
+              <Link href={`/clients/${active.slug}`} className="btn btn-ghost shrink-0 !px-2.5 !py-1.5">
+                <span className="hidden sm:inline">Profile</span> <ChevronRight size={13} />
               </Link>
             </header>
 
-            <div className="flex-1 space-y-3 overflow-auto px-6 py-5">
+            <details className="border-b border-black/10 px-4 py-3 lg:hidden">
+              <summary className="cursor-pointer text-xs font-semibold">How to talk to them</summary>
+              <div className="pt-3">
+                {ctx ? (
+                  <BriefFacts profile={ctx.profile} extraKids={ctx.crm.extraMembers.filter((m) => m.role === "child").length} />
+                ) : (
+                  <p className="text-xs text-ink/40">Loading…</p>
+                )}
+              </div>
+            </details>
+
+            <div className="flex-1 space-y-3 overflow-auto px-3 py-4 sm:px-6 sm:py-5">
               {messages.map((m) => {
                 const out = m.direction === "out";
                 return (
                   <div key={m.id} className={`flex ${out ? "justify-end" : "justify-start"}`}>
                     <div
-                      className={`max-w-[560px] rounded-3xl px-4 py-2.5 text-[13px] leading-relaxed ${
+                      className={`max-w-[85%] rounded-3xl px-4 py-2.5 text-[13px] leading-relaxed sm:max-w-[560px] ${
                         out ? "rounded-br-lg bg-ink text-white" : "rounded-bl-lg bg-black/[0.05] text-ink"
                       }`}
                     >
@@ -209,7 +250,7 @@ export default function UnifiedInbox() {
               <div ref={endRef} />
             </div>
 
-            <div className="border-t border-black/10 px-6 py-4">
+            <div className="border-t border-black/10 px-3 py-3 sm:px-6 sm:py-4">
               {note && <div className="mb-3"><Toast tone="ok">{note}</Toast></div>}
               {error && <div className="mb-3"><Toast tone="error">{error}</Toast></div>}
               <div className="flex items-end gap-2">
@@ -235,7 +276,7 @@ export default function UnifiedInbox() {
       </section>
 
       {/* ---------- client snapshot ---------- */}
-      <aside className="glass flex min-h-0 flex-col overflow-auto p-5">
+      <aside className="glass hidden min-h-0 flex-col overflow-auto p-5 lg:flex">
         {ctx && active ? (
           <div className="animate-fade">
             <div className="flex items-center gap-3">
@@ -247,25 +288,9 @@ export default function UnifiedInbox() {
                 </p>
               </div>
             </div>
-            {(() => {
-              const b = clientBrief(ctx.profile, ctx.crm.extraMembers.filter((m) => m.role === "child").length);
-              const rows = [
-                ["How to talk", b.talk],
-                ["Family", b.family],
-                ["Investing", b.markets],
-                b.next ? ["Next", `${b.next.name} · ${b.next.date}`] : null,
-              ].filter((row): row is [string, string] => row !== null);
-              return (
-                <dl className="mt-5 space-y-3">
-                  {rows.map(([k, v]) => (
-                    <div key={k}>
-                      <dt className="text-[10px] font-semibold uppercase tracking-[0.14em] text-ink/40">{k}</dt>
-                      <dd className="mt-0.5 text-xs leading-snug text-ink/80">{v}</dd>
-                    </div>
-                  ))}
-                </dl>
-              );
-            })()}
+            <div className="mt-5">
+              <BriefFacts profile={ctx.profile} extraKids={ctx.crm.extraMembers.filter((m) => m.role === "child").length} />
+            </div>
           </div>
         ) : (
           <div className="space-y-3">

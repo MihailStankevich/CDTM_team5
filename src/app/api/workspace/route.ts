@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { allMessages, readInbox } from "@/lib/inbox/state";
 import { THREADS } from "@/lib/inbox/seed";
-import { mapPool, writeClientNote } from "@/lib/draft/generator";
+import { clientCard, mapPool, writeClientNote } from "@/lib/draft/generator";
 import { buildNurture } from "@/lib/nurture/build";
 import { loadAllProfiles } from "@/lib/profiles";
 
@@ -16,13 +16,12 @@ export async function GET() {
 
   await mapPool(nurture, 3, async (item) => {
     const profile = profiles.find((p) => p.slug === item.slug);
-    const name =
-      profile?.members.find((m) => m.role === "client")?.firstName ?? item.displayName;
+    if (!profile) return;
     const written = await writeClientNote({
-      cacheKey: `${item.id}:${item.why}`,
-      clientName: name,
-      voice: item.tone,
+      cacheKey: `personal5:${item.id}:${item.why}`,
       situation: item.title,
+      about: clientCard(profile),
+      happened: item.why,
       facts: [item.why, ...item.body.split("\n").filter((line) => line && !line.startsWith("Hi "))],
     });
     if (!written) return;

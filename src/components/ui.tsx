@@ -232,7 +232,7 @@ export function PageHeader({
         <h1 className="mt-1 text-[28px] font-semibold leading-tight tracking-tight">{title}</h1>
         {subtitle && <p className="mt-1.5 text-sm text-ink/55">{subtitle}</p>}
       </div>
-      {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+      {actions && <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">{actions}</div>}
     </header>
   );
 }

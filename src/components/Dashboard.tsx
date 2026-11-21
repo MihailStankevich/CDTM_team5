@@ -111,6 +111,18 @@ export default function Dashboard() {
       .then((d) => setClients(d.clients ?? []));
   }, [load]);
 
+  // The priority model ranks the day. The panel stays as it is; nothing here is drawn from the score.
+  useEffect(() => {
+    const ctrl = new AbortController();
+    fetch("/api/priority", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tasks }),
+      signal: ctrl.signal,
+    }).catch(() => {});
+    return () => ctrl.abort();
+  }, [tasks, drafts]);
+
   useEffect(() => {
     const read = () => {
       const v = localStorage.getItem(TASKS_KEY);
@@ -259,16 +271,16 @@ export default function Dashboard() {
     setDecided((p) => ({ ...p, [a.id]: "ok" }));
   }
 
-  const box = "glass group p-5";
+  const box = "glass group p-4 sm:p-5";
   const btn = "btn btn-ghost !px-2.5 !py-1 text-xs";
   const actionCount = actions.length;
 
   return (
-    <div className="mx-auto grid max-w-[1500px] grid-cols-1 gap-5 p-5 lg:h-screen lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+    <div className="mx-auto grid max-w-[1500px] grid-cols-1 gap-5 p-3 sm:p-5 lg:h-full lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
       <div className="min-h-0 space-y-4 overflow-y-auto pr-1">
         <details className={box} open>
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-            <span className="text-lg font-semibold">Actions</span>
+            <span className="min-w-0 flex-1 text-lg font-semibold">Actions</span>
             <span className="flex items-center gap-2">
               <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-ink px-1.5 text-xs font-bold text-white">
                 {actionCount}
@@ -284,7 +296,7 @@ export default function Dashboard() {
                 <li key={a.id} className="rounded-2xl bg-black/[0.03] ring-1 ring-black/5">
                   <details className="group/a">
                     <summary className="flex cursor-pointer list-none items-center justify-between gap-2 p-3">
-                      <span className="text-sm font-semibold leading-snug">{a.title}</span>
+                      <span className="min-w-0 flex-1 text-sm font-semibold leading-snug">{a.title}</span>
                       <span className="flex shrink-0 items-center gap-2">
                         <span className="rounded-full bg-black px-2 py-0.5 text-[10px] font-semibold text-white">Needs you</span>
                         <span className="text-xs text-ink/40 transition group-open/a:rotate-180">▾</span>
@@ -450,7 +462,7 @@ export default function Dashboard() {
 
         <details className={box} open>
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-            <span className="text-lg font-semibold">What moved today</span>
+            <span className="min-w-0 flex-1 text-lg font-semibold">What moved today</span>
             <span className="flex items-center gap-2">
               <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-black/5 px-1.5 text-xs font-bold text-ink">
                 {shown.auto.length}
@@ -464,7 +476,7 @@ export default function Dashboard() {
               <li key={s.id} className="rounded-2xl bg-black/[0.03] ring-1 ring-black/5">
                 <details className="group/n">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-2 p-3">
-                    <span className="text-sm font-semibold">{s.headline}</span>
+                    <span className="min-w-0 flex-1 text-sm font-semibold leading-snug">{s.headline}</span>
                     <span className="flex shrink-0 items-center gap-2">
                       <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-medium ring-1 ring-black/10">
                         Notified

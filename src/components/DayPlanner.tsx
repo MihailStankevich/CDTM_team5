@@ -100,7 +100,7 @@ export default function DayPlanner() {
   }
 
   return (
-    <section className="glass flex h-full min-h-[420px] flex-col p-6">
+    <section className="glass flex h-auto min-h-[420px] flex-col p-4 sm:p-6 lg:h-full">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold">My day</h2>
@@ -119,15 +119,15 @@ export default function DayPlanner() {
       {adding && (
         <form onSubmit={add} className="mt-3 flex flex-wrap gap-2 rounded-2xl bg-black/[0.03] p-3 text-sm">
           {(form.type === "reunion" || form.type === "llamada") && (
-            <input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} className="field w-auto" />
+            <input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} className="field w-full sm:w-auto" />
           )}
           <input
             value={form.title}
             onChange={(e) => setForm({ ...form, title: e.target.value })}
             placeholder="New task"
-            className="field min-w-40 flex-1"
+            className="field w-full min-w-0 flex-1 sm:min-w-40"
           />
-          <select value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className="field w-auto">
+          <select value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className="field w-full sm:w-auto">
             <option value="">No client</option>
             {clients.map((c) => (
               <option key={c.slug} value={c.slug}>
@@ -138,7 +138,7 @@ export default function DayPlanner() {
           <select
             value={form.type}
             onChange={(e) => setForm({ ...form, type: e.target.value as TaskType })}
-            className="field w-auto"
+            className="field w-full sm:w-auto"
           >
             {(Object.keys(TYPE) as TaskType[]).map((k) => (
               <option key={k} value={k}>

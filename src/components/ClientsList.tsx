@@ -48,19 +48,19 @@ export default function ClientsList() {
   );
 
   return (
-    <div className="mx-auto max-w-[1240px] px-6 py-7 lg:px-8">
+    <div className="mx-auto max-w-[1240px] px-3 py-5 sm:px-6 sm:py-7 lg:px-8">
       <PageHeader
         eyebrow="Your book"
         title="Clients"
         subtitle={clients ? `${clients.length} households` : "Loading…"}
         actions={
-          <label className="glass flex items-center gap-2 !rounded-full px-4 py-2">
-            <Search size={14} className="text-ink/45" />
+          <label className="glass flex w-full items-center gap-2 !rounded-full px-4 py-2 sm:w-auto">
+            <Search size={14} className="shrink-0 text-ink/45" />
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search name, city, tag"
-              className="w-48 bg-transparent text-sm outline-none placeholder:text-ink/35"
+              className="w-full min-w-0 bg-transparent text-sm outline-none placeholder:text-ink/35 sm:w-48"
             />
           </label>
         }

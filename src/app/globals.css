@@ -241,6 +241,10 @@ body {
   border-radius: 16px;
 }
 
+summary::-webkit-details-marker {
+  display: none;
+}
+
 /* ---------- Scrollbars ---------- */
 * {
   scrollbar-width: thin;
