@@ -1,0 +1,210 @@
+<title>One-Minute Report</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: the text message on the left, the one-page plan update it links to on the right; stacks on phones. */
+:root{
+  --bg:#f3f4f6; --card:#ffffff; --ink:#0f1c2e; --muted:#5b6676; --line:#e3e6eb; --soft:#f7f8fa;
+  --navy:#1e3a5f; --green:#15803d; --green-soft:#e8f5ec; --amber:#b45309; --amber-soft:#fdf3e6; --red:#b91c1c;
+  --sms-in:#e9e9ee; --sms-ink:#111111; --phone:#ffffff; --link:#2563eb;
+  --font: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0c1118; --card:#141b25; --ink:#e8edf4; --muted:#9aa6b6; --line:#263142; --soft:#18212d;
+  --navy:#8fb3e0; --green:#4ade80; --green-soft:#11281a; --amber:#f2a54a; --amber-soft:#2e2112; --red:#f87171;
+  --sms-in:#262a31; --sms-ink:#f2f2f2; --phone:#0a0e14; --link:#7aa7ff; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c1118; --card:#141b25; --ink:#e8edf4; --muted:#9aa6b6; --line:#263142; --soft:#18212d;
+  --navy:#8fb3e0; --green:#4ade80; --green-soft:#11281a; --amber:#f2a54a; --amber-soft:#2e2112; --red:#f87171;
+  --sms-in:#262a31; --sms-ink:#f2f2f2; --phone:#0a0e14; --link:#7aa7ff; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--font);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 40px}
+.wrap{max-width:1040px;margin:0 auto}
+.ctrl{display:flex;flex-wrap:wrap;gap:10px 24px;align-items:center;margin-bottom:20px;font-size:13px;color:var(--muted)}
+.ctrl > div{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.ctrl b{font-weight:600;text-transform:uppercase;letter-spacing:.07em;font-size:11px;margin-right:4px}
+.ctrl button{font:inherit;font-weight:500;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:5px 12px;border-radius:6px;cursor:pointer}
+.ctrl button[aria-pressed="true"]{border-color:var(--navy);background:var(--navy);color:var(--card)}
+.grid{display:grid;grid-template-columns:300px 1fr;gap:28px;align-items:start}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:0 0 8px}
+.phone{background:var(--phone);border:1px solid var(--line);border-radius:28px;padding:18px 14px 22px;min-width:0}
+.phone .from{text-align:center;font-size:13px;color:var(--muted)}
+.phone .from b{display:block;color:var(--ink);font-size:15px;font-weight:600}
+.time{font-size:12px;color:var(--muted);text-align:center;margin:12px 0 8px}
+.sms{background:var(--sms-in);color:var(--sms-ink);border-radius:18px;border-bottom-left-radius:5px;padding:10px 13px;font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15.5px;line-height:1.4}
+.sms a{color:var(--link);word-break:break-all}
+.report{background:var(--card);border:1px solid var(--line);border-radius:12px;min-width:0;overflow:hidden}
+.rhead{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:18px 26px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
+.rhead b{color:var(--ink);font-weight:600}
+.rbody{padding:24px 26px 26px;display:grid;gap:24px}
+.status{display:flex;gap:14px;align-items:flex-start}
+.status svg{width:40px;height:40px;flex:none;margin-top:2px}
+.status h1{margin:0;font-size:clamp(24px,3.4vw,30px);line-height:1.2;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+.status p{margin:4px 0 0;color:var(--muted)}
+.two{display:grid;grid-template-columns:1.3fr 1fr;gap:20px}
+@media(max-width:640px){.two{grid-template-columns:1fr}}
+.panel{border:1px solid var(--line);border-radius:10px;padding:16px 18px;min-width:0}
+h2{margin:0 0 10px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.panel p{margin:10px 0 0;font-size:15px}
+.kpi{font-size:38px;font-weight:700;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums;color:var(--navy)}
+.kpi-sub{font-size:14px;color:var(--muted);margin-top:4px}
+.drops{display:grid;gap:9px}
+.drop{display:grid;grid-template-columns:96px 1fr 52px;gap:10px;align-items:center;font-size:13px;font-variant-numeric:tabular-nums}
+.drop .t{color:var(--muted);white-space:nowrap}
+.drop .track{height:10px;background:var(--soft);border-radius:3px;overflow:hidden}
+.drop .track i{display:block;height:100%;background:var(--navy);border-radius:3px}
+.drop .v{text-align:right;font-weight:600}
+.drop.hi .track i{background:var(--amber)}
+.rule{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+.rule th{font-weight:500;color:var(--muted);text-align:right;padding:6px 0;border-bottom:1px solid var(--line)}
+.rule th:first-child,.rule td:first-child{text-align:left}
+.rule td{padding:8px 0;border-bottom:1px solid var(--line);text-align:right}
+.rule td.new{font-weight:600}
+.goals{display:grid;gap:0}
+.goal{display:grid;grid-template-columns:1fr 140px 116px;gap:14px;align-items:center;padding:11px 0;border-top:1px solid var(--line);font-size:15px}
+.goal:first-of-type{border-top:0}
+@media(max-width:560px){.goal{grid-template-columns:1fr auto}.goal .bar{grid-column:1/-1;order:3}}
+.goal .bar{height:8px;background:var(--soft);border-radius:4px;overflow:hidden}
+.goal .bar i{display:block;height:100%;border-radius:4px;background:var(--green)}
+.goal .bar i.p{background:var(--amber)}
+.pill{justify-self:end;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;white-space:nowrap}
+.pill.ok{background:var(--green-soft);color:var(--green)}
+.pill.p{background:var(--amber-soft);color:var(--amber)}
+.action{display:flex;justify-content:space-between;align-items:center;gap:14px;background:var(--soft);border-radius:10px;padding:14px 18px;flex-wrap:wrap}
+.action b{font-size:17px}
+.action span{color:var(--muted);font-size:14px;display:block}
+.action .none{font-weight:700;color:var(--green);font-size:15px}
+.sig{display:flex;gap:12px;align-items:center;font-size:14px;color:var(--muted);border-top:1px solid var(--line);padding-top:18px}
+.sig .av{width:38px;height:38px;border-radius:50%;background:var(--navy);color:var(--card);display:grid;place-items:center;font-weight:600;flex:none}
+.sig b{color:var(--ink);font-weight:600}
+.calm{display:grid;gap:0;border:1px solid var(--line);border-radius:10px}
+.calm div{display:grid;grid-template-columns:150px 1fr;gap:14px;padding:14px 18px;border-top:1px solid var(--line);font-size:16px}
+.calm div:first-child{border-top:0}
+.calm span{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding-top:3px}
+.calm b{font-weight:600}
+.calm .do b{color:var(--green)}
+@media(max-width:560px){.calm div{grid-template-columns:1fr;gap:2px}}
+details{border-top:1px solid var(--line);padding-top:16px}
+summary{cursor:pointer;font-weight:600;color:var(--navy);list-style:none;display:flex;align-items:center;gap:10px}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"";width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform .15s}
+details[open] summary::before{transform:rotate(45deg)}
+.more{display:grid;gap:22px;margin-top:18px}
+.note{font-size:12px;color:var(--muted);margin-top:18px}
+button:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <div class="ctrl">
+    <div><b>Family</b><span id="fam" style="display:flex;gap:6px;flex-wrap:wrap"></span></div>
+    <div><b>Trigger</b><span id="ev" style="display:flex;gap:6px;flex-wrap:wrap"></span></div>
+  </div>
+  <div class="grid">
+    <div>
+      <p class="label">1. Text message from the advisor</p>
+      <div class="phone">
+        <div class="from"><b id="smsFrom"></b>Text message</div>
+        <div class="time" id="smsTime"></div>
+        <div class="sms" id="sms"></div>
+      </div>
+    </div>
+    <div>
+      <p class="label">2. Plan update the link opens</p>
+      <article class="report" id="report"></article>
+    </div>
+  </div>
+  <p class="note">Prototype for CDTM VLC Hacks 2026. All figures come from each family's Sherpas plan; past market drops are each family's current holdings, back-tested. The advisor approves every message before it is sent. Advisor names and dates are simulated.</p>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const CHECK = `<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="var(--green)"/><path d="M12 20.5 L17.5 26 L28.5 14.5" fill="none" stroke="var(--card)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+const DROP_NAMES = ["Fed rate hike", "Global sell-off", "Fed rate cut", "Tariff shock"];
+const DROP_DATES = ["Jul 2023", "Aug 2024", "Sep 2024", "Apr 2025"];
+const F = {
+  johnson: { name: "Daniel & Emily", hi: "Daniel and Emily", adv: "Rachel Moore", slug: "dj7k", invest: "$344,000",
+    drops: [3.9, 3.1, 2.8, 8.1], worst: 10.0, days: 61,
+    tax: { kpi: "+$200 a year", sub: "Child tax credit: $100 more each for Oliver and Sophia", rows: [["Standard deduction (joint)", "$32,200", "$33,200"], ["Child tax credit, per child", "$2,200", "$2,300"]] },
+    goals: [["Retirement at 62 and 60", 100], ["College for Oliver and Sophia", 25], ["Emergency savings", 18]] },
+  carter: { name: "Michael", hi: "Michael", adv: "David Kim", slug: "mc4p", invest: "$172,000",
+    drops: [4.2, 3.5, 2.6, 8.4], worst: 10.2, days: 62,
+    tax: { kpi: "≈ $120 a year", sub: "Less federal tax, from the higher standard deduction", rows: [["Standard deduction (single)", "$16,100", "$16,600"], ["Social Security wage base", "$184,500", "$192,300"]] },
+    goals: [["Home down payment, Jan 2027", 77], ["Retirement at 58", 82], ["Emergency savings", 64]] },
+  lewis: { name: "Samantha", hi: "Samantha", adv: "Rachel Moore", slug: "sl9q", invest: "$415,000",
+    drops: [4.6, 4.1, 3.0, 9.9], worst: 12.0, days: 78,
+    tax: { kpi: "≈ $484 a year", sub: "More Social Security tax, because the wage cap rises. Already in your plan.", rows: [["Social Security wage base", "$184,500", "$192,300"], ["Standard deduction (single)", "$16,100", "$16,600"]] },
+    goals: [["College for Ethan and Ava", 35], ["Second home, 2030", 100], ["Retirement at 65", 31]] },
+  weah: { name: "Timothy & Melanie", hi: "Timothy and Melanie", adv: "Laura Bennett", slug: "tm2w", invest: "$360,000",
+    drops: [4.2, 3.4, 2.4, 7.1], worst: 9.2, days: 37,
+    tax: { kpi: "+$200 a year", sub: "Child tax credit: $100 more each for Liam and Josh", rows: [["Standard deduction (joint)", "$32,200", "$33,200"], ["Child tax credit, per child", "$2,200", "$2,300"]] },
+    goals: [["Retirement at 62 and 60", 100], ["Home purchase, 2030", 100], ["College for Liam and Josh", 0]] },
+};
+
+const EV = {
+  market: { label: "Market drop", date: "November 18, 2026", time: "Wed 6:05 PM",
+    subject: "Market drop this week",
+    sms: (f) => `Hi ${f.hi}, this is ${f.adv.split(" ")[0]}. Markets fell this week. I've reviewed your plan: no changes are needed. Your one-page update: `,
+    title: () => "Your plan is safe. You don't need to do anything.",
+    lead: () => "I checked this week's market drop against your plan.",
+    left: (f) => `<h2>Your portfolio in past market drops</h2><div class="drops">${f.drops.map((d, i) =>
+        `<div class="drop ${i === 3 ? "hi" : ""}"><span class="t">${DROP_DATES[i]}</span><div class="track"><i style="width:${d / 12 * 100}%"></i></div><span class="v">-${d.toFixed(1)}%</span></div>`).join("")}</div>
+        <p>Every one of these drops recovered. Your plan already assumes years like these.</p>`,
+    right: (f) => `<h2>Recovery time</h2><div class="kpi">${f.days} days</div><div class="kpi-sub">to recover from the largest drop of the last three years (-${f.worst.toFixed(1)}%)</div>`,
+    action: "Please don't sell. Selling after a drop locks in the loss.",
+    happened: () => "Stock markets fell sharply this week.",
+    means: (f) => `Your plan was built for drops like this. Your money has come back from every past drop, the biggest in ${f.days} days.`,
+    todo: "Nothing. Please don't sell." },
+  tax: { label: "Tax law change", date: "November 6, 2026", time: "Fri 9:12 AM",
+    subject: "2027 tax changes",
+    sms: (f) => `Hi ${f.hi}, this is ${f.adv.split(" ")[0]}. The IRS published the 2027 tax figures. I've checked them against your plan: no changes are needed. Your one-page update: `,
+    title: () => "Your plan is safe. You don't need to do anything.",
+    lead: () => "I checked the new 2027 tax rules against your plan.",
+    left: (f) => `<h2>What changes for you in 2027</h2><table class="rule"><thead><tr><th>Item</th><th>2026</th><th>2027</th></tr></thead><tbody>${f.tax.rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td class="new">${r[2]}</td></tr>`).join("")}</tbody></table><p>Your plan has been updated with the new figures.</p>`,
+    right: (f) => `<h2>Effect on you</h2><div class="kpi">${f.tax.kpi}</div><div class="kpi-sub">${f.tax.sub}</div>`,
+    action: "Your plan already uses the new figures.",
+    happened: () => "The IRS published the new tax figures for 2027.",
+    means: (f) => `${f.tax.kpi}. ${f.tax.sub.replace(/\.$/, "")}.`,
+    todo: "Nothing. I've already updated your plan." },
+};
+
+let fam = "johnson", ev = "market";
+function render() {
+  const f = F[fam], e = EV[ev];
+  $("#smsFrom").textContent = f.adv + " (Advisor)";
+  $("#smsTime").textContent = e.time;
+  const sms = $("#sms"); sms.textContent = e.sms(f);
+  const a = document.createElement("a"); a.href = "#"; a.textContent = `plan.link/${f.slug}`; a.onclick = (x) => x.preventDefault();
+  sms.append(a);
+  $("#report").innerHTML = `
+    <div class="rhead"><span><b>Plan update</b> · ${e.subject}</span><span>Prepared for ${f.hi} · ${e.date}</span></div>
+    <div class="rbody">
+      <div class="status">${CHECK}<div><h1>${e.title()}</h1><p>${e.lead()}</p></div></div>
+      <div class="calm">
+        <div><span>What happened</span><p style="margin:0">${e.happened(f)}</p></div>
+        <div><span>What it means</span><p style="margin:0">${e.means(f)}</p></div>
+        <div class="do"><span>What to do</span><p style="margin:0"><b>${e.todo}</b></p></div>
+      </div>
+      <details><summary>See the details</summary><div class="more">
+      <div class="two"><div class="panel">${e.left(f)}</div><div class="panel">${e.right(f)}</div></div>
+      <div><h2>Your goals</h2><div class="goals">${f.goals.map(g => {
+        const ok = g[1] >= 90;
+        return `<div class="goal"><span>${g[0]}</span><div class="bar"><i class="${ok ? "" : "p"}" style="width:${Math.max(2, g[1])}%"></i></div><span class="pill ${ok ? "ok" : "p"}">${ok ? "On track" : g[1] === 0 ? "Not started" : g[1] + "% there"}</span></div>`;
+      }).join("")}</div></div>
+      </div></details>
+      <div class="sig"><div class="av">${f.adv.split(" ").map(w => w[0]).join("")}</div><div><b>${f.adv}</b>, your financial advisor. Questions? Reply to my text or book a call.</div></div>
+    </div>`;
+  document.querySelectorAll("#fam button").forEach(b => b.setAttribute("aria-pressed", b.dataset.k === fam));
+  document.querySelectorAll("#ev button").forEach(b => b.setAttribute("aria-pressed", b.dataset.k === ev));
+}
+const mk = (box, obj, set) => Object.entries(obj).forEach(([k, v]) => {
+  const b = document.createElement("button"); b.type = "button"; b.dataset.k = k; b.textContent = v.name || v.label;
+  b.onclick = () => { set(k); render(); }; $(box).appendChild(b);
+});
+mk("#fam", F, (k) => fam = k);
+mk("#ev", EV, (k) => ev = k);
+render();
+</script>

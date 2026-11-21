@@ -1,0 +1,290 @@
+<title>Talk to Your Advisor</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one phone-width conversation, centered. Demo family switcher sits above it. */
+:root{
+  --bg:#eef1ee; --surface:#ffffff; --ink:#18221f; --muted:#5f6d68; --line:#dfe5e1;
+  --bubble-in:#ffffff; --bubble-me:#1f5f5b; --on-me:#ffffff;
+  --accent:#1f5f5b; --accent-soft:#e1eeeb; --track:#e6ebe8;
+  --ok:#2e7d4f; --warn:#b7791f; --bad:#b4442f;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1514; --surface:#18211f; --ink:#e7eeeb; --muted:#9db0aa; --line:#2a3633;
+  --bubble-in:#1f2a28; --bubble-me:#2b7f78; --on-me:#ffffff;
+  --accent:#7cc7bf; --accent-soft:#1c3330; --track:#2c3835;
+  --ok:#5bbd86; --warn:#e2a84c; --bad:#e58068; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1514; --surface:#18211f; --ink:#e7eeeb; --muted:#9db0aa; --line:#2a3633;
+  --bubble-in:#1f2a28; --bubble-me:#2b7f78; --on-me:#ffffff;
+  --accent:#7cc7bf; --accent-soft:#1c3330; --track:#2c3835;
+  --ok:#5bbd86; --warn:#e2a84c; --bad:#e58068; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.45 var(--font);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 32px}
+.demo{max-width:520px;margin:0 auto 14px}
+.demo p{margin:0 0 8px;font-size:13px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.who{display:flex;gap:8px;flex-wrap:wrap}
+.who button{font:inherit;font-size:15px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 14px;border-radius:999px;cursor:pointer}
+.who button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:600}
+.phone{max-width:520px;margin:0 auto;background:var(--surface);border:1px solid var(--line);border-radius:28px;overflow:hidden;display:flex;flex-direction:column;min-height:640px}
+.top{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.av{width:44px;height:44px;border-radius:50%;background:var(--accent);color:var(--surface);display:grid;place-items:center;font-weight:700;flex:none}
+.top b{display:block;font-size:17px}
+.top span{font-size:13px;color:var(--muted)}
+.dotlive{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:6px;vertical-align:1px}
+.chat{flex:1;padding:16px 14px 8px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.day{align-self:center;font-size:12px;color:var(--muted);margin:8px 0 2px}
+.msg{max-width:88%;padding:11px 14px;border-radius:20px;background:var(--bubble-in);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:6px}
+.msg.me{align-self:flex-end;background:var(--bubble-me);color:var(--on-me);border-color:transparent;border-bottom-left-radius:20px;border-bottom-right-radius:6px}
+.msg p{margin:0}
+.viz{margin-top:10px;padding:12px;border-radius:14px;background:var(--accent-soft)}
+.big{font-size:34px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+.big.good{color:var(--ok)} .big.warn{color:var(--warn)}
+.cap{font-size:14px;color:var(--muted)}
+.meter{height:14px;background:var(--track);border-radius:999px;overflow:hidden;margin:8px 0 6px}
+.meter i{display:block;height:100%;border-radius:999px;background:var(--warn)}
+.meter i.good{background:var(--ok)}
+.row{display:flex;justify-content:space-between;gap:8px;font-size:14px;font-variant-numeric:tabular-nums}
+.jars{display:flex;gap:14px;flex-wrap:wrap}
+.jar{flex:1 1 110px;text-align:center}
+.jar svg{width:70px;height:88px;display:block;margin:0 auto 4px}
+.jar b{display:block}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.steps li{display:grid;grid-template-columns:86px 1fr;gap:8px;font-size:15px}
+.steps li span:first-child{font-weight:700;color:var(--accent)}
+.vs{display:grid;gap:8px}
+.vs .bar{height:22px;border-radius:6px;background:var(--accent)}
+.vs .bar.alt{background:var(--warn)}
+.dip svg{width:100%;height:auto;display:block}
+.dip text{font-size:12px;fill:var(--muted)}
+.dip .l{fill:none;stroke:var(--accent);stroke-width:3}
+.dip .z{stroke:var(--line);stroke-dasharray:4 4}
+.typing{display:flex;gap:4px;padding:14px}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:b 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes b{0%,60%,100%{opacity:.3}30%{opacity:1}}
+@media (prefers-reduced-motion: reduce){.typing i{animation:none}}
+.chips{display:flex;gap:8px;flex-wrap:wrap;padding:10px 14px;border-top:1px solid var(--line);background:var(--surface)}
+.chips button{font:inherit;font-size:15px;border:1px solid var(--accent);color:var(--accent);background:transparent;border-radius:999px;padding:7px 13px;cursor:pointer}
+.chips button:hover{background:var(--accent-soft)}
+form{display:flex;gap:8px;padding:10px 14px 14px;background:var(--surface)}
+form input{flex:1;min-width:0;font:inherit;padding:11px 14px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+form button{font:inherit;font-weight:600;border:0;border-radius:999px;padding:0 18px;background:var(--accent);color:var(--surface);cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.note{max-width:520px;margin:14px auto 0;font-size:13px;color:var(--muted)}
+</style>
+
+<div class="demo">
+  <p>Demo: open the app as</p>
+  <div class="who" id="who"></div>
+</div>
+
+<div class="phone">
+  <div class="top"><div class="av" id="av">R</div><div><b id="adv">Rachel Moore</b><span><span class="dotlive"></span>Your advisor · watching your plan</span></div></div>
+  <div class="chat" id="chat" aria-live="polite"></div>
+  <div class="chips" id="chips"></div>
+  <form id="f"><input id="q" placeholder="Ask anything about your money" autocomplete="off" aria-label="Your question"><button>Send</button></form>
+</div>
+<p class="note">Demo for CDTM VLC Hacks 2026. All figures come from each family's Sherpas plan. Advisor names and message dates are simulated. Questions the app cannot answer go to the advisor to reply.</p>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const usd = (n) => "$" + Math.round(n).toLocaleString("en-US");
+
+/* ---------- small visuals, one per message ---------- */
+const V = {
+  big: (v) => `<div class="viz"><div class="big ${v.tone||""}">${v.value}</div><div class="cap">${v.label}</div></div>`,
+  meter: (v) => {
+    const pct = Math.max(3, Math.min(100, v.now / v.goal * 100));
+    return `<div class="viz"><div class="row"><b>${v.title}</b><span>${Math.round(v.now/v.goal*100)}%</span></div>
+      <div class="meter"><i class="${pct>=100?"good":""}" style="width:${pct}%"></i></div>
+      <div class="row cap"><span>${v.nowLabel}</span><span>Goal: ${v.goalLabel}</span></div></div>`;
+  },
+  jars: (v) => `<div class="viz"><div class="jars">${v.kids.map(k => {
+      const f = Math.min(1, k.saved / k.total), h = 70 * f;
+      return `<div class="jar"><svg viewBox="0 0 70 88" aria-hidden="true">
+        <rect x="8" y="8" width="54" height="76" rx="12" fill="var(--surface)" stroke="var(--accent)" stroke-width="2"/>
+        <rect x="11" y="${81-h}" width="48" height="${h}" rx="9" fill="var(--ok)"/>
+        <rect x="18" y="2" width="34" height="8" rx="3" fill="var(--accent)"/></svg>
+        <b>${k.name}</b><span class="cap">${usd(k.saved)} of ${usd(k.total)}<br>${k.when}</span></div>`;
+    }).join("")}</div></div>`,
+  steps: (v) => `<div class="viz"><ul class="steps">${v.items.map(i => `<li><span>${i[0]}</span><span>${i[1]}</span></li>`).join("")}</ul></div>`,
+  vs: (v) => {
+    const max = Math.max(...v.items.map(i => i.value));
+    return `<div class="viz vs">${v.items.map(i => `<div><div class="row"><span>${i.label}</span><b>${i.text||usd(i.value)}</b></div>
+      <div class="bar ${i.alt?"alt":""}" style="width:${Math.max(4, i.value/max*100)}%"></div></div>`).join("")}
+      ${v.foot?`<div class="cap">${v.foot}</div>`:""}</div>`;
+  },
+  dip: (v) => `<div class="viz dip"><svg viewBox="0 0 300 110" role="img" aria-label="Fell ${v.fall}% and recovered in ${v.days} days">
+      <line x1="10" y1="22" x2="290" y2="22" class="z"/>
+      <path d="M10 22 L60 26 L95 88 L130 70 L170 52 L215 30 L245 22 L290 18" class="l"/>
+      <circle cx="95" cy="88" r="5" fill="var(--warn)"/><circle cx="245" cy="22" r="5" fill="var(--ok)"/>
+      <text x="105" y="100">-${v.fall}% at the worst</text><text x="198" y="14">back in ${v.days} days</text></svg>
+      <div class="cap">Shape is for illustration. Numbers are your own portfolio, back-tested.</div></div>`,
+};
+const viz = (v) => v ? V[v.type](v) : "";
+
+/* ---------- each family's own conversation ---------- */
+const FAMILIES = {
+  johnson: {
+    label: "Daniel & Emily", advisor: "Rachel Moore",
+    thread: [
+      { day: "Mon, Nov 2", text: "Hi Daniel and Emily, your plan is ready. The first thing I'd work on is your safety cushion. If a paycheck stopped today, your savings would last about 6 weeks.",
+        viz: { type: "meter", title: "Safety cushion", now: 1.4, goal: 8, nowLabel: "1.4 months saved ($19,000)", goalLabel: "8 months" } },
+      { day: "Thu, Nov 5", text: "Good news from the IRS for 2027. The child tax credit goes up for Oliver and Sophia. Nothing to do on your side, I've already added it to your plan.",
+        viz: { type: "big", value: "+$200 a year", label: "more in your pocket from January", tone: "good" } },
+      { day: "Wed, Nov 18", text: "Markets were nervous this week, so I checked your money. The biggest fall in the last 3 years took 10% off and came back in 61 days. Your plan is built for this. No need to sell anything.",
+        viz: { type: "dip", fall: 10, days: 61 } },
+      { day: "Today", text: "Quick look at the kids' college savings. You put in $8,000 a year, which is a great habit. Oliver starts in 2033.",
+        viz: { type: "jars", kids: [{ name: "Oliver", saved: 15000, total: 60000, when: "starts 2033" }, { name: "Sophia", saved: 15000, total: 60000, when: "starts 2035" }] } },
+    ],
+    qa: [
+      { q: "Are we OK?", k: ["ok", "fine", "good", "worried"], text: "Yes. Your bills are paid and about $15,000 is left over each year. The two weak spots are the safety cushion and life insurance. I'm keeping an eye on both.",
+        viz: { type: "big", value: usd(15032), label: "left over each year after all bills", tone: "good" } },
+      { q: "Can we retire at 62 and 60?", k: ["retire", "401", "pension"], text: "On today's plan your savings last past age 91, so yes. One easy win: nothing goes into your 401(k)s right now. Starting there also lowers your taxes.",
+        viz: { type: "meter", title: "Years of retirement covered", now: 31, goal: 31, nowLabel: "Savings last to 91", goalLabel: "age 91" } },
+      { q: "What should we do next?", k: ["next", "do", "should", "insurance", "life"], text: "Raise your life insurance. With two kids, we recommend about $1.6M for Daniel and $1.2M for Emily. It's a small monthly cost and it protects everything else.",
+        viz: { type: "vs", items: [{ label: "Daniel has", value: 250000 }, { label: "Recommended", value: 1600000, alt: true }] } },
+      { q: "Kids' college", k: ["college", "school", "529", "oliver", "sophia"], text: "Each child has about $15,000 saved toward $60,000. Keep the $8,000 a year going and we'll look at a small top-up at our next call.",
+        viz: { type: "jars", kids: [{ name: "Oliver", saved: 15000, total: 60000, when: "starts 2033" }, { name: "Sophia", saved: 15000, total: 60000, when: "starts 2035" }] } },
+    ],
+  },
+  carter: {
+    label: "Michael", advisor: "David Kim",
+    thread: [
+      { day: "Mon, Nov 2", text: "Hi Michael, your plan is ready. Big moment coming: your new home in January. Here's where the down payment stands.",
+        viz: { type: "meter", title: "Down payment", now: 87000, goal: 113300, nowLabel: "$87,000 in cash and investments", goalLabel: "$113,300" } },
+      { day: "Thu, Nov 5", text: "The 2027 tax numbers are out. Your standard deduction goes up by $500, so slightly less tax. Nothing to do.",
+        viz: { type: "big", value: "+$500", label: "tax-free income from January", tone: "good" } },
+      { day: "Mon, Nov 16", text: "One thing to plan together: after the purchase you'd have almost no cash left for surprises. Let's set aside a cushion before closing.",
+        viz: { type: "vs", items: [{ label: "Cushion today", value: 3.2, text: "3.2 months" }, { label: "After buying the home", value: 0.1, text: "0 months", alt: true }], foot: "Goal: 5 months of expenses" } },
+      { day: "Today", text: "And about retiring at 58: on today's path your savings last to age 85. Small changes now close that gap. I'll bring two options to our next call.",
+        viz: { type: "meter", title: "Retirement years covered", now: 27, goal: 33, nowLabel: "Savings last to 85", goalLabel: "age 91" } },
+    ],
+    qa: [
+      { q: "Can I afford the house?", k: ["house", "home", "afford", "mortgage", "buy"], text: "Yes, with planning. The monthly payment would be about $3,015, close to the $2,800 rent you pay now. The tight part is cash right after closing.",
+        viz: { type: "vs", items: [{ label: "Rent today", value: 2800 }, { label: "Mortgage payment", value: 3015, alt: true }] } },
+      { q: "Can I retire at 58?", k: ["retire", "58", "401"], text: "Not quite yet. Savings last to 85 and the plan runs to 91. You still have $7,500 of room in your 401(k) each year, which also saves about $1,800 in tax.",
+        viz: { type: "meter", title: "Retirement years covered", now: 27, goal: 33, nowLabel: "Savings last to 85", goalLabel: "age 91" } },
+      { q: "Should I worry about the markets?", k: ["market", "stock", "crash", "fall", "drop"], text: "No need to worry. In the April 2025 tariff shock your portfolio fell 8.4%. The worst fall in 3 years was 10.2% and it came back in 62 days.",
+        viz: { type: "dip", fall: 10.2, days: 62 } },
+      { q: "What should I do next?", k: ["next", "do", "should"], text: "Keep the down payment money safe in cash, not stocks, until January. Then we rebuild your cushion.",
+        viz: { type: "steps", items: [["Now", "Keep the $113,300 out of the stock market"], ["Jan 2027", "Close on the home"], ["2027", "Rebuild 5 months of cushion"]] } },
+    ],
+  },
+  lewis: {
+    label: "Samantha", advisor: "Rachel Moore",
+    thread: [
+      { day: "Mon, Nov 2", text: "Hi Samantha, your plan is ready. College bills are the next big thing, so here are the dates to keep in mind.",
+        viz: { type: "steps", items: [["Jan 2027", "Vacation, $6,000"], ["Aug 2027", "Ethan's next college year, $12,500"], ["Aug 2028", "Ava starts college, $12,500 a year"], ["2030", "Second home, about $112,500 down"]] } },
+      { day: "Thu, Nov 5", text: "The 2027 tax numbers are out. Your Social Security tax goes up a little, because the cap rises above your salary level. I've already updated your plan.",
+        viz: { type: "big", value: "+$484 a year", label: "Social Security tax in 2027", tone: "warn" } },
+      { day: "Wed, Nov 18", text: "Markets wobbled this week. I checked: the biggest fall in your portfolio in 3 years was 12%, and it was back in 78 days. Nothing to change.",
+        viz: { type: "dip", fall: 12, days: 78 } },
+      { day: "Today", text: "I want to be straight with you on one thing: there's no retirement account yet, so on today's path savings would run out at 73. You have 18 years to fix it, which is plenty if we start now.",
+        viz: { type: "meter", title: "Retirement years covered", now: 8, goal: 26, nowLabel: "Savings last to 73", goalLabel: "age 91" } },
+    ],
+    qa: [
+      { q: "Can I pay for college?", k: ["college", "school", "ethan", "ava", "tuition"], text: "You've already put money aside in their own accounts. About $65,000 is still to cover across both kids, paid year by year.",
+        viz: { type: "jars", kids: [{ name: "Ethan", saved: 20000, total: 50000, when: "in college now" }, { name: "Ava", saved: 15000, total: 50000, when: "starts 2028" }] } },
+      { q: "How do I fix retirement?", k: ["retire", "401", "ira", "pension", "73"], text: "Start with the accounts that also save tax: up to $7,500 a year in an IRA and $4,400 in a health savings account. Together they save around $1,400 or more in tax each year.",
+        viz: { type: "steps", items: [["This month", "Open an IRA"], ["January", "Set up a monthly transfer"], ["Each year", "We check progress together"]] } },
+      { q: "Can I still buy the second home?", k: ["house", "home", "buy", "2030"], text: "Yes, the cash for the down payment is there today. The question is balancing it with college and retirement. That's what we'll plan next.",
+        viz: { type: "meter", title: "Down payment for 2030", now: 112551, goal: 112551, nowLabel: "Covered by today's savings", goalLabel: "$112,551" } },
+      { q: "Am I spending too much?", k: ["spend", "budget", "cash", "money"], text: "A little. You're about $6,400 a year short after expenses and savings. Small cuts or a lower savings transfer would balance it.",
+        viz: { type: "big", value: "-$6,418", label: "per year after all bills and savings", tone: "warn" } },
+    ],
+  },
+  weah: {
+    label: "Timothy & Melanie", advisor: "Laura Bennett",
+    thread: [
+      { day: "Mon, Nov 2", text: "Hi Timothy and Melanie, your plan is ready. The first step is an easy one: pay off the 18% credit card with cash you already have.",
+        viz: { type: "vs", items: [{ label: "Cash you have", value: 150800 }, { label: "Card balance", value: 18000, alt: true }], foot: "Paying it off saves about $3,240 a year in interest." } },
+      { day: "Thu, Nov 5", text: "Good news from the IRS for 2027: a bigger child tax credit for Liam and Josh. I've added it to your plan.",
+        viz: { type: "big", value: "+$200 a year", label: "more in your pocket from January", tone: "good" } },
+      { day: "Wed, Nov 18", text: "Markets were jumpy this week. I checked your money: the worst fall in 3 years was 9.2%, and it was back in 37 days. Your plan holds.",
+        viz: { type: "dip", fall: 9.2, days: 37 } },
+      { day: "Today", text: "One idea for Liam and Josh: there's nothing saved for college yet. Starting a 529 now gives the money 12 or more years to grow.",
+        viz: { type: "jars", kids: [{ name: "Liam", saved: 0, total: 45000, when: "starts 2038" }, { name: "Josh", saved: 0, total: 45000, when: "starts 2041" }] } },
+    ],
+    qa: [
+      { q: "Why pay the card now?", k: ["card", "debt", "credit", "pay"], text: "It charges 18%, while your cash earns about 0.1%. Paying it off is like a guaranteed 18% return.",
+        viz: { type: "vs", items: [{ label: "Card costs you", value: 18, text: "18% a year" }, { label: "Your cash earns", value: 0.4, text: "0.1% a year", alt: true }] } },
+      { q: "Can we buy the house in 2030?", k: ["house", "home", "buy", "car"], text: "Yes. The down payment of about $135,000 is covered by what you have today, and the car in 2028 too.",
+        viz: { type: "steps", items: [["Jul 2028", "New car, about $9,500 down"], ["Jan 2030", "Home, about $135,000 down"]] } },
+      { q: "Can we retire at 62 and 60?", k: ["retire", "401", "ira"], text: "Yes. On today's plan your savings last well past age 91.",
+        viz: { type: "meter", title: "Retirement years covered", now: 31, goal: 31, nowLabel: "Savings last past 91", goalLabel: "age 91" } },
+      { q: "Is our cash safe?", k: ["cash", "safe", "save", "emergency", "cushion"], text: "Very. You have about 16 months of expenses in cash, double what you need. Some of it could work harder for the kids' college.",
+        viz: { type: "meter", title: "Safety cushion", now: 16, goal: 8, nowLabel: "16 months saved", goalLabel: "8 months" } },
+    ],
+  },
+};
+
+/* ---------- chat behaviour ---------- */
+let current = "johnson";
+const chat = $("#chat");
+
+function bubble(text, v, me) {
+  const d = document.createElement("div");
+  d.className = "msg" + (me ? " me" : "");
+  d.innerHTML = `<p></p>${me ? "" : viz(v)}`;
+  d.querySelector("p").textContent = text;
+  chat.appendChild(d);
+  d.scrollIntoView({ block: "nearest", behavior: "smooth" });
+}
+
+function render(key) {
+  current = key;
+  const f = FAMILIES[key];
+  $("#adv").textContent = f.advisor;
+  $("#av").textContent = f.advisor[0];
+  chat.innerHTML = "";
+  f.thread.forEach(m => {
+    const day = document.createElement("div");
+    day.className = "day"; day.textContent = m.day; chat.appendChild(day);
+    bubble(m.text, m.viz, false);
+  });
+  $("#chips").innerHTML = "";
+  f.qa.forEach((a, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = a.q;
+    b.onclick = () => ask(a.q, a);
+    $("#chips").appendChild(b);
+  });
+  document.querySelectorAll("#who button").forEach(b => b.setAttribute("aria-pressed", b.dataset.k === key));
+  window.scrollTo(0, 0);
+}
+
+function ask(question, answer) {
+  bubble(question, null, true);
+  const t = document.createElement("div");
+  t.className = "msg typing"; t.innerHTML = "<i></i><i></i><i></i>";
+  chat.appendChild(t); t.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  setTimeout(() => {
+    t.remove();
+    if (answer) bubble(answer.text, answer.viz, false);
+    else bubble(`Good question. I've passed it to ${FAMILIES[current].advisor}, who will reply here today.`, null, false);
+  }, 900);
+}
+
+$("#f").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const q = $("#q").value.trim();
+  if (!q) return;
+  $("#q").value = "";
+  const low = q.toLowerCase();
+  const hit = FAMILIES[current].qa.find(a => a.k.some(k => low.includes(k)));
+  ask(q, hit);
+});
+
+Object.entries(FAMILIES).forEach(([k, f]) => {
+  const b = document.createElement("button");
+  b.type = "button"; b.dataset.k = k; b.textContent = f.label;
+  b.onclick = () => { try { history.replaceState(null, "", "#" + k); } catch (e) {} render(k); };
+  $("#who").appendChild(b);
+});
+const start = (location.hash || "").slice(1);
+render(FAMILIES[start] ? start : "johnson");
+window.addEventListener("hashchange", () => { const h = location.hash.slice(1); if (FAMILIES[h]) render(h); });
+</script>
