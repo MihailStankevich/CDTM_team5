@@ -5,12 +5,14 @@ import type { ChatMessage, InboxState } from "../types";
 import { SEED_MESSAGES } from "./seed";
 
 const PATH = path.join(REPO_ROOT, "data", "inbox.json");
+let memoryInbox: InboxState | null = null;
 
 function empty(): InboxState {
   return { ingestedIds: [], dismissedIds: [], approvedIds: [], extraMessages: [] };
 }
 
 export function readInbox(): InboxState {
+  if (memoryInbox) return memoryInbox;
   try {
     if (!fs.existsSync(PATH)) return empty();
     const parsed = JSON.parse(fs.readFileSync(PATH, "utf8")) as InboxState;
@@ -26,9 +28,14 @@ export function readInbox(): InboxState {
 }
 
 export function writeInbox(state: InboxState) {
-  const dir = path.dirname(PATH);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(PATH, JSON.stringify(state, null, 2), "utf8");
+  memoryInbox = state;
+  try {
+    const dir = path.dirname(PATH);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(PATH, JSON.stringify(state, null, 2), "utf8");
+  } catch {
+    // Read-only on Vercel; memoryInbox keeps the demo working on this instance.
+  }
 }
 
 export function allMessages(): ChatMessage[] {

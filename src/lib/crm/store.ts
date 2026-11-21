@@ -4,6 +4,7 @@ import { REPO_ROOT } from "../paths";
 import type { ClientCrmState, CrmStore, MeetingRecord, ProfileUpdate } from "../types";
 
 const CRM_PATH = path.join(REPO_ROOT, "data", "crm.json");
+let memoryCrm: CrmStore | null = null;
 
 function emptyClient(): ClientCrmState {
   return {
@@ -22,6 +23,7 @@ function ensureDir() {
 }
 
 export function readCrm(): CrmStore {
+  if (memoryCrm) return memoryCrm;
   try {
     if (!fs.existsSync(CRM_PATH)) return { bySlug: {} };
     return JSON.parse(fs.readFileSync(CRM_PATH, "utf8")) as CrmStore;
@@ -31,8 +33,13 @@ export function readCrm(): CrmStore {
 }
 
 export function writeCrm(store: CrmStore) {
-  ensureDir();
-  fs.writeFileSync(CRM_PATH, JSON.stringify(store, null, 2), "utf8");
+  memoryCrm = store;
+  try {
+    ensureDir();
+    fs.writeFileSync(CRM_PATH, JSON.stringify(store, null, 2), "utf8");
+  } catch {
+    // Vercel’s filesystem is read-only. The in-memory copy still serves this instance.
+  }
 }
 
 export function getClientCrm(slug: string): ClientCrmState {
