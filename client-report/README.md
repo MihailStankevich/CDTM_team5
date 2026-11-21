@@ -40,3 +40,29 @@ Python standard library only. `python3 export_html.py out.html` exports it as on
 - **Real** (from the case files): every figure, goals and dates, each family's back-tested drop in past market shocks, the 2027 tax values applied to each family.
 - **Simulated**: advisor names, message dates and times, the short link, the fact that the advisor reviewed each event.
 - **Our own calculation**: goal progress (retirement = share of retirement years the savings cover; college = money set aside / total cost; home = cash and investments / down payment; emergency savings = months covered / months recommended).
+
+## Screenshots
+
+### Market drop, one per family
+| Daniel & Emily | Michael |
+|---|---|
+| ![](screenshots/report-market-johnson.png) | ![](screenshots/report-market-carter.png) |
+| **Samantha** | **Timothy & Melanie** |
+| ![](screenshots/report-market-lewis.png) | ![](screenshots/report-market-weah.png) |
+
+### 2027 tax change, one per family
+| Daniel & Emily | Michael |
+|---|---|
+| ![](screenshots/report-tax-johnson.png) | ![](screenshots/report-tax-carter.png) |
+| **Samantha** | **Timothy & Melanie** |
+| ![](screenshots/report-tax-lewis.png) | ![](screenshots/report-tax-weah.png) |
+
+### Details opened, and on a phone
+| See the details | Phone |
+|---|---|
+| ![](screenshots/one-minute-report-details.png) | ![](screenshots/report-mobile.png) |
+
+### Earlier prototypes
+| Advisor tab in the plan | Chat | Family dashboard |
+|---|---|---|
+| ![](screenshots/plan-advisor-tab.png) | ![](screenshots/chat.png) | ![](screenshots/dashboard.png) |
