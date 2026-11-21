@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { CASES_DIR, FAMILY_SLUGS } from "../paths";
-import type { NewsSignal } from "../types";
+import type { NewsSignal, SignalGroup } from "../types";
 import { enrichFromText, inferSeverity } from "./enrich";
 
 interface AnalysisEvent {
@@ -14,6 +14,14 @@ interface AnalysisEvent {
   portfolioImpact: string;
   assetClassesAffected: string[];
   impactDirection: string;
+}
+
+function groupForEvent(name: string, type: string): SignalGroup {
+  if (/fed|rate/i.test(name) || /fed/i.test(type)) return "rates";
+  if (/iran|oil|fury|geopolit/i.test(name) || /geopolit/i.test(type)) return "geopolitics";
+  if (/deepseek|nvidia|tech|semi/i.test(name) || /tech/i.test(type)) return "sector";
+  if (/tariff|supreme|tax/i.test(name)) return "legislation";
+  return "broad_market";
 }
 
 function slugify(name: string): string {
@@ -69,6 +77,7 @@ export function loadReplaySignals(limit = 6): NewsSignal[] {
       date: e.dateLabel || e.startDate,
       source: "replay",
       moment: "market",
+      group: groupForEvent(e.name, e.type),
       assetClasses: e.assetClassesAffected ?? [],
       severity: severity as NewsSignal["severity"],
       eventTitle: e.name,

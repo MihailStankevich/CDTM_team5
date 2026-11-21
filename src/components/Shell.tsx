@@ -4,9 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const LINKS = [
-  { href: "/", label: "Today", hint: "What to send" },
+  { href: "/", label: "Markets", hint: "News → assets" },
   { href: "/inbox", label: "Inbox", hint: "All channels" },
-  { href: "/markets", label: "Markets", hint: "News → plan" },
+  { href: "/today", label: "Life & pay", hint: "Dates and raises" },
   { href: "/clients", label: "Clients", hint: "People & CRM" },
 ];
 

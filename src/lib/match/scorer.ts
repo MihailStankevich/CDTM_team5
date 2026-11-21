@@ -42,164 +42,125 @@ export function scoreFamilyAgainstSignal(
   const where: string[] = [];
   let score = 0;
 
+  if (signal.watchTickers?.length) {
+    const held = profile.holdings.filter(
+      (h) => h.ticker && signal.watchTickers!.includes(h.ticker),
+    );
+    if (!held.length) return null;
+    const value = held.reduce((sum, h) => sum + h.value, 0);
+    const lines = held.map(
+      (h) => `${h.ticker || h.name} · ${money(h.value)} in ${h.account}`,
+    );
+    return {
+      slug: profile.slug,
+      displayName: profile.displayName,
+      score: 50 + Math.min(40, Math.round(value / 2500)),
+      reasons: [
+        `Holds ${[...new Set(held.map((h) => h.ticker).filter(Boolean))].join(", ")}`,
+      ],
+      touches_this_family: [
+        `This is about a fund already on the plan: ${lines.join("; ")}.`,
+        `About ${money(value)} of this household sits in that sleeve.`,
+      ],
+      where_in_the_data: ["investment-analysis.json: positions"],
+    };
+  }
+
   const blob = `${signal.headline} ${signal.what_happened}`.toLowerCase();
-  const isEquity =
-    signal.moment === "market" &&
-    (signal.assetClasses.some((a) => /equit|stock/i.test(a)) ||
-      /s&p|market|selloff|tariff|vix|nasdaq|equity/i.test(blob));
+  const holds = (re: RegExp) => profile.tickers.some((t) => re.test(t));
+  const tech = profile.sectors.find((s) => /technology/i.test(s.sector));
+  const techIsSignificant = /significant/i.test(tech?.severity ?? "") || profile.techWeight >= 0.34;
+
+  const isRates = signal.group === "rates" || /fed\b|rate cut|rate hike|fomc/i.test(signal.headline);
   const isTech =
-    signal.sectors.some((s) => /technology/i.test(s)) ||
-    /tech|nvidia|ai\b|deepseek|semiconductor|tariff/i.test(blob);
-  const isRates =
-    signal.assetClasses.some((a) => /treasury|rate/i.test(a)) ||
-    /fed\b|rate cut|rate hike|interest rate/i.test(blob);
-  const isTax = signal.moment === "rule" || /irs|tax|wage base|child tax|standard deduction/i.test(blob);
-  const isOil = /oil|brent|iran|energy/i.test(blob);
+    signal.group === "sector" || /deepseek|nvidia|semiconductor/i.test(signal.headline);
+  const isTariff = /tariff|supreme court/i.test(signal.headline);
+  const isOil = signal.group === "geopolitics" || /iran|oil|brent|airstrike/i.test(signal.headline);
+  const isTax =
+    signal.moment === "rule" ||
+    /wage base|child tax credit|standard deduction/i.test(signal.headline);
+  const isBroad = signal.group === "broad_market";
 
-  // Equity / market shock
-  if (isEquity && profile.equityValue > 0) {
-    score += 35;
-    reasons.push("Equity exposure in plan");
-    const dd = findDrawdown(profile, signal);
-    if (dd) {
-      const dollarHit = Math.abs(dd.drawdownPct) * profile.investableApprox;
-      touches.push(
-        `In a similar shock ("${dd.eventTitle}"), this portfolio fell ${pct(dd.drawdownPct)}${
-          dd.recoveryDays ? ` and recovered in ${dd.recoveryDays} days` : ""
-        }. On today's ~${money(profile.investableApprox)} invested book, that size move is about ${money(dollarHit)}.`,
-      );
-      where.push(
-        "investment-analysis.json: key_metrics.performanceAnalysis.perEventDrawdowns",
-      );
-      score += Math.min(25, Math.round(Math.abs(dd.drawdownPct) * 200));
-    } else {
-      touches.push(
-        `Investable assets are about ${money(profile.investableApprox)}; a broad equity move would touch this book.`,
-      );
-      where.push("investment-analysis.json: positions");
-    }
-  }
-
-  // Tech / tariffs
-  if (isTech && profile.techWeight >= TECH_THRESHOLD) {
-    score += 25;
-    reasons.push(`Technology ${pct(profile.techWeight)} of equity`);
-    const tech = profile.sectors.find((s) => /technology/i.test(s.sector));
-    touches.push(
-      `Technology is ${(profile.techWeight * 100).toFixed(1)}% of equity holdings${
-        tech?.driver ? ` (${tech.driver})` : ""
-      } — elevated vs a 20% comfort band.`,
-    );
-    where.push(
-      "investment-analysis.json: key_metrics.concentrationAndDiversification.sectorConcentration",
-    );
-  }
-
-  // Rates / bonds / home buyers
   if (isRates) {
-    if (profile.bondExposure) {
-      score += 18;
-      reasons.push("Bond / rate-sensitive holdings");
-      const bondTickers = profile.tickers.filter((t) =>
-        /JNK|LQD|SCHP|BND|TIP/i.test(t),
-      );
+    const bonds = profile.holdings.filter((h) => /SCHP|LQD/i.test(h.ticker));
+    const home = nearTermGoals(profile, 18).find((g) => /home/i.test(g.name));
+    if (!bonds.length && !home) return null;
+    score += 40;
+    if (bonds.length) {
+      reasons.push(`Holds ${bonds.map((h) => h.ticker).join(", ")}`);
       touches.push(
-        `Rate-sensitive holdings include ${
-          bondTickers.length ? bondTickers.join(", ") : "bond funds in the plan"
-        }.`,
+        `Rate move hits ${bonds.map((h) => `${h.ticker} (${money(h.value)})`).join("; ")}, not the stock funds.`,
       );
-      where.push("investment-analysis.json: positions");
     }
-    const home = nearTermGoals(profile, 24).find((g) =>
-      /home|REAL_ESTATE|Purchase a home/i.test(`${g.goalType} ${g.name}`),
-    );
     if (home) {
-      score += 20;
-      reasons.push(`Near-term home goal (${home.date})`);
-      touches.push(
-        `${home.name} is planned for ${home.date} (${home.monthsAway} months away) — mortgage rates and investment draws for a down payment both matter.`,
-      );
-      where.push("financial-health.json: goals.chartGoals");
+      reasons.push(`Home purchase ${home.date}`);
+      touches.push(`${home.name} is ${home.monthsAway} months away, so the mortgage rate is the point.`);
+      score += 15;
     }
-  }
-
-  // Tax / SSA rules
-  if (isTax) {
-    score += 20;
-    reasons.push("Tax filing / payroll sensitivity");
-    const filing =
-      profile.taxFilingStatus === "SINGLE"
-        ? "single"
-        : profile.taxFilingStatus === "MARRIED_JOINTLY"
-          ? "married filing jointly"
-          : profile.taxFilingStatus;
-    touches.push(
-      `Filing status is ${filing}; salary income is about ${money(profile.salaryTotal)}/year.`,
+    where.push("investment-analysis.json: positions");
+  } else if (isTech) {
+    if (!techIsSignificant && !holds(/UPRO|FCNTX/)) return null;
+    score += 40 + Math.round(profile.techWeight * 40);
+    reasons.push(
+      holds(/UPRO|FCNTX/)
+        ? "Leveraged or active US equity"
+        : `Technology ${pct(profile.techWeight)} of equity`,
     );
-    if (profile.aboveSsWageBase2027) {
+    touches.push(
+      `Technology is ${(profile.techWeight * 100).toFixed(1)}% of equity${tech?.driver ? ` (${tech.driver})` : ""}.`,
+    );
+    where.push("investment-analysis.json: sectorConcentration");
+  } else if (isTariff) {
+    if (!holds(/VWO|VEA/) || profile.techWeight < TECH_THRESHOLD) return null;
+    if (!techIsSignificant && !holds(/UPRO/)) return null;
+    score += 35 + Math.round(profile.techWeight * 30);
+    reasons.push("Emerging or foreign equity plus a heavy tech weight");
+    touches.push(
+      `Holds ${profile.tickers.filter((t) => /VWO|VEA|UPRO/.test(t)).join(", ")}. Technology is ${(profile.techWeight * 100).toFixed(1)}% of equity.`,
+    );
+    where.push("investment-analysis.json: positions");
+  } else if (isOil) {
+    const foreign = profile.holdings.filter((h) => /VEA|VWO/.test(h.ticker));
+    if (!holds(/VEA/) && !techIsSignificant) return null;
+    score += holds(/VEA/) ? 45 : 30;
+    reasons.push(holds(/VEA/) ? "Holds VEA" : "High technology weight in a risk-off shock");
+    if (foreign.length) {
       touches.push(
-        `Salary is above the 2027 Social Security wage base ($192,300), so the higher wage base raises payroll tax on the excess.`,
+        `Foreign funds on the plan: ${foreign.map((h) => `${h.ticker} ${money(h.value)}`).join("; ")}.`,
       );
-      score += 10;
-    } else {
+    }
+    where.push("investment-analysis.json: positions");
+  } else if (isTax) {
+    const material = profile.aboveSsWageBase2027 || profile.childCount > 0;
+    if (!material) return null;
+    score += 25;
+    if (profile.aboveSsWageBase2027) {
+      score += 20;
+      reasons.push("Salary above the 2027 wage base");
       touches.push(
-        `Salary is below the 2027 Social Security wage base ($192,300), so the wage-base increase does not raise payroll tax.`,
+        `Salary is about ${money(profile.salaryTotal)}, above the $192,300 Social Security wage base, so payroll tax goes up.`,
       );
     }
     if (profile.childCount > 0) {
+      score += 10;
+      reasons.push(`${profile.childCount} children`);
+      touches.push(`Child tax credit indexing can apply — ${profile.childCount} dependent(s) on the plan.`);
+    }
+    where.push("legal-values.json, financial-health.json: incomes, household");
+  } else if (isBroad && profile.equityValue > 0) {
+    const dd = findDrawdown(profile, signal);
+    const leveraged = holds(/UPRO/);
+    score += (leveraged ? 50 : 15) + Math.round(Math.abs(dd?.drawdownPct ?? 0) * 200);
+    reasons.push(leveraged ? "Holds UPRO" : "Equity book");
+    if (dd) {
       touches.push(
-        `${profile.childCount} dependent(s) in the household — child tax credit indexing may apply.`,
+        `In "${dd.eventTitle}" this mix fell ${pct(dd.drawdownPct)} — about ${money(Math.abs(dd.drawdownPct) * profile.investableApprox)} on ${money(profile.investableApprox)}.`,
       );
-      score += 8;
-    } else {
-      touches.push("No children on the plan — child tax credit changes do not apply.");
     }
-    where.push(
-      "legal-values.json: SSWageBaseByYear, StandardDeductionByYear, ChildTaxCreditByYear",
-      "financial-health.json: case.tax_filing_status, profile.incomes, case.household",
-    );
+    where.push("investment-analysis.json: perEventDrawdowns");
   }
 
-  // Oil / energy
-  if (isOil && profile.equityValue > 0) {
-    score += 12;
-    reasons.push("Broad equity book in energy shock");
-    const energy = profile.sectors.find((s) => /energy/i.test(s.sector));
-    if (energy) {
-      touches.push(
-        `Energy is ${(energy.weight * 100).toFixed(1)}% of equity; oil spikes also move the broader book.`,
-      );
-    } else {
-      touches.push("An energy/geopolitical shock typically hits the equity sleeve first.");
-    }
-  }
-
-  // Goal proximity for college / life moments
-  const college = nearTermGoals(profile, 36).filter((g) =>
-    /COLLEGE|EDUCATION|college/i.test(`${g.goalType} ${g.name}`),
-  );
-  if (college.length && (isEquity || isTax || isRates)) {
-    score += 10;
-    reasons.push("College funding window");
-    touches.push(
-      `College-related goals: ${college.map((g) => `${g.name} (${g.date})`).join("; ")}.`,
-    );
-    where.push("financial-health.json: goals.chartGoals");
-  }
-
-  // Persona hooks
-  if (score > 0 && profile.persona.concerns.length) {
-    const relevant = profile.persona.concerns.find((c) =>
-      /cash|home|retirement|employer|technolog|insurance|college/i.test(c),
-    );
-    if (relevant) {
-      touches.push(`Persona concern still open: ${relevant}.`);
-      where.push("persona.md: Objective concerns");
-      score += 5;
-    }
-  }
-
-  if (score < 15) return null;
+  if (score < 25) return null;
 
   // Deduplicate touches / where
   const uniqueTouches = [...new Set(touches)];
@@ -220,8 +181,15 @@ export function matchSignalToFamilies(
   signal: NewsSignal,
   profiles: ClientProfile[],
 ): FamilyImpact[] {
-  return profiles
+  const hits = profiles
     .map((p) => scoreFamilyAgainstSignal(p, signal))
     .filter((x): x is FamilyImpact => x !== null)
     .sort((a, b) => b.score - a.score);
+
+  // A plain index move is real for everyone with stocks. Show who is actually
+  // different — leveraged, or the deeper drawdown — instead of listing the whole book.
+  if (!signal.watchTickers?.length && signal.group === "broad_market" && hits.length > 2) {
+    return hits.slice(0, 2);
+  }
+  return hits;
 }

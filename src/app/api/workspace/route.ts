@@ -44,9 +44,9 @@ export async function GET() {
     sources: [
       {
         name: "News",
-        status: "RSS + replay",
+        status: "Live wires",
         detail:
-          "Live headlines from Yahoo Finance and CNBC when the network allows, plus historical shocks replayed from each family's investment analysis. Not a full-web crawler.",
+          "Headlines pulled now from Yahoo Finance, CNBC, and Google News on rates, technology, trade, and tax. A story stays on the desk only if it touches a fund or a rule on a plan. Past shocks in the case files are optional.",
       },
       {
         name: "Funds & holdings",

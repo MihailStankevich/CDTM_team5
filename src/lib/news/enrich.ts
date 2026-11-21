@@ -1,4 +1,4 @@
-import type { MomentType, NewsSignal } from "../types";
+import type { MomentType, NewsSignal, SignalGroup } from "../types";
 
 const TECH_KEYWORDS =
   /tech|technology|nvidia|semiconductor|ai\b|deepseek|nasdaq|software|chip/i;
@@ -10,6 +10,20 @@ const TAX_KEYWORDS =
 const EQUITY_KEYWORDS =
   /s&p|stock market|equities|selloff|sell-off|crash|drawdown|vix|bear market|rally/i;
 const OIL_KEYWORDS = /oil|brent|crude|iran|geopolitic|energy shock/i;
+
+export function classifyGroup(text: string, moment?: MomentType): SignalGroup {
+  const headline = text.slice(0, 90);
+  if (/fed\b|rate cut|rate hike|fomc|tips/i.test(headline)) return "rates";
+  if (/iran|oil|brent|strike|geopolitic/i.test(headline)) return "geopolitics";
+  if (/vix|selloff|sell-off/i.test(headline)) return "broad_market";
+  if (/deepseek|nvidia|semiconductor/i.test(headline)) return "sector";
+  if (moment === "rule" || /irs|wage base|supreme court|tariff/i.test(headline)) return "legislation";
+  if (/fed\b|rate cut|rate hike/i.test(text)) return "rates";
+  if (/iran|oil|brent|airstrike/i.test(text)) return "geopolitics";
+  if (/wage base|child tax credit|supreme court/i.test(text)) return "legislation";
+  if (/nvidia|semiconductor|deepseek/i.test(text)) return "sector";
+  return "broad_market";
+}
 
 export function classifyMoment(text: string): MomentType {
   if (TAX_KEYWORDS.test(text)) return "rule";
@@ -87,9 +101,11 @@ export function enrichFromText(
     headline,
     what_happened: body,
     moment: partial.moment ?? classifyMoment(blob),
+    group: partial.group ?? classifyGroup(blob, partial.moment ?? classifyMoment(blob)),
     entities: partial.entities ?? extractEntities(blob),
     sectors: partial.sectors ?? extractSectors(blob),
     assetClasses: partial.assetClasses ?? extractAssetClasses(blob),
+    watchTickers: partial.watchTickers,
     severity: partial.severity ?? inferSeverity(blob),
     sources: partial.sources,
     eventTitle: partial.eventTitle,

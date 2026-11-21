@@ -1,5 +1,5 @@
-import AdvisorInbox from "@/components/AdvisorInbox";
+import { redirect } from "next/navigation";
 
 export default function MarketsPage() {
-  return <AdvisorInbox />;
+  redirect("/");
 }

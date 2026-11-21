@@ -6,9 +6,36 @@ import type {
   DraftStatus,
   MessageDraft,
   NewsSignal,
+  SignalGroup,
 } from "@/lib/types";
 
-type Mode = "replay" | "rss" | "both";
+const GROUPS: { id: SignalGroup; title: string; blurb: string }[] = [
+  {
+    id: "legislation",
+    title: "Legislation",
+    blurb: "Tax, tariffs, and rules that change what a family keeps.",
+  },
+  {
+    id: "sector",
+    title: "Sectors in their funds",
+    blurb: "Technology, high yield, dividends — only the families who hold that sleeve.",
+  },
+  {
+    id: "rates",
+    title: "Rates and bonds",
+    blurb: "The Fed, TIPS, and investment-grade credit on the plan.",
+  },
+  {
+    id: "geopolitics",
+    title: "Geopolitics and trade",
+    blurb: "Energy, emerging markets, and anything that hits the non-US funds.",
+  },
+  {
+    id: "broad_market",
+    title: "The whole market",
+    blurb: "Index drops and leveraged funds. Calm first, then the dollar figure.",
+  },
+];
 
 const STATUS_STYLE: Record<DraftStatus, string> = {
   pending: "bg-amber-100 text-amber-900",
@@ -21,11 +48,12 @@ export default function AdvisorInbox() {
   const [store, setStore] = useState<AdvisorStore | null>(null);
   const [selectedSignalId, setSelectedSignalId] = useState<string | null>(null);
   const [selectedDraftId, setSelectedDraftId] = useState<string | null>(null);
-  const [mode, setMode] = useState<Mode>("replay");
+  const [includeHistory, setIncludeHistory] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const [editBody, setEditBody] = useState("");
   const [editSubject, setEditSubject] = useState("");
+  const [groupFilter, setGroupFilter] = useState<SignalGroup | "all">("all");
 
   const applyStore = useCallback((data: {
     signals: NewsSignal[];
@@ -52,14 +80,14 @@ export default function AdvisorInbox() {
   }, []);
 
   const runIngest = useCallback(
-    (ingestMode: Mode) => {
+    (withHistory: boolean) => {
       setError(null);
       startTransition(async () => {
         try {
           const res = await fetch("/api/ingest", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mode: ingestMode }),
+            body: JSON.stringify({ mode: withHistory ? "both" : "rss" }),
           });
           const data = await res.json();
           if (!data.ok) throw new Error(data.error || "Ingest failed");
@@ -73,7 +101,7 @@ export default function AdvisorInbox() {
   );
 
   useEffect(() => {
-    runIngest("replay");
+    runIngest(false);
   }, [runIngest]);
 
   const selectedSignal = useMemo(
@@ -142,31 +170,30 @@ export default function AdvisorInbox() {
       <header className="border-b border-line bg-white">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.18em] text-muted">News matched to each plan</p>
+            <p className="text-xs uppercase tracking-[0.18em] text-muted">What touches the book</p>
             <h1 className="display mt-1 text-3xl font-semibold tracking-tight">Markets</h1>
-            <p className="mt-2 max-w-xl text-sm text-muted">
-              One headline, grouped by the families it actually touches. Approve a draft here or
-              send the calmer version from Today.
+            <p className="mt-2 max-w-2xl text-sm text-muted">
+              Grouped by legislation, sector, rates, and the broad market. A card only lists a
+              family when that fund or rule is actually on their plan.
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <select
-              value={mode}
-              onChange={(e) => setMode(e.target.value as Mode)}
-              className="rounded-md border border-line bg-paper px-3 py-2 text-sm"
-            >
-              <option value="replay">Demo replay</option>
-              <option value="rss">Live RSS</option>
-              <option value="both">Replay + RSS</option>
-            </select>
+          <div className="flex flex-col items-start gap-2 sm:items-end">
             <button
               type="button"
               disabled={pending}
-              onClick={() => runIngest(mode)}
+              onClick={() => runIngest(includeHistory)}
               className="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-deep disabled:opacity-60"
             >
-              {pending ? "Matching…" : "Ingest today"}
+              {pending ? "Reading the wires…" : "Pull live headlines"}
             </button>
+            <label className="flex items-center gap-2 text-xs text-muted">
+              <input
+                type="checkbox"
+                checked={includeHistory}
+                onChange={(e) => setIncludeHistory(e.target.checked)}
+              />
+              Also show past shocks already saved in the plans
+            </label>
           </div>
         </div>
       </header>
@@ -199,59 +226,94 @@ export default function AdvisorInbox() {
           <div className="rounded-xl border border-dashed border-line bg-white/50 px-6 py-16 text-center">
             <p className="display text-xl text-ink">No signals yet</p>
             <p className="mt-2 text-sm text-muted">
-              Click <strong>Ingest today</strong> to replay market shocks from the case
-              data (or pull live RSS).
+              Pull live headlines. We only keep a story when it touches a fund or a tax rule on a plan.
             </p>
           </div>
         ) : (
-          <div className="animate-rise-delay-2 grid gap-5 lg:grid-cols-12">
-            {/* Signal list */}
-            <aside className="lg:col-span-4">
-              <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted">
-                Today&apos;s signals
-              </h2>
-              <ul className="space-y-2">
-                {store.signals.map((signal) => {
-                  const count = store.drafts.filter((d) => d.signalId === signal.id).length;
-                  const active = signal.id === selectedSignalId;
-                  return (
-                    <li key={signal.id}>
-                      <button
-                        type="button"
-                        onClick={() => selectSignal(signal.id)}
-                        className={`w-full rounded-lg border px-3 py-3 text-left transition ${
-                          active
-                            ? "border-accent bg-white shadow-md"
-                            : "border-line bg-white/60 hover:border-accent/40 hover:bg-white"
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <span className="text-[10px] uppercase tracking-wide text-muted">
-                            {signal.moment} · {signal.source}
-                          </span>
-                          {pending && active ? (
-                            <span className="live-dot text-[10px] text-accent">matching</span>
-                          ) : (
-                            <span className="rounded-full bg-paper-2 px-2 py-0.5 text-[10px] font-medium text-ink-soft">
-                              {count} {count === 1 ? "family" : "families"}
-                            </span>
-                          )}
-                        </div>
-                        <p className="mt-1 text-sm font-semibold leading-snug text-ink">
-                          {signal.headline}
-                        </p>
-                        <p className="mt-1 line-clamp-2 text-xs text-muted">
-                          {signal.what_happened}
-                        </p>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </aside>
+          <div className="space-y-8">
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setGroupFilter("all")}
+                className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                  groupFilter === "all" ? "bg-ink text-paper" : "bg-white text-ink-soft border border-line"
+                }`}
+              >
+                All
+              </button>
+              {GROUPS.map((g) => {
+                const n = store.signals.filter((s) => s.group === g.id).length;
+                if (!n) return null;
+                return (
+                  <button
+                    key={g.id}
+                    type="button"
+                    onClick={() => setGroupFilter(g.id)}
+                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                      groupFilter === g.id ? "bg-ink text-paper" : "bg-white text-ink-soft border border-line"
+                    }`}
+                  >
+                    {g.title} · {n}
+                  </button>
+                );
+              })}
+            </div>
 
-            {/* Impact + draft */}
-            <section className="lg:col-span-8 space-y-4">
+            {GROUPS.filter((g) => groupFilter === "all" || groupFilter === g.id).map((g) => {
+              const items = store.signals.filter((s) => s.group === g.id);
+              if (!items.length) return null;
+              return (
+                <section key={g.id}>
+                  <h2 className="display text-xl font-semibold">{g.title}</h2>
+                  <p className="mt-1 text-xs text-muted">{g.blurb}</p>
+                  <ul className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                    {items.map((signal) => {
+                      const drafts = store.drafts.filter((d) => d.signalId === signal.id);
+                      const active = signal.id === selectedSignalId;
+                      return (
+                        <li key={signal.id}>
+                          <button
+                            type="button"
+                            onClick={() => selectSignal(signal.id)}
+                            className={`flex h-full w-full flex-col rounded-xl border px-3 py-3 text-left ${
+                              active
+                                ? "border-accent bg-white shadow-md"
+                                : "border-line bg-white/80 hover:border-accent/40"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-[10px] uppercase tracking-wide text-muted">
+                                {signal.source === "book"
+                                  ? "Held in the plan"
+                                  : signal.source === "rss"
+                                    ? "Live headline"
+                                    : signal.source === "rule"
+                                      ? "Tax tables"
+                                      : "Past example"}
+                              </span>
+                              <span className="rounded-full bg-paper-2 px-2 py-0.5 text-[10px] font-medium">
+                                {drafts.length} {drafts.length === 1 ? "family" : "families"}
+                              </span>
+                            </div>
+                            <p className="mt-2 text-sm font-semibold leading-snug">{signal.headline}</p>
+                            <p className="mt-2 text-[11px] text-muted">
+                              {drafts.map((d) => d.displayName).join(" · ") || "No household matched"}
+                            </p>
+                            {signal.watchTickers && signal.watchTickers.length > 0 && (
+                              <p className="mt-2 text-[11px] font-medium text-accent">
+                                {signal.watchTickers.join(" · ")}
+                              </p>
+                            )}
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </section>
+              );
+            })}
+
+            <section className="space-y-4">
               {selectedSignal && (
                 <div className="rounded-xl border border-line bg-white p-5 shadow-sm">
                   <div className="flex flex-wrap items-start justify-between gap-3">
@@ -433,9 +495,16 @@ export default function AdvisorInbox() {
         <footer className="mt-10 border-t border-line pt-4 text-xs text-muted">
           {store?.meta && (
             <p>
-              Last ingest: {new Date(store.meta.generatedAt).toLocaleString()} · mode{" "}
-              {store.meta.mode} · {store.meta.signalCount} signals →{" "}
-              {store.meta.draftCount} drafts. Messages are never auto-sent.
+              Last pull: {new Date(store.meta.generatedAt).toLocaleString()}. Read{" "}
+              {store.meta.liveRead ?? 0} live headlines, kept {store.meta.liveKept ?? 0} that touch
+              a family. Messages are never auto-sent.
+              {store.meta.feeds && store.meta.feeds.length > 0 && (
+                <span className="mt-1 block">
+                  {store.meta.feeds
+                    .map((f) => `${f.label}: ${f.ok ? f.count : "unreachable"}`)
+                    .join(" · ")}
+                </span>
+              )}
             </p>
           )}
           <p className="mt-1">

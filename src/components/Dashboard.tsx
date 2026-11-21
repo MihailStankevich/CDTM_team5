@@ -61,7 +61,7 @@ export default function Dashboard() {
 
   const groups = useMemo(() => {
     const nurture = data?.nurture ?? [];
-    return (Object.keys(KIND) as (keyof typeof KIND)[])
+    return (["milestone", "career"] as const)
       .map((kind) => ({ kind, items: nurture.filter((n) => n.kind === kind) }))
       .filter((g) => g.items.length);
   }, [data]);
@@ -156,9 +156,9 @@ export default function Dashboard() {
 
       <section className="mt-8">
         <div className="mb-3 flex items-baseline justify-between">
-          <h2 className="display text-xl font-semibold">Send these — grouped by reason</h2>
-          <Link href="/markets" className="text-sm font-medium text-accent hover:underline">
-            Market matching →
+          <h2 className="display text-xl font-semibold">Life and pay</h2>
+          <Link href="/" className="text-sm font-medium text-accent hover:underline">
+            Market, sector, and legislation drafts are on Markets →
           </Link>
         </div>
         {!data ? (

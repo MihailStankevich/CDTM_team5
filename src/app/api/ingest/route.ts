@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     const mode: IngestMode =
       body.mode === "rss" || body.mode === "both" || body.mode === "replay"
         ? body.mode
-        : "replay";
+        : "rss";
 
     const store = await ingest(mode);
     return NextResponse.json({
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  const store = await ingest("replay");
+  const store = await ingest("rss");
   return NextResponse.json({
     ok: true,
     meta: store.meta,

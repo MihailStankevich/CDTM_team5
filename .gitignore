@@ -6,6 +6,7 @@
 # Next
 .next/
 out/
+*.tsbuildinfo
 
 # Local CRM persistence (meetings / profile updates)
 data/crm.json

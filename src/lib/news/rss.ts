@@ -2,16 +2,39 @@ import Parser from "rss-parser";
 import type { NewsSignal } from "../types";
 import { enrichFromText } from "./enrich";
 
+/** Public feeds. This is the live scrape: we pull headlines, then keep only the ones that touch a holding or a tax rule. */
 const FEEDS = [
   {
     url: "https://feeds.finance.yahoo.com/rss/2.0/headline?s=%5EGSPC&region=US&lang=en-US",
-    label: "Yahoo Finance",
+    label: "Yahoo Finance · S&P 500",
   },
   {
     url: "https://www.cnbc.com/id/100003114/device/rss/rss.html",
-    label: "CNBC Top News",
+    label: "CNBC",
+  },
+  {
+    url: "https://news.google.com/rss/search?q=Federal+Reserve+interest+rates+OR+Treasury+yields&hl=en-US&gl=US&ceid=US:en",
+    label: "Rates",
+  },
+  {
+    url: "https://news.google.com/rss/search?q=Nvidia+OR+semiconductor+OR+%22technology+stocks%22&hl=en-US&gl=US&ceid=US:en",
+    label: "Technology",
+  },
+  {
+    url: "https://news.google.com/rss/search?q=tariff+OR+%22high+yield%22+OR+%22emerging+markets%22+OR+oil+price&hl=en-US&gl=US&ceid=US:en",
+    label: "Trade, credit, energy",
+  },
+  {
+    url: "https://news.google.com/rss/search?q=IRS+tax+brackets+OR+%22Social+Security%22+wage+base&hl=en-US&gl=US&ceid=US:en",
+    label: "Tax and Social Security",
   },
 ];
+
+export interface FeedResult {
+  label: string;
+  ok: boolean;
+  count: number;
+}
 
 function slugify(s: string): string {
   return s
@@ -21,19 +44,24 @@ function slugify(s: string): string {
     .slice(0, 50);
 }
 
-export async function fetchRssSignals(limit = 8): Promise<NewsSignal[]> {
+export async function fetchRssSignals(limit = 24): Promise<{
+  signals: NewsSignal[];
+  feeds: FeedResult[];
+}> {
   const parser = new Parser({
     timeout: 8000,
     headers: { "User-Agent": "SherpasHackathonNewsTracker/1.0" },
   });
 
   const collected: NewsSignal[] = [];
+  const feeds: FeedResult[] = [];
   const seen = new Set<string>();
 
   for (const feed of FEEDS) {
+    let count = 0;
     try {
       const result = await parser.parseURL(feed.url);
-      for (const item of result.items.slice(0, 6)) {
+      for (const item of result.items.slice(0, 5)) {
         const headline = item.title?.trim();
         if (!headline) continue;
         const key = headline.toLowerCase();
@@ -58,11 +86,13 @@ export async function fetchRssSignals(limit = 8): Promise<NewsSignal[]> {
             sources: item.link ? [item.link, feed.label] : [feed.label],
           }),
         );
+        count += 1;
       }
+      feeds.push({ label: feed.label, ok: true, count });
     } catch {
-      // Feed may be blocked; continue with others / replay fallback
+      feeds.push({ label: feed.label, ok: false, count: 0 });
     }
   }
 
-  return collected.slice(0, limit);
+  return { signals: collected.slice(0, limit), feeds };
 }

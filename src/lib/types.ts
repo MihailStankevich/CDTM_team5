@@ -1,5 +1,12 @@
 export type MomentType = "market" | "rule" | "life" | "decision";
 
+export type SignalGroup =
+  | "legislation"
+  | "rates"
+  | "sector"
+  | "geopolitics"
+  | "broad_market";
+
 export type DraftStatus = "pending" | "approved" | "edited" | "dismissed";
 
 export interface NewsSignal {
@@ -8,10 +15,13 @@ export interface NewsSignal {
   moment: MomentType;
   headline: string;
   what_happened: string;
-  source: "rss" | "replay" | "rule";
+  source: "rss" | "replay" | "rule" | "book";
+  group: SignalGroup;
   entities: string[];
   sectors: string[];
   assetClasses: string[];
+  /** When set, only families holding one of these tickers are affected. */
+  watchTickers?: string[];
   severity: "low" | "medium" | "high";
   sources?: string[];
   /** For replay: original event title for drawdown lookup */
@@ -110,6 +120,9 @@ export interface IngestResult {
     signalCount: number;
     draftCount: number;
     generatedAt: string;
+    liveRead?: number;
+    liveKept?: number;
+    feeds?: { label: string; ok: boolean; count: number }[];
   };
 }
 

@@ -1,24 +1,33 @@
 import { generateDraft, maybePolishWithLlm } from "./draft/generator";
 import { matchSignalToFamilies } from "./match/scorer";
 import { fetchRssSignals } from "./news/rss";
+import { loadHoldingSignals } from "./news/holdings";
 import { loadReplaySignals, loadRuleSignal } from "./news/replay";
 import { loadAllProfiles } from "./profiles";
 import type { FamilyImpact, IngestResult, MessageDraft, NewsSignal } from "./types";
 
 export type IngestMode = "replay" | "rss" | "both";
 
-export async function runPipeline(mode: IngestMode = "replay"): Promise<IngestResult> {
+export async function runPipeline(mode: IngestMode = "rss"): Promise<IngestResult> {
   const profiles = loadAllProfiles();
   const signals: NewsSignal[] = [];
 
+  // The book and the published 2027 tax tables are always on the desk.
+  signals.push(...loadHoldingSignals(profiles));
+  signals.push(loadRuleSignal());
+
+  // Past shocks already written into the case files. Not today's news.
   if (mode === "replay" || mode === "both") {
-    signals.push(...loadReplaySignals(6));
-    signals.push(loadRuleSignal());
+    signals.push(...loadReplaySignals(8));
   }
 
+  let feeds: { label: string; ok: boolean; count: number }[] = [];
+  let liveRead = 0;
   if (mode === "rss" || mode === "both") {
-    const rss = await fetchRssSignals(8);
-    signals.push(...rss);
+    const rss = await fetchRssSignals(24);
+    feeds = rss.feeds;
+    liveRead = rss.signals.length;
+    signals.push(...rss.signals);
   }
 
   // Deduplicate by headline
@@ -48,18 +57,27 @@ export async function runPipeline(mode: IngestMode = "replay"): Promise<IngestRe
     }
   }
 
-  // Sort drafts: highest impact first
   drafts.sort((a, b) => b.impactScore - a.impactScore);
 
+  // A live headline with no family match does not belong on the desk.
+  const visible = unique.filter(
+    (signal) => signal.source !== "rss" || (impactsBySignal[signal.id]?.length ?? 0) > 0,
+  );
+  const visibleDrafts = drafts.filter((draft) => visible.some((signal) => signal.id === draft.signalId));
+  const liveKept = visible.filter((signal) => signal.source === "rss").length;
+
   return {
-    signals: unique,
+    signals: visible,
     matched: allMatched,
-    drafts,
+    drafts: visibleDrafts,
     meta: {
       mode,
-      signalCount: unique.length,
-      draftCount: drafts.length,
+      signalCount: visible.length,
+      draftCount: visibleDrafts.length,
       generatedAt: new Date().toISOString(),
+      liveRead,
+      liveKept,
+      feeds,
     },
   };
 }
