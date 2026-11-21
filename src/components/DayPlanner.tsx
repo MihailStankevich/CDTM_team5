@@ -15,8 +15,8 @@ import {
 } from "@/lib/dayTasks";
 
 const STATUS: Record<ClientStatus, { label: string; cls: string }> = {
-  pendiente: { label: "Waiting on them", cls: "bg-white/10 text-white/55" },
-  aceptada: { label: "They accepted", cls: "bg-lime/15 text-lime" },
+  pendiente: { label: "Waiting on them", cls: "bg-black/[0.05] text-ink/55" },
+  aceptada: { label: "They accepted", cls: "bg-black/5 text-ink" },
   cambio: { label: "They want another time", cls: "bg-rose/15 text-rose" },
 };
 
@@ -30,9 +30,9 @@ interface ClientRow {
 
 const TYPE: Record<TaskType, { label: string; cls: string }> = {
   reunion: { label: "Meeting", cls: "bg-lav/15 text-lav" },
-  llamada: { label: "Call", cls: "bg-lime/15 text-lime" },
+  llamada: { label: "Call", cls: "bg-black/5 text-ink" },
   seguimiento: { label: "Follow-up", cls: "bg-amber/15 text-amber" },
-  nota: { label: "Notes", cls: "bg-white/10 text-white/60" },
+  nota: { label: "Notes", cls: "bg-black/[0.05] text-ink/60" },
 };
 
 export const SEED: Task[] = [
@@ -104,11 +104,11 @@ export default function DayPlanner() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold">My day</h2>
-          <p className="text-xs capitalize text-white/45">{today}</p>
+          <p className="text-xs capitalize text-ink/45">{today}</p>
         </div>
         <div className="flex items-center gap-3">
-          <p className="text-sm text-white/60">
-            <span className="font-semibold text-lime">{done}</span> / {sorted.length} done
+          <p className="text-sm text-ink/60">
+            <span className="font-semibold text-ink">{done}</span> / {sorted.length} done
           </p>
           <button type="button" onClick={() => setAdding(!adding)} className="btn btn-primary">
             + Add task
@@ -117,7 +117,7 @@ export default function DayPlanner() {
       </div>
 
       {adding && (
-        <form onSubmit={add} className="mt-3 flex flex-wrap gap-2 rounded-2xl bg-white/5 p-3 text-sm">
+        <form onSubmit={add} className="mt-3 flex flex-wrap gap-2 rounded-2xl bg-black/[0.03] p-3 text-sm">
           {(form.type === "reunion" || form.type === "llamada") && (
             <input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} className="field w-auto" />
           )}
@@ -159,9 +159,9 @@ export default function DayPlanner() {
         {sorted.map((t, i) => (
           <Fragment key={t.id}>
             {!timed(t) && (i === 0 || timed(sorted[i - 1])) && (
-              <li className="pt-2 text-[11px] font-semibold uppercase tracking-wider text-white/40">Tasks</li>
+              <li className="pt-2 text-[11px] font-semibold uppercase tracking-wider text-ink/40">Tasks</li>
             )}
-            <li className={`flex gap-3 rounded-2xl bg-white/5 p-3 ring-1 ring-white/10 ${t.done ? "opacity-50" : ""}`}>
+            <li className={`flex gap-3 rounded-2xl bg-black/[0.03] p-3 ring-1 ring-black/8 ${t.done ? "opacity-50" : ""}`}>
               {timed(t) && <span className="w-12 shrink-0 pt-0.5 text-sm font-semibold">{t.time}</span>}
               <input
                 type="checkbox"
@@ -193,25 +193,25 @@ export default function DayPlanner() {
                       href={`https://meet.google.com/lookup/sherpas-${t.id}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="font-semibold text-lime hover:underline"
+                      className="font-semibold text-ink hover:underline"
                     >
                       Join meeting
                     </a>
                   ) : t.type === "llamada" ? (
-                    <a href="tel:+10000000000" className="font-semibold text-lime hover:underline">
+                    <a href="tel:+10000000000" className="font-semibold text-ink hover:underline">
                       Call {name(t.slug)}
                     </a>
                   ) : (
                     t.slug && (
-                      <Link href={`/clients/${t.slug}`} className="text-lime hover:underline">
+                      <Link href={`/clients/${t.slug}`} className="text-ink hover:underline">
                         {name(t.slug)}
                       </Link>
                     )
                   )}
-                  <button type="button" onClick={() => setOpenId(t.id)} className="text-white/55 hover:underline">
+                  <button type="button" onClick={() => setOpenId(t.id)} className="text-ink/55 hover:underline">
                     Notes
                   </button>
-                  <button type="button" onClick={() => save(tasks.filter((x) => x.id !== t.id))} className="text-white/35 hover:underline">
+                  <button type="button" onClick={() => save(tasks.filter((x) => x.id !== t.id))} className="text-ink/35 hover:underline">
                     Remove
                   </button>
                 </div>
@@ -234,22 +234,22 @@ export default function DayPlanner() {
       </ol>
 
       {upcoming.length > 0 && (
-        <div className="mt-3 border-t border-white/10 pt-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">Coming up</p>
+        <div className="mt-3 border-t border-black/10 pt-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-ink/40">Coming up</p>
           <ul className="mt-2 max-h-48 space-y-2 overflow-y-auto">
             {upcoming.map((t) => (
-              <li key={t.id} className="rounded-2xl bg-white/5 p-3 text-sm ring-1 ring-white/10">
+              <li key={t.id} className="rounded-2xl bg-black/[0.03] p-3 text-sm ring-1 ring-black/8">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-semibold capitalize">
                     {fmtDate(t.date!)} · {t.time}
                   </span>
-                  <span className="text-white/60">{t.title}</span>
+                  <span className="text-ink/60">{t.title}</span>
                   {t.status && (
                     <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${STATUS[t.status].cls}`}>
                       {STATUS[t.status].label}
                     </span>
                   )}
-                  <button type="button" onClick={() => save(tasks.filter((x) => x.id !== t.id))} className="ml-auto text-xs text-white/35 hover:underline">
+                  <button type="button" onClick={() => save(tasks.filter((x) => x.id !== t.id))} className="ml-auto text-xs text-ink/35 hover:underline">
                     Cancel
                   </button>
                 </div>
@@ -272,7 +272,7 @@ export default function DayPlanner() {
 function Proposal({ t, onAccept, onKeep }: { t: Task; onAccept: () => void; onKeep: () => void }) {
   return (
     <div className="mt-2 flex flex-wrap items-center gap-2 rounded-xl bg-rose/10 p-2 text-xs">
-      <span className="text-white/70">
+      <span className="text-ink/70">
         They prefer <b className="capitalize">{fmtDate(t.proposal!.date)} · {t.proposal!.time}</b>
       </span>
       <button type="button" onClick={onAccept} className="btn btn-primary !px-2.5 !py-1 text-xs">

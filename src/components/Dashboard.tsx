@@ -1,18 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { MessageDraft, NewsSignal } from "@/lib/types";
 import DayPlanner, { SEED } from "./DayPlanner";
 import {
   TASKS_EVENT,
   TASKS_KEY,
   findSlot,
-  isUnconfirmed,
   mergeIntoNotes,
   proposeToClient,
-  remind,
   scheduledFor,
+  taskDate,
   type Range,
   type Task,
 } from "@/lib/dayTasks";
@@ -25,11 +24,23 @@ interface ClientRow {
 }
 
 const KIND: Record<RequestKind, { label: string; cls: string }> = {
-  llamada: { label: "Call", cls: "bg-lime/20 text-lime" },
-  reunion: { label: "Meeting", cls: "bg-lav/20 text-lav" },
-  chatbot: { label: "Chat", cls: "bg-white/10 text-white/70" },
-  consulta_plan: { label: "Plan view", cls: "bg-amber/15 text-amber" },
+  llamada: { label: "Call", cls: "bg-black/5 text-ink" },
+  reunion: { label: "Meeting", cls: "bg-black/5 text-ink" },
+  chatbot: { label: "Chat", cls: "bg-black/5 text-ink/70" },
+  consulta_plan: { label: "Plan view", cls: "bg-black/5 text-ink/70" },
 };
+
+/** Quiet stories go out on their own. A hard hit, or a high-severity one, waits for the advisor. */
+function why(draft: MessageDraft) {
+  const lines = (draft.touches?.length ? draft.touches : draft.reasons).slice(0, 2);
+  return lines.join(" ");
+}
+
+function needsAdvisor(signal: NewsSignal, matched: MessageDraft[]) {
+  const peak = matched.reduce((max, d) => Math.max(max, d.impactScore), 0);
+  if (peak >= 52) return true;
+  return signal.severity === "high" && peak >= 42;
+}
 
 type Action = {
   id: string;
@@ -46,10 +57,11 @@ export default function Dashboard() {
   const [drafts, setDrafts] = useState<MessageDraft[]>([]);
   const [clients, setClients] = useState<ClientRow[]>([]);
   const [decided, setDecided] = useState<Record<string, "ok" | "no">>({});
-  const [open, setOpen] = useState<string | null>(null);
   const [tasks, setTasks] = useState<Task[]>(SEED);
   const [scheduled, setScheduled] = useState<Record<string, string>>({});
   const [picking, setPicking] = useState<{ key: string; type: "llamada" | "reunion" } | null>(null);
+  const [edits, setEdits] = useState<Record<string, string>>({});
+  const notified = useRef(new Set<string>());
 
   const load = useCallback(async () => {
     let d = await fetch("/api/drafts").then((r) => r.json());
@@ -83,18 +95,18 @@ export default function Dashboard() {
 
   const name = (slug: string) => clients.find((c) => c.slug === slug)?.displayName ?? slug;
 
-  const trends = useMemo(
-    () =>
-      signals
-        .map((s) => {
-          const ds = drafts.filter((d) => d.signalId === s.id);
-          const avg = ds.length ? Math.round(ds.reduce((a, d) => a + d.impactScore, 0) / ds.length) : 0;
-          return { s, n: ds.length, avg, top: [...ds].sort((a, b) => b.impactScore - a.impactScore)[0] };
-        })
-        .sort((a, b) => b.avg - a.avg)
-        .slice(0, 5),
-    [signals, drafts],
-  );
+  const grouped = useMemo(() => {
+    const rows = signals
+      .map((s) => {
+        const ds = drafts.filter((d) => d.signalId === s.id);
+        return { s, drafts: ds };
+      })
+      .filter((row) => row.drafts.length > 0);
+    return {
+      auto: rows.filter((row) => !needsAdvisor(row.s, row.drafts)),
+      review: rows.filter((row) => needsAdvisor(row.s, row.drafts)),
+    };
+  }, [signals, drafts]);
 
   useEffect(() => {
     for (const slug of new Set(CLIENT_REQUESTS.map((r) => r.slug))) {
@@ -133,55 +145,80 @@ export default function Dashboard() {
     }));
   }
 
-  const actions = useMemo<Action[]>(() => {
+  const meetings = useMemo(
+    () => tasks.filter((t) => (t.type === "llamada" || t.type === "reunion") && !t.done),
+    [tasks],
+  );
+
+  const shown = useMemo(() => {
+    const peak = (ds: MessageDraft[]) => ds.reduce((max, d) => Math.max(max, d.impactScore), 0);
+    const byImpact = (a: { s: NewsSignal; drafts: MessageDraft[] }, b: { s: NewsSignal; drafts: MessageDraft[] }) =>
+      peak(b.drafts) - peak(a.drafts) || a.s.id.localeCompare(b.s.id);
+    const open = (row: { drafts: MessageDraft[] }) =>
+      row.drafts.some((d) => d.status === "pending" || d.status === "edited");
+    return {
+      auto: [...grouped.auto].sort(byImpact).slice(0, 5),
+      review: [...grouped.review].filter(open).sort(byImpact).slice(0, 2),
+    };
+  }, [grouped]);
+
+  useEffect(() => {
+    const pending = shown.auto.filter(
+      (row) =>
+        !notified.current.has(row.s.id) &&
+        row.drafts.some((d) => d.status === "pending" || d.status === "edited"),
+    );
+    if (!pending.length) return;
+    pending.forEach((row) => notified.current.add(row.s.id));
+    Promise.all(
+      pending.map((row) =>
+        fetch("/api/drafts", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ approveAllSignalId: row.s.id }),
+        }),
+      ),
+    ).then(() =>
+      fetch("/api/drafts")
+        .then((r) => r.json())
+        .then((d) => {
+          if (d.drafts) setDrafts(d.drafts);
+        }),
+    );
+  }, [shown.auto]);
+
+  const actions = useMemo(() => {
     const out: Action[] = [];
-    const unconf = tasks.filter((t) => isUnconfirmed(t));
-    if (unconf.length) {
+    for (const row of shown.review) {
+      const openDrafts = row.drafts.filter((d) => d.status === "pending" || d.status === "edited");
+      if (!openDrafts.length) continue;
       out.push({
-        id: `remind-${unconf.map((t) => t.id).join("-")}`,
-        type: "recordatorio",
-        taskIds: unconf.map((t) => t.id),
-        title: "These clients have not confirmed their calls and meetings. Nudge them?",
-        detail: "We send a reminder. If the time does not work, they can propose another and you accept it in My day.",
-        clients: [...new Set(unconf.map((t) => name(t.slug)))],
+        id: `msg-${row.s.id}`,
+        type: "mensaje",
+        signalId: row.s.id,
+        title: row.s.headline,
+        detail: row.s.what_happened,
+        clients: openDrafts.map((d) => d.displayName),
       });
     }
-    for (const t of trends.slice(0, 3)) {
-      const ds = drafts.filter((d) => d.signalId === t.s.id && (d.status === "pending" || d.status === "edited"));
-      if (ds.length >= 2) {
-        out.push({
-          id: `msg-${t.s.id}`,
-          type: "mensaje",
-          signalId: t.s.id,
-          title: `Message ${ds.length} clients about “${t.s.headline}”`,
-          detail: ds[0]?.body ?? "",
-          clients: ds.map((d) => d.displayName),
-        });
-      }
-    }
-    const techHeavy = clients.filter((c) => c.techWeight > 0.3);
-    if (techHeavy.length) {
-      out.push({
-        id: "inv-tech-rebalance",
-        type: "inversion",
-        title: "Rebalance technology into a broad ETF (VTI)",
-        detail: "Tech is above 30% after the DeepSeek shock and the tariffs. Proposal: move the excess over 25% into a broad market ETF.",
-        clients: techHeavy.map((c) => c.displayName),
-      });
-    }
-    out.push({
-      id: "inv-bonds-ratecut",
-      type: "inversion",
-      title: "Lock bond yield (BND) before further rate cuts",
-      detail: "With the Fed cutting, clients sitting on cash can lock quality bond yield now.",
-      clients: clients.slice(0, 2).map((c) => c.displayName),
-    });
     return out;
-  }, [trends, drafts, clients, tasks]);
+  }, [shown.review]);
+
+  const textOf = (draft: MessageDraft) => edits[draft.id] ?? draft.body;
 
   async function accept(a: Action) {
-    if (a.type === "recordatorio" && a.taskIds) remind(a.taskIds, SEED);
     if (a.type === "mensaje" && a.signalId) {
+      const row = shown.review.find((r) => r.s.id === a.signalId);
+      const dirty = (row?.drafts ?? []).filter((draft) => edits[draft.id] !== undefined && edits[draft.id] !== draft.body);
+      await Promise.all(
+        dirty.map((draft) =>
+          fetch("/api/drafts", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: draft.id, body: edits[draft.id] }),
+          }),
+        ),
+      );
       const d = await fetch("/api/drafts", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -194,31 +231,108 @@ export default function Dashboard() {
 
   const box = "glass group p-5";
   const btn = "btn btn-ghost !px-2.5 !py-1 text-xs";
+  const actionCount = actions.length;
 
   return (
     <div className="mx-auto grid max-w-[1500px] grid-cols-1 gap-5 p-5 lg:h-screen lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
       <div className="min-h-0 space-y-4 overflow-y-auto pr-1">
         <details className={box} open>
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-            <span className="text-lg font-semibold">Clients waiting</span>
+            <span className="text-lg font-semibold">Actions</span>
             <span className="flex items-center gap-2">
-              <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-rose px-1.5 text-xs font-bold text-navy">
-                {pending.length}
+              <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-ink px-1.5 text-xs font-bold text-white">
+                {actionCount}
               </span>
-              <span className="text-white/40 transition group-open:rotate-180">▾</span>
+              <span className="text-ink/40 transition group-open:rotate-180">▾</span>
             </span>
           </summary>
           <ul className="mt-4 space-y-3">
+            {actions.map((a) => {
+              const d = decided[a.id];
+              const row = grouped.review.find((r) => r.s.id === a.signalId);
+              return (
+                <li key={a.id} className="rounded-2xl bg-black/[0.03] ring-1 ring-black/5">
+                  <details className="group/a">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-2 p-3">
+                      <span className="text-sm font-semibold leading-snug">{a.title}</span>
+                      <span className="flex shrink-0 items-center gap-2">
+                        <span className="rounded-full bg-black px-2 py-0.5 text-[10px] font-semibold text-white">Needs you</span>
+                        <span className="text-xs text-ink/40 transition group-open/a:rotate-180">▾</span>
+                      </span>
+                    </summary>
+                    <div className="px-3 pb-3">
+                      <ul className="space-y-3">
+                        {row?.drafts
+                          .filter((draft) => draft.status === "pending" || draft.status === "edited")
+                          .map((draft) => (
+                            <li key={draft.id}>
+                              <p className="text-xs text-ink/75">
+                                <span className="font-semibold">{draft.displayName}</span>
+                                <span className="text-ink/45"> · {why(draft)}</span>
+                              </p>
+                              <textarea
+                                className="field mt-1.5 min-h-24 w-full resize-y text-xs leading-relaxed"
+                                value={textOf(draft)}
+                                onChange={(e) => setEdits((p) => ({ ...p, [draft.id]: e.target.value }))}
+                              />
+                            </li>
+                          ))}
+                      </ul>
+                      {d === "ok" ? (
+                        <p className="mt-3 text-xs font-medium">Sent to these clients.</p>
+                      ) : d === "no" ? (
+                        <p className="mt-3 text-xs text-ink/45">Left for later.</p>
+                      ) : (
+                        <div className="mt-3 flex gap-2">
+                          <button className="btn btn-primary !px-3 !py-1.5 text-xs" onClick={() => accept(a)}>
+                            Send
+                          </button>
+                          <button className={btn} onClick={() => setDecided((p) => ({ ...p, [a.id]: "no" }))}>
+                            Not now
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </details>
+                </li>
+              );
+            })}
+
+            {meetings.map((t) => (
+              <li key={t.id} className="rounded-2xl bg-black/[0.03] p-4 ring-1 ring-black/5">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <span className="rounded-full bg-black/5 px-2 py-0.5 text-[10px] font-semibold">
+                      {t.type === "llamada" ? "Call" : "Meeting"}
+                    </span>
+                    <p className="mt-2 text-sm font-semibold">{name(t.slug)}</p>
+                    <p className="mt-1 text-xs text-ink/60">
+                      {new Date(`${taskDate(t)}T12:00`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })} · {t.time}
+                      {t.note ? ` · ${t.note.split("•")[0].trim()}` : ""}
+                    </p>
+                  </div>
+                  <span className="shrink-0 rounded-full bg-white px-2 py-0.5 text-[10px] font-medium ring-1 ring-black/10">
+                    {t.status === "aceptada" ? "Accepted" : t.status === "cambio" ? "Asked to move" : "Waiting"}
+                  </span>
+                </div>
+              </li>
+            ))}
+
+            {pending.length > 0 && (
+              <li className="pt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink/40">
+                Propose a call or a meeting
+              </li>
+            )}
             {pending.map((c) => (
-              <li key={c.slug} className="rounded-2xl bg-white/5 p-3 ring-1 ring-white/10">
-                <Link href={`/clients/${c.slug}`} className="text-sm font-semibold text-lime hover:underline">
+              <li key={c.slug} className="rounded-2xl bg-black/[0.03] p-3 ring-1 ring-black/5">
+                <Link href={`/clients/${c.slug}`} className="text-sm font-semibold hover:underline">
                   {name(c.slug)}
                 </Link>
                 {c.triggers.map((t, i) => {
                   const k = `${c.slug}-${i}`;
                   return (
                     <div key={i} className="mt-2">
-                      <p className="text-sm text-white/75">
+                      <p className="text-sm text-ink/75">
                         <span
                           className={`mr-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
                             t.kind === "alerta" ? "bg-rose/15 text-rose" : KIND[t.kind].cls
@@ -253,7 +367,7 @@ export default function Dashboard() {
                             );
                           })()
                         ) : (
-                          <p className="mt-1 text-xs font-semibold text-lime">{scheduled[k]}</p>
+                          <p className="mt-1 text-xs font-semibold">{scheduled[k]}</p>
                         )
                       ) : (
                         <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -270,7 +384,7 @@ export default function Dashboard() {
                                   {l}
                                 </button>
                               ))}
-                              <button type="button" onClick={() => setPicking(null)} className="text-xs text-white/40 hover:underline">
+                              <button type="button" onClick={() => setPicking(null)} className="text-xs text-ink/40 hover:underline">
                                 Cancel
                               </button>
                             </>
@@ -294,8 +408,8 @@ export default function Dashboard() {
                   );
                 })}
                 {c.queries.length > 0 && (
-                  <p className="mt-2 rounded-xl bg-white/5 p-2 text-xs text-white/60">
-                    <span className="font-semibold text-white">They are looking at ({c.queries.length}):</span>{" "}
+                  <p className="mt-2 rounded-xl bg-white p-2 text-xs text-ink/60 ring-1 ring-black/5">
+                    <span className="font-semibold text-ink">They are looking at ({c.queries.length}):</span>{" "}
                     {c.queries.map((q) => q.text.replace(/\.$/, "")).join(" · ")}
                   </p>
                 )}
@@ -304,87 +418,47 @@ export default function Dashboard() {
           </ul>
         </details>
 
-        <details className={box}>
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-            <span className="text-lg font-semibold">Actions</span>
-            <span className="flex items-center gap-2">
-              <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-lime px-1.5 text-xs font-bold text-navy">
-                {actions.filter((a) => !decided[a.id]).length}
-              </span>
-              <span className="text-white/40 transition group-open:rotate-180">▾</span>
-            </span>
-          </summary>
-          <ul className="mt-4 space-y-3">
-            {actions.map((a) => {
-              const st = decided[a.id];
-              return (
-                <li key={a.id} className={`rounded-2xl p-3 ring-1 ${st ? "bg-white/5 opacity-60 ring-white/10" : "bg-lime/5 ring-lime/30"}`}>
-                  <p className="eyebrow">
-                    {a.type === "mensaje" ? "Group message" : a.type === "recordatorio" ? "Reminder" : "Investment"}
-                  </p>
-                  <p className="mt-1 text-sm font-semibold">{a.title}</p>
-                  <p className="mt-1 text-[11px] text-white/45">{a.clients.join(", ")}</p>
-                  {open === a.id ? (
-                    <pre className="mt-2 max-h-48 overflow-y-auto whitespace-pre-wrap rounded-xl bg-white/5 p-2 font-sans text-xs text-white/70">
-                      {a.detail}
-                    </pre>
-                  ) : (
-                    <button type="button" onClick={() => setOpen(a.id)} className="mt-1 text-xs text-lime hover:underline">
-                      See detail
-                    </button>
-                  )}
-                  {st ? (
-                    <p className={`mt-2 text-xs font-semibold ${st === "ok" ? "text-lime" : "text-white/40"}`}>
-                      {st === "ok" ? (a.type === "recordatorio" ? "Reminder sent" : a.type === "mensaje" ? "Sent" : "Approved") : "Dismissed"}
-                    </p>
-                  ) : (
-                    <div className="mt-2 flex gap-2">
-                      <button type="button" onClick={() => accept(a)} className="btn btn-primary !px-3 !py-1.5 text-xs">
-                        {a.type === "mensaje" ? "Send to all" : a.type === "recordatorio" ? "Nudge" : "Approve"}
-                      </button>
-                      <button type="button" onClick={() => setDecided((p) => ({ ...p, [a.id]: "no" }))} className="btn btn-ghost !px-3 !py-1.5 text-xs">
-                        Dismiss
-                      </button>
-                    </div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </details>
-
         <details className={box} open>
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
             <span className="text-lg font-semibold">What moved today</span>
             <span className="flex items-center gap-2">
-              <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-lav px-1.5 text-xs font-bold text-navy">
-                {trends.length}
+              <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-black/5 px-1.5 text-xs font-bold text-ink">
+                {shown.auto.length}
               </span>
-              <span className="text-white/40 transition group-open:rotate-180">▾</span>
+              <span className="text-ink/40 transition group-open:rotate-180">▾</span>
             </span>
           </summary>
+          <p className="mt-2 text-xs text-ink/50">Already sent. These were quiet enough to notify on their own.</p>
           <ul className="mt-4 space-y-3">
-            {trends.map(({ s, n, avg, top }) => {
-              const hot = avg >= 80;
-              return (
-                <li key={s.id} className={`rounded-2xl ${hot ? "bg-lime/10 ring-1 ring-lime/40" : "bg-white/5 ring-1 ring-white/10"}`}>
-                  <details className="group/t p-3">
-                    <summary className="flex cursor-pointer list-none items-center justify-between gap-2">
-                      <span className="text-sm font-semibold">{s.headline}</span>
-                      <span className="flex shrink-0 items-center gap-2">
-                        {hot && <span className="rounded-full bg-lime px-2 py-0.5 text-[10px] font-semibold text-navy">Important</span>}
-                        <span className="text-xs text-white/40 transition group-open/t:rotate-180">▾</span>
+            {shown.auto.map(({ s, drafts: ds }) => (
+              <li key={s.id} className="rounded-2xl bg-black/[0.03] ring-1 ring-black/5">
+                <details className="group/n">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-2 p-3">
+                    <span className="text-sm font-semibold">{s.headline}</span>
+                    <span className="flex shrink-0 items-center gap-2">
+                      <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-medium ring-1 ring-black/10">
+                        Notified
                       </span>
-                    </summary>
-                    <p className="mt-2 text-xs text-white/65">{s.what_happened}</p>
-                    <p className="mt-1 text-[11px] text-white/40">
-                      {n} clients · impact {avg}
-                      {top ? ` · most exposed: ${top.displayName}` : ""}
-                    </p>
-                  </details>
-                </li>
-              );
-            })}
+                      <span className="text-xs text-ink/40 transition group-open/n:rotate-180">▾</span>
+                    </span>
+                  </summary>
+                  <ul className="space-y-2 px-3 pb-3">
+                    {ds.map((draft) => (
+                      <li key={draft.id} className="rounded-xl bg-white p-2.5 ring-1 ring-black/5">
+                        <p className="text-xs text-ink/75">
+                          <span className="font-semibold">{draft.displayName}</span>
+                          <span className="text-ink/45"> · {why(draft)}</span>
+                        </p>
+                        <p className="mt-1.5 whitespace-pre-wrap text-xs leading-relaxed text-ink/70">{draft.body}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              </li>
+            ))}
+            {shown.auto.length === 0 && (
+              <li className="text-xs text-ink/45">Nothing quiet enough to send on its own today.</li>
+            )}
           </ul>
         </details>
       </div>

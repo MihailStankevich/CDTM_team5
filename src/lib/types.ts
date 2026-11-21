@@ -5,7 +5,8 @@ export type SignalGroup =
   | "rates"
   | "sector"
   | "geopolitics"
-  | "broad_market";
+  | "broad_market"
+  | "other";
 
 export type DraftStatus = "pending" | "approved" | "edited" | "dismissed";
 

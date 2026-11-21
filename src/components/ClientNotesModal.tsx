@@ -36,16 +36,16 @@ export default function ClientNotesModal({ slug, taskNote, onNote, onClose }: Pr
   const goals = p?.goals ?? [];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/70 p-4 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/25 p-4 backdrop-blur-sm" onClick={onClose}>
       <div className="glass-strong max-h-[85vh] w-full max-w-lg overflow-y-auto p-5" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-start justify-between gap-3">
           <h3 className="text-lg font-semibold">{p?.displayName ?? "Loading…"}</h3>
-          <button type="button" onClick={onClose} className="text-white/50 hover:text-white" aria-label="Close">
+          <button type="button" onClick={onClose} className="text-ink/50 hover:text-ink" aria-label="Close">
             ✕
           </button>
         </div>
         {p && (
-          <p className="mt-1 text-sm text-white/60">
+          <p className="mt-1 text-sm text-ink/60">
             {p.members?.[0]?.age} · {p.city} · {p.childCount ? `${p.childCount} kids` : "no kids"} ·{" "}
             {p.members?.[0]?.riskProfile} · Income {moneyShort(p.salaryTotal)} · Invested{" "}
             {moneyShort(p.investableApprox)}
@@ -64,7 +64,7 @@ export default function ClientNotesModal({ slug, taskNote, onNote, onClose }: Pr
         {(facts.length > 0 || d?.crm?.notes) && (
           <section className="mt-4">
             <p className="eyebrow">On their plan</p>
-            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-white/80">
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-ink/80">
               {d?.crm?.notes && <li>{d.crm.notes}</li>}
               {facts.map((f) => (
                 <li key={f}>{f}</li>
@@ -78,13 +78,13 @@ export default function ClientNotesModal({ slug, taskNote, onNote, onClose }: Pr
             <ul className="mt-2 space-y-1 text-sm">
               {goals.slice(0, 4).map((g) => (
                 <li key={g.name + g.date}>
-                  {g.name} <span className="text-white/45">· {g.date}</span>
+                  {g.name} <span className="text-ink/45">· {g.date}</span>
                 </li>
               ))}
             </ul>
           </section>
         )}
-        <Link href={`/clients/${slug}`} className="mt-4 inline-block text-xs font-medium text-lime hover:underline">
+        <Link href={`/clients/${slug}`} className="mt-4 inline-block text-xs font-medium text-ink hover:underline">
           Open full profile →
         </Link>
       </div>

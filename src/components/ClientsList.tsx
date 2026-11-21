@@ -55,12 +55,12 @@ export default function ClientsList() {
         subtitle={clients ? `${clients.length} households` : "Loading…"}
         actions={
           <label className="glass flex items-center gap-2 !rounded-full px-4 py-2">
-            <Search size={14} className="text-white/45" />
+            <Search size={14} className="text-ink/45" />
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search name, city, tag"
-              className="w-48 bg-transparent text-sm outline-none placeholder:text-white/35"
+              className="w-48 bg-transparent text-sm outline-none placeholder:text-ink/35"
             />
           </label>
         }
@@ -87,7 +87,7 @@ export default function ClientsList() {
                     <Avatar name={c.displayName} size={52} />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-base font-semibold">{c.displayName}</p>
-                      <p className="mt-0.5 truncate text-xs text-white/50">
+                      <p className="mt-0.5 truncate text-xs text-ink/50">
                         {c.city}, {c.state} · {filing(c.taxFilingStatus)}
                       </p>
                     </div>
@@ -100,8 +100,8 @@ export default function ClientsList() {
                       ["Income", moneyShort(c.salaryTotal)],
                       ["Household", `${c.members.length} people`],
                     ].map(([k, v]) => (
-                      <div key={k} className="rounded-2xl bg-white/5 px-3 py-2.5">
-                        <p className="text-[10px] uppercase tracking-wider text-white/40">{k}</p>
+                      <div key={k} className="rounded-2xl bg-black/[0.03] px-3 py-2.5">
+                        <p className="text-[10px] uppercase tracking-wider text-ink/40">{k}</p>
                         <p className="mt-0.5 text-sm font-semibold tabular-nums">{v}</p>
                       </div>
                     ))}
@@ -115,7 +115,7 @@ export default function ClientsList() {
                       </span>
                     )}
                     {signals > 0 && (
-                      <span className="chip !text-lime">
+                      <span className="chip !text-ink">
                         <Radar size={11} /> {signals} social {signals === 1 ? "signal" : "signals"}
                       </span>
                     )}

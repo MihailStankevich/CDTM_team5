@@ -12,17 +12,17 @@ const EQUITY_KEYWORDS =
 const OIL_KEYWORDS = /oil|brent|crude|iran|geopolitic|energy shock/i;
 
 export function classifyGroup(text: string, moment?: MomentType): SignalGroup {
-  const headline = text.slice(0, 90);
-  if (/fed\b|rate cut|rate hike|fomc|tips/i.test(headline)) return "rates";
-  if (/iran|oil|brent|strike|geopolitic/i.test(headline)) return "geopolitics";
-  if (/vix|selloff|sell-off/i.test(headline)) return "broad_market";
-  if (/deepseek|nvidia|semiconductor/i.test(headline)) return "sector";
-  if (moment === "rule" || /irs|wage base|supreme court|tariff/i.test(headline)) return "legislation";
-  if (/fed\b|rate cut|rate hike/i.test(text)) return "rates";
-  if (/iran|oil|brent|airstrike/i.test(text)) return "geopolitics";
-  if (/wage base|child tax credit|supreme court/i.test(text)) return "legislation";
+  const headline = text.slice(0, 160);
+  if (/bond yield|treasury|fed\b|rate cut|rate hike|fomc|interest rate/i.test(headline)) return "rates";
+  if (/\boil\b|brent|crude|iran|airstrike/i.test(headline)) return "geopolitics";
+  if (/nvidia|semiconductor|deepseek|\bchips?\b/i.test(headline)) return "sector";
+  if (moment === "rule" || /irs\b|wage base|child tax credit|tariff|supreme court/i.test(headline)) return "legislation";
+  if (/s&p|stock market|correction|sell-?off|dow jones|nasdaq composite|\bequities\b|\bvix\b/i.test(headline)) return "broad_market";
+  if (/bond yield|treasury|fed\b|rate cut|rate hike/i.test(text)) return "rates";
+  if (/\boil\b|brent|crude|iran/i.test(text)) return "geopolitics";
   if (/nvidia|semiconductor|deepseek/i.test(text)) return "sector";
-  return "broad_market";
+  if (/s&p|correction|sell-?off/i.test(text)) return "broad_market";
+  return "other";
 }
 
 export function classifyMoment(text: string): MomentType {

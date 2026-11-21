@@ -36,6 +36,18 @@ export async function runPipeline(mode: IngestMode = "replay"): Promise<IngestRe
     unique.push(s);
   }
 
+  return finish(unique, profiles, { mode, liveRead, feeds });
+}
+
+export async function rescoreSignals(signals: NewsSignal[]): Promise<IngestResult> {
+  return finish(signals, loadAllProfiles(), { mode: "rss", liveRead: signals.length, feeds: [] });
+}
+
+async function finish(
+  unique: NewsSignal[],
+  profiles: ClientProfile[],
+  origin: { mode: IngestMode; liveRead: number; feeds: { label: string; ok: boolean; count: number }[] },
+): Promise<IngestResult> {
   const impactsBySignal: Record<string, FamilyImpact[]> = {};
   const drafts: MessageDraft[] = [];
   const allMatched: FamilyImpact[] = [];
@@ -75,13 +87,13 @@ export async function runPipeline(mode: IngestMode = "replay"): Promise<IngestRe
     matched: allMatched,
     drafts: visibleDrafts,
     meta: {
-      mode,
+      mode: origin.mode,
       signalCount: visible.length,
       draftCount: visibleDrafts.length,
       generatedAt: new Date().toISOString(),
-      liveRead,
+      liveRead: origin.liveRead,
       liveKept,
-      feeds,
+      feeds: origin.feeds,
     },
   };
 }

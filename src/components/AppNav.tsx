@@ -30,7 +30,7 @@ export default function AppNav() {
                 className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
                   active
                     ? "bg-accent text-white"
-                    : "text-emerald-50/80 hover:bg-ink-soft hover:text-white"
+                    : "text-emerald-50/80 hover:bg-ink-soft hover:text-ink"
                 }`}
               >
                 {l.label}

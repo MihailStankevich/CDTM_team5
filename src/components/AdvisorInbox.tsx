@@ -187,7 +187,7 @@ export default function AdvisorInbox() {
                 if (!n) return null;
                 return (
                   <button key={g.id} className="tab glass !rounded-full" data-active={group === g.id} onClick={() => setGroup(g.id)}>
-                    {g.title} <span className="ml-1 text-white/40">{n}</span>
+                    {g.title} <span className="ml-1 text-ink/40">{n}</span>
                   </button>
                 );
               })}
@@ -202,7 +202,7 @@ export default function AdvisorInbox() {
                       onClick={() => select(s.id)}
                       className={`glass glass-hover w-full px-4 py-3.5 text-left ${s.id === signalId ? "glass-active" : ""}`}
                     >
-                      <div className="flex items-center justify-between gap-2 text-[10px] font-medium uppercase tracking-wider text-white/45">
+                      <div className="flex items-center justify-between gap-2 text-[10px] font-medium uppercase tracking-wider text-ink/45">
                         <span className="flex items-center gap-2">
                           <Dots level={sev(s.severity)} />
                           {GROUP_TITLE[s.group]}
@@ -218,11 +218,11 @@ export default function AdvisorInbox() {
                             </span>
                           ))}
                         </div>
-                        <span className="text-[11px] text-white/50">
+                        <span className="text-[11px] text-ink/50">
                           {ds.length} {ds.length === 1 ? "client" : "clients"}
                         </span>
                         {s.watchTickers?.slice(0, 2).map((t) => (
-                          <span key={t} className="chip !text-lime">
+                          <span key={t} className="chip !text-ink">
                             {t}
                           </span>
                         ))}
@@ -255,17 +255,17 @@ export default function AdvisorInbox() {
                     </button>
                   )}
                 </div>
-                <p className={`mt-2.5 text-[13px] leading-relaxed text-white/60 ${expanded ? "" : "line-clamp-2"}`}>
+                <p className={`mt-2.5 text-[13px] leading-relaxed text-ink/60 ${expanded ? "" : "line-clamp-2"}`}>
                   {signal.what_happened}
                 </p>
                 {signal.what_happened.length > 140 && (
-                  <button className="mt-1 text-xs font-medium text-lav hover:text-white" onClick={() => setExpanded((v) => !v)}>
+                  <button className="mt-1 text-xs font-medium text-lav hover:text-ink" onClick={() => setExpanded((v) => !v)}>
                     {expanded ? "Show less" : "Read more"}
                   </button>
                 )}
 
                 {drafts.length === 0 ? (
-                  <p className="mt-6 rounded-2xl bg-white/5 px-4 py-8 text-center text-sm text-white/50">
+                  <p className="mt-6 rounded-2xl bg-black/[0.03] px-4 py-8 text-center text-sm text-ink/50">
                     No client matched this strongly enough.
                   </p>
                 ) : (
@@ -280,7 +280,7 @@ export default function AdvisorInbox() {
                           className={`flex w-[148px] shrink-0 flex-col gap-2 rounded-2xl border px-3 py-3 text-left transition ${
                             d.id === draftId
                               ? "border-lime/60 bg-lime/10"
-                              : "border-white/10 bg-white/5 hover:bg-white/10"
+                              : "border-black/10 bg-black/[0.03] hover:bg-black/[0.05]"
                           }`}
                         >
                           <div className="flex items-center gap-2">
@@ -293,13 +293,13 @@ export default function AdvisorInbox() {
                             />
                           </div>
                           <Meter value={Math.min(1, d.impactScore / 100)} />
-                          <p className="line-clamp-1 text-[10px] text-white/45">{d.reasons[0]}</p>
+                          <p className="line-clamp-1 text-[10px] text-ink/45">{d.reasons[0]}</p>
                         </button>
                       ))}
                     </div>
 
                     {draft && (
-                      <div className="mt-4 border-t border-white/10 pt-5">
+                      <div className="mt-4 border-t border-black/10 pt-5">
                         <Composer
                           slug={draft.slug}
                           name={draft.displayName}
@@ -323,7 +323,7 @@ export default function AdvisorInbox() {
       )}
 
       {store?.meta && (
-        <p className="mt-8 text-[11px] text-white/30">
+        <p className="mt-8 text-[11px] text-ink/30">
           Updated {new Date(store.meta.generatedAt).toLocaleString()}
           {store.meta.mode === "rss" && ` · read ${store.meta.liveRead ?? 0} live headlines, kept ${store.meta.liveKept ?? 0}`}
           {" · "}Synthetic Sherpas case families. Messages are never auto-sent.

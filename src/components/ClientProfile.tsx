@@ -208,7 +208,7 @@ export default function ClientProfileView({ slug }: { slug: string }) {
 
   return (
     <div className="mx-auto max-w-[1240px] px-6 py-7 lg:px-8">
-      <Link href="/clients" className="inline-flex items-center gap-1 text-xs font-medium text-lav hover:text-white">
+      <Link href="/clients" className="inline-flex items-center gap-1 text-xs font-medium text-lav hover:text-ink">
         <ChevronLeft size={14} /> Clients
       </Link>
 
@@ -218,13 +218,13 @@ export default function ClientProfileView({ slug }: { slug: string }) {
           <Avatar name={profile.displayName} size={72} />
           <div className="min-w-0 flex-1">
             <h1 className="text-2xl font-semibold tracking-tight">{profile.displayName}</h1>
-            <p className="mt-1 text-sm text-white/55">
+            <p className="mt-1 text-sm text-ink/55">
               {profile.city}, {profile.state} · {filing(profile.taxFilingStatus)} · {household.length} in household
             </p>
             {(crm.tags.length > 0 || socialSignals > 0) && (
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {socialSignals > 0 && (
-                  <span className="chip !text-lime">
+                  <span className="chip !text-ink">
                     <Radar size={11} /> {socialSignals} social signal{socialSignals > 1 ? "s" : ""}
                   </span>
                 )}
@@ -244,7 +244,7 @@ export default function ClientProfileView({ slug }: { slug: string }) {
             ].map(([k, v]) => (
               <div key={k} className="hidden text-right sm:block">
                 <p className="text-xl font-semibold tabular-nums">{v}</p>
-                <p className="text-[10px] uppercase tracking-wider text-white/40">{k}</p>
+                <p className="text-[10px] uppercase tracking-wider text-ink/40">{k}</p>
               </div>
             ))}
             <Ring value={profile.score} size={64} label="Financial health score" />
@@ -292,9 +292,9 @@ export default function ClientProfileView({ slug }: { slug: string }) {
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium">
                         {m.firstName}
-                        {m.source === "meeting" && <span className="chip ml-2 !text-lime">new</span>}
+                        {m.source === "meeting" && <span className="chip ml-2 !text-ink">new</span>}
                       </p>
-                      <p className="text-xs capitalize text-white/45">
+                      <p className="text-xs capitalize text-ink/45">
                         {m.role.replace(/_/g, " ")}
                         {m.age != null && ` · ${m.age}`}
                       </p>
@@ -307,7 +307,7 @@ export default function ClientProfileView({ slug }: { slug: string }) {
 
             <Card title="What’s ahead" className="lg:col-span-7">
               {goals.length === 0 ? (
-                <p className="text-sm text-white/45">No goals on the plan.</p>
+                <p className="text-sm text-ink/45">No goals on the plan.</p>
               ) : (
                 <ul className="space-y-4">
                   {goals.slice(0, 5).map((g) => (
@@ -317,7 +317,7 @@ export default function ClientProfileView({ slug }: { slug: string }) {
                           <Calendar size={13} className="text-amber" />
                           {g.name}
                         </p>
-                        <p className="text-xs tabular-nums text-white/50">
+                        <p className="text-xs tabular-nums text-ink/50">
                           {g.date} · {g.monthsAway} mo
                         </p>
                       </div>
@@ -332,9 +332,9 @@ export default function ClientProfileView({ slug }: { slug: string }) {
 
             <Card title="Life timeline" className="lg:col-span-12">
               {timeline.length === 0 ? (
-                <p className="text-sm text-white/45">Nothing new since the plan was made.</p>
+                <p className="text-sm text-ink/45">Nothing new since the plan was made.</p>
               ) : (
-                <ol className="relative ml-2 space-y-5 border-l border-white/10 pl-6">
+                <ol className="relative ml-2 space-y-5 border-l border-black/10 pl-6">
                   {timeline.slice(0, 8).map((t, i) => (
                     <li key={i} className="relative">
                       <span
@@ -343,11 +343,11 @@ export default function ClientProfileView({ slug }: { slug: string }) {
                           background: t.kind === "update" ? "var(--lime)" : t.kind === "social" ? "var(--lav)" : "var(--amber)",
                         }}
                       />
-                      <p className="text-[11px] text-white/40">
+                      <p className="text-[11px] text-ink/40">
                         {t.title}
                         {t.date && ` · ${t.date}`}
                       </p>
-                      <p className="mt-0.5 text-sm text-white/85">{t.text}</p>
+                      <p className="mt-0.5 text-sm text-ink/85">{t.text}</p>
                     </li>
                   ))}
                 </ol>
@@ -366,12 +366,12 @@ export default function ClientProfileView({ slug }: { slug: string }) {
                 </span>
                 <div className="min-w-0">
                   <p className="text-base font-semibold leading-snug">{linkedIn.title}</p>
-                  <p className="mt-0.5 text-xs text-white/50">
+                  <p className="mt-0.5 text-xs text-ink/50">
                     {plainOrg(linkedIn.company)} · {linkedIn.location}
                   </p>
                 </div>
               </div>
-              <p className="mt-4 text-[13px] leading-relaxed text-white/65">{linkedIn.about}</p>
+              <p className="mt-4 text-[13px] leading-relaxed text-ink/65">{linkedIn.about}</p>
               <div className="mt-4 flex flex-wrap gap-1.5">
                 {linkedIn.skills.map((s) => (
                   <span key={s} className="chip">
@@ -379,7 +379,7 @@ export default function ClientProfileView({ slug }: { slug: string }) {
                   </span>
                 ))}
               </div>
-              <p className="mt-5 flex items-center gap-1.5 text-[11px] text-white/35">
+              <p className="mt-5 flex items-center gap-1.5 text-[11px] text-ink/35">
                 <ShieldCheck size={12} /> Demo data, shown as if connected with client consent.
               </p>
             </Card>
@@ -390,11 +390,11 @@ export default function ClientProfileView({ slug }: { slug: string }) {
               ) : (
                 <ul className="space-y-3">
                   {linkedIn.recentActivity.map((a) => (
-                    <li key={a.date + a.text} className="rounded-2xl bg-white/5 p-4">
-                      <p className="text-[11px] text-white/40">{a.date}</p>
+                    <li key={a.date + a.text} className="rounded-2xl bg-black/[0.03] p-4">
+                      <p className="text-[11px] text-ink/40">{a.date}</p>
                       <p className="mt-1 text-sm">{a.text}</p>
                       {a.signal && (
-                        <p className="mt-2.5 flex items-start gap-2 rounded-xl bg-lime/10 px-3 py-2 text-xs font-medium text-lime">
+                        <p className="mt-2.5 flex items-start gap-2 rounded-xl bg-black/5 px-3 py-2 text-xs font-medium text-ink">
                           <Radar size={13} className="mt-0.5 shrink-0" />
                           {a.signal}
                         </p>
@@ -417,7 +417,7 @@ export default function ClientProfileView({ slug }: { slug: string }) {
                   center={
                     <>
                       <p className="text-lg font-semibold tabular-nums">{moneyShort(profile.investableApprox)}</p>
-                      <p className="text-[10px] uppercase tracking-wider text-white/40">invested</p>
+                      <p className="text-[10px] uppercase tracking-wider text-ink/40">invested</p>
                     </>
                   }
                 />
@@ -426,7 +426,7 @@ export default function ClientProfileView({ slug }: { slug: string }) {
                     <li key={s.sector} className="flex items-center gap-2.5 text-xs">
                       <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: donutColor(i) }} />
                       <span className="min-w-0 flex-1 truncate">{s.sector}</span>
-                      <span className="tabular-nums text-white/55">{pct(s.weight, 0)}</span>
+                      <span className="tabular-nums text-ink/55">{pct(s.weight, 0)}</span>
                     </li>
                   ))}
                 </ul>
@@ -440,7 +440,7 @@ export default function ClientProfileView({ slug }: { slug: string }) {
                     <div className="flex items-baseline justify-between gap-3 text-sm">
                       <span className="min-w-0 truncate">
                         <span className="font-semibold">{h.ticker}</span>
-                        <span className="ml-2 text-xs text-white/45">{h.name}</span>
+                        <span className="ml-2 text-xs text-ink/45">{h.name}</span>
                       </span>
                       <span className="tabular-nums">{money(h.value)}</span>
                     </div>
@@ -451,7 +451,7 @@ export default function ClientProfileView({ slug }: { slug: string }) {
                 ))}
               </ul>
               {holdings.length > 6 && (
-                <button className="mt-4 text-xs font-medium text-lav hover:text-white" onClick={() => setShowAll((v) => !v)}>
+                <button className="mt-4 text-xs font-medium text-lav hover:text-ink" onClick={() => setShowAll((v) => !v)}>
                   {showAll ? "Show top 6" : `Show all ${holdings.length}`}
                 </button>
               )}
@@ -459,7 +459,7 @@ export default function ClientProfileView({ slug }: { slug: string }) {
 
             <Card title="How past shocks hit this plan" className="lg:col-span-12">
               {worst && (
-                <p className="mb-4 flex items-center gap-2 text-sm text-white/65">
+                <p className="mb-4 flex items-center gap-2 text-sm text-ink/65">
                   <TrendingDown size={15} className="text-rose" />
                   Worst case on record: {worst.eventTitle}, {pct(worst.drawdownPct)} (about{" "}
                   {money(Math.abs(worst.drawdownPct) * profile.investableApprox)}).
@@ -470,7 +470,7 @@ export default function ClientProfileView({ slug }: { slug: string }) {
                   <li key={e.eventTitle}>
                     <div className="flex items-baseline justify-between gap-3 text-xs">
                       <span className="truncate">{e.eventTitle}</span>
-                      <span className="tabular-nums text-white/55">
+                      <span className="tabular-nums text-ink/55">
                         {pct(e.drawdownPct)}
                         {e.recoveryDays != null && ` · ${e.recoveryDays}d`}
                       </span>
@@ -528,25 +528,25 @@ export default function ClientProfileView({ slug }: { slug: string }) {
 
             <Card title="History" className="lg:col-span-12">
               {crm.meetings.length === 0 ? (
-                <p className="text-sm text-white/45">No meetings logged yet.</p>
+                <p className="text-sm text-ink/45">No meetings logged yet.</p>
               ) : (
                 <ul className="space-y-3">
                   {crm.meetings.map((m) => (
-                    <li key={m.id} className="rounded-2xl bg-white/5 p-4">
+                    <li key={m.id} className="rounded-2xl bg-black/[0.03] p-4">
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <p className="text-sm font-medium">{m.title}</p>
-                        <p className="text-[11px] text-white/40">{new Date(m.createdAt).toLocaleDateString()}</p>
+                        <p className="text-[11px] text-ink/40">{new Date(m.createdAt).toLocaleDateString()}</p>
                       </div>
                       {m.extractedEvents.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-1.5">
                           {m.extractedEvents.map((e, i) => (
-                            <span key={i} className="chip !text-lime">
+                            <span key={i} className="chip !text-ink">
                               {EVENT_LABEL[e.eventType] || e.eventType}
                             </span>
                           ))}
                         </div>
                       )}
-                      {m.transcript && <p className="mt-2 line-clamp-2 text-xs text-white/50">{m.transcript}</p>}
+                      {m.transcript && <p className="mt-2 line-clamp-2 text-xs text-ink/50">{m.transcript}</p>}
                     </li>
                   ))}
                 </ul>

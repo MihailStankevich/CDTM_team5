@@ -29,6 +29,27 @@ function findDrawdown(profile: ClientProfile, signal: NewsSignal) {
   );
 }
 
+type StoryKind = "rates" | "tech" | "tariff" | "oil" | "tax" | "broad";
+
+/** A headline only counts when it is about a sleeve someone actually owns. */
+function storyKind(signal: NewsSignal): StoryKind | null {
+  const headline = signal.headline;
+  const blob = `${headline} ${signal.what_happened}`;
+  if (/bond yield|treasury|fed\b|rate cut|rate hike|fomc|interest rate/i.test(blob)) return "rates";
+  if (/nvidia|semiconductor|deepseek|\bchips?\b/i.test(headline)) return "tech";
+  if (/tariff|trade war|reciprocal/i.test(headline)) return "tariff";
+  if (/\boil\b|brent|crude|iran|airstrike/i.test(headline)) return "oil";
+  if (/wage base|child tax credit|standard deduction|social security wage/i.test(blob)) return "tax";
+  if (/s&p|stock market|correction|sell-?off|dow jones|nasdaq composite|\bequities\b|\bvix\b/i.test(headline)) return "broad";
+  if (signal.source === "rss" || signal.group === "other") return null;
+  if (signal.group === "rates") return "rates";
+  if (signal.group === "sector") return "tech";
+  if (signal.group === "geopolitics") return "oil";
+  if (signal.group === "legislation") return /tariff|supreme/i.test(headline) ? "tariff" : "tax";
+  if (signal.group === "broad_market") return "broad";
+  return null;
+}
+
 function nearTermGoals(profile: ClientProfile, withinMonths = 36) {
   return profile.goals.filter((g) => g.monthsAway >= 0 && g.monthsAway <= withinMonths);
 }
@@ -66,71 +87,65 @@ export function scoreFamilyAgainstSignal(
     };
   }
 
-  const blob = `${signal.headline} ${signal.what_happened}`.toLowerCase();
-  const holds = (re: RegExp) => profile.tickers.some((t) => re.test(t));
-  const tech = profile.sectors.find((s) => /technology/i.test(s.sector));
-  const techIsSignificant = /significant/i.test(tech?.severity ?? "") || profile.techWeight >= 0.34;
+  const kind = storyKind(signal);
+  if (!kind) return null;
 
-  const isRates = signal.group === "rates" || /fed\b|rate cut|rate hike|fomc/i.test(signal.headline);
-  const isTech =
-    signal.group === "sector" || /deepseek|nvidia|semiconductor/i.test(signal.headline);
-  const isTariff = /tariff|supreme court/i.test(signal.headline);
-  const isOil = signal.group === "geopolitics" || /iran|oil|brent|airstrike/i.test(signal.headline);
-  const isTax =
-    signal.moment === "rule" ||
-    /wage base|child tax credit|standard deduction/i.test(signal.headline);
-  const isBroad = signal.group === "broad_market";
+  const listed = (held: { ticker: string; name: string; value: number }[]) => {
+    const totals = new Map<string, number>();
+    for (const h of held) {
+      const key = h.ticker || h.name;
+      totals.set(key, (totals.get(key) ?? 0) + h.value);
+    }
+    return [...totals.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([name, value]) => `${name} ${money(value)}`)
+      .join(", ");
+  };
+  const dollars = (held: { value: number }[]) => held.reduce((sum, h) => sum + h.value, 0);
 
-  if (isRates) {
-    const bonds = profile.holdings.filter((h) => /SCHP|LQD/i.test(h.ticker));
-    const home = nearTermGoals(profile, 18).find((g) => /home/i.test(g.name));
-    if (!bonds.length && !home) return null;
-    score += 40;
+  if (kind === "rates") {
+    const bonds = profile.holdings.filter((h) =>
+      /SCHP|LQD|JNK|BND|FSTDX|bond|tips/i.test(`${h.ticker} ${h.name} ${h.category}`),
+    );
+    const home = nearTermGoals(profile, 18).find((g) => /home|mortgage/i.test(g.name));
+    const value = dollars(bonds);
+    if (value < 8000 && !home) return null;
+    score += Math.round(value / 1500) + (home ? 4 : 0);
     if (bonds.length) {
-      reasons.push(`Holds ${bonds.map((h) => h.ticker).join(", ")}`);
+      reasons.push(`Bond sleeve ${money(value)}`);
       touches.push(
-        `Rate move hits ${bonds.map((h) => `${h.ticker} (${money(h.value)})`).join("; ")}, not the stock funds.`,
+        `The bond sleeve is ${listed(bonds)}. A move in yields shows up here, not in the stock funds.`,
       );
     }
     if (home) {
       reasons.push(`Home purchase ${home.date}`);
       touches.push(`${home.name} is ${home.monthsAway} months away, so the mortgage rate is the point.`);
-      score += 15;
     }
     where.push("investment-analysis.json: positions");
-  } else if (isTech) {
-    if (!techIsSignificant && !holds(/UPRO|FCNTX/)) return null;
-    score += 40 + Math.round(profile.techWeight * 40);
-    reasons.push(
-      holds(/UPRO|FCNTX/)
-        ? "Leveraged or active US equity"
-        : `Technology ${pct(profile.techWeight)} of equity`,
-    );
+  } else if (kind === "tech") {
+    if (profile.techWeight < TECH_THRESHOLD) return null;
+    const tech = profile.sectors.find((s) => /technology/i.test(s.sector));
+    const equity = profile.holdings.filter((h) => /VTI|VUG|FCNTX|VWELX|SCHD/i.test(h.ticker));
+    score += 25 + Math.round(profile.techWeight * 80);
+    reasons.push(`Technology ${pct(profile.techWeight)} of equity`);
     touches.push(
-      `Technology is ${(profile.techWeight * 100).toFixed(1)}% of equity${tech?.driver ? ` (${tech.driver})` : ""}.`,
+      `Technology is ${(profile.techWeight * 100).toFixed(1)}% of equity${tech?.driver ? ` (${tech.driver})` : ""}. The stock funds carrying that are ${listed(equity) || "the equity mix"}.`,
     );
     where.push("investment-analysis.json: sectorConcentration");
-  } else if (isTariff) {
-    if (!holds(/VWO|VEA/) || profile.techWeight < TECH_THRESHOLD) return null;
-    if (!techIsSignificant && !holds(/UPRO/)) return null;
-    score += 35 + Math.round(profile.techWeight * 30);
-    reasons.push("Emerging or foreign equity plus a heavy tech weight");
+  } else if (kind === "tariff" || kind === "oil") {
+    const foreign = profile.holdings.filter((h) => /VEA|VWO/i.test(h.ticker));
+    const value = dollars(foreign);
+    if (value < 8000) return null;
+    score += Math.round(value / 1200);
+    reasons.push(`International equity ${money(value)}`);
     touches.push(
-      `Holds ${profile.tickers.filter((t) => /VWO|VEA|UPRO/.test(t)).join(", ")}. Technology is ${(profile.techWeight * 100).toFixed(1)}% of equity.`,
+      kind === "oil"
+        ? `Foreign funds on the plan: ${listed(foreign)}. An oil shock hits this sleeve, not a leveraged US fund.`
+        : `Foreign funds on the plan: ${listed(foreign)}. Tariffs land on this international sleeve.`,
     );
     where.push("investment-analysis.json: positions");
-  } else if (isOil) {
-    const foreign = profile.holdings.filter((h) => /VEA|VWO/.test(h.ticker));
-    if (!holds(/VEA/) && !techIsSignificant) return null;
-    score += holds(/VEA/) ? 45 : 30;
-    reasons.push(holds(/VEA/) ? "Holds VEA" : "High technology weight in a risk-off shock");
-    if (foreign.length) {
-      touches.push(
-        `Foreign funds on the plan: ${foreign.map((h) => `${h.ticker} ${money(h.value)}`).join("; ")}.`,
-      );
-    }
-    where.push("investment-analysis.json: positions");
-  } else if (isTax) {
+  } else if (kind === "tax") {
     const material = profile.aboveSsWageBase2027 || profile.childCount > 0;
     if (!material) return null;
     score += 25;
@@ -147,17 +162,25 @@ export function scoreFamilyAgainstSignal(
       touches.push(`Child tax credit indexing can apply — ${profile.childCount} dependent(s) on the plan.`);
     }
     where.push("legal-values.json, financial-health.json: incomes, household");
-  } else if (isBroad && profile.equityValue > 0) {
+  } else if (kind === "broad") {
+    const equity = profile.holdings.filter((h) => /VTI|VOO|SPY|UPRO|FCNTX|VWELX|SCHD|FIGSX/i.test(h.ticker));
+    const value = dollars(equity);
+    if (value < 20000) return null;
+    const upro = equity.find((h) => /UPRO/i.test(h.ticker));
+    const effective = equity.reduce((sum, h) => sum + h.value * (/UPRO/i.test(h.ticker) ? 3 : 1), 0);
+    score += Math.min(80, 15 + Math.round(effective / 4000));
     const dd = findDrawdown(profile, signal);
-    const leveraged = holds(/UPRO/);
-    score += (leveraged ? 50 : 15) + Math.round(Math.abs(dd?.drawdownPct ?? 0) * 200);
-    reasons.push(leveraged ? "Holds UPRO" : "Equity book");
+    reasons.push(`US equity ${money(value)}`);
+    const lever = upro ? `, including ${money(upro.value)} in UPRO, which moves about 3x the index on the day` : "";
+    touches.push(
+      `US stock funds: ${listed(equity)}. An index move lands on this ${money(value)} sleeve${lever}.`,
+    );
     if (dd) {
       touches.push(
         `In "${dd.eventTitle}" this mix fell ${pct(dd.drawdownPct)} — about ${money(Math.abs(dd.drawdownPct) * profile.investableApprox)} on ${money(profile.investableApprox)}.`,
       );
     }
-    where.push("investment-analysis.json: perEventDrawdowns");
+    where.push("investment-analysis.json: positions");
   }
 
   if (score < 25) return null;
@@ -186,10 +209,14 @@ export function matchSignalToFamilies(
     .filter((x): x is FamilyImpact => x !== null)
     .sort((a, b) => b.score - a.score);
 
-  // A plain index move is real for everyone with stocks. Show who is actually
-  // different — leveraged, or the deeper drawdown — instead of listing the whole book.
-  if (!signal.watchTickers?.length && signal.group === "broad_market" && hits.length > 2) {
-    return hits.slice(0, 2);
+  if (signal.watchTickers?.length || hits.length < 2) return hits;
+  const lead = hits[0];
+  const indexMove = lead.touches_this_family[0]?.startsWith("US stock funds");
+  if (indexMove) {
+    const levered = hits.find((h) => /UPRO/.test(h.touches_this_family[0] ?? ""));
+    if (levered && levered !== lead) return [lead, levered];
   }
-  return hits;
+  const buyer = hits.find((h) => h.reasons.some((r) => r.startsWith("Home purchase")));
+  if (buyer && buyer !== lead) return [lead, buyer];
+  return hits.slice(0, 2);
 }

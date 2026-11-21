@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Calendar, ChevronRight, Inbox, Radar, Send } from "lucide-react";
+import { ChevronRight, Inbox, Send } from "lucide-react";
 import type { Channel, ChatMessage, ClientCrmState, ClientProfile, LinkedInSim } from "@/lib/types";
-import { Avatar, CHANNEL, ChannelIcon, Empty, moneyShort, Ring, Toast } from "./ui";
+import { Avatar, CHANNEL, ChannelIcon, Empty, moneyShort, Toast } from "./ui";
 
 interface Thread {
   slug: string;
@@ -20,6 +20,28 @@ interface Context {
 
 const time = (iso: string) =>
   new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+
+function clientBrief(profile: ClientProfile, extraKids: number) {
+  const style = profile.persona.decisionStyle.toLowerCase();
+  const risk = profile.persona.riskOrientation.toLowerCase();
+  let talk = "Plain and personal. One idea per message.";
+  if (style.includes("validator")) talk = "Short and factual. She confirms before she acts.";
+  else if (style.includes("dual")) talk = "Write so both of them can follow. Skip the jargon.";
+  else if (style.includes("collaborator")) talk = "Decide it with them. Offer the option, don't push.";
+
+  const names = profile.members.filter((m) => m.role === "child").map((m) => m.firstName);
+  const n = profile.childCount + extraKids;
+  const family = n === 0 ? "No kids." : `${n} ${n === 1 ? "child" : "kids"}${names.length ? `: ${names.join(", ")}` : ""}.`;
+
+  let markets = "Knows the basics. Stay concrete.";
+  if (style.includes("validator")) markets = "Comfortable with a simple portfolio. Lead with the number.";
+  else if (style.includes("dual")) markets = "Not deep in markets. Say what it changes for the family.";
+  else if (profile.score < 40) markets = "Needs everyday language. Don't assume they follow the news.";
+  else if (risk.includes("aggressive") || profile.score >= 70) markets = "Comfortable with risk. Be direct.";
+
+  const next = [...profile.goals].sort((a, b) => a.monthsAway - b.monthsAway)[0];
+  return { talk, family, markets, next };
+}
 
 export default function UnifiedInbox() {
   const params = useSearchParams();
@@ -102,9 +124,9 @@ export default function UnifiedInbox() {
   }
 
   return (
-    <div className="flex h-full min-h-0 gap-4 p-4 pl-0">
+    <div className="grid h-full min-h-0 grid-cols-[210px_minmax(0,1fr)_230px] gap-4 p-4 pl-0">
       {/* ---------- threads ---------- */}
-      <section className="glass flex w-[300px] shrink-0 flex-col overflow-hidden">
+      <section className="glass flex min-h-0 flex-col overflow-hidden">
         <div className="px-5 pb-3 pt-5">
           <h1 className="text-lg font-semibold">Inbox</h1>
           <div className="mt-3 flex flex-wrap gap-1">
@@ -126,16 +148,16 @@ export default function UnifiedInbox() {
                   type="button"
                   onClick={() => select(t.slug)}
                   className={`flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${
-                    t.slug === slug ? "bg-white/12" : "hover:bg-white/6"
+                    t.slug === slug ? "bg-black/[0.06]" : "hover:bg-black/[0.04]"
                   }`}
                 >
                   <Avatar name={t.displayName} size={40} />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
                       <span className="truncate text-[13px] font-semibold">{t.displayName}</span>
-                      <span className="shrink-0 text-[10px] text-white/35">{last ? time(last.at) : ""}</span>
+                      <span className="shrink-0 text-[10px] text-ink/35">{last ? time(last.at) : ""}</span>
                     </div>
-                    <div className="mt-0.5 flex items-center gap-1.5 text-white/45">
+                    <div className="mt-0.5 flex items-center gap-1.5 text-ink/45">
                       <ChannelIcon channel={t.channel} size={11} />
                       <span className="line-clamp-1 flex-1 text-[11px]">{last?.body}</span>
                       {waiting && <span className="h-2 w-2 shrink-0 rounded-full bg-lime" />}
@@ -152,11 +174,11 @@ export default function UnifiedInbox() {
       <section className="glass flex min-w-0 flex-1 flex-col overflow-hidden">
         {active ? (
           <>
-            <header className="flex items-center gap-3 border-b border-white/10 px-6 py-4">
+            <header className="flex items-center gap-3 border-b border-black/10 px-6 py-4">
               <Avatar name={active.displayName} size={38} />
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold">{active.displayName}</p>
-                <p className="flex items-center gap-1.5 text-[11px] text-white/45">
+                <p className="flex items-center gap-1.5 text-[11px] text-ink/45">
                   <ChannelIcon channel={active.channel} size={11} /> {CHANNEL[active.channel].label}
                 </p>
               </div>
@@ -172,11 +194,11 @@ export default function UnifiedInbox() {
                   <div key={m.id} className={`flex ${out ? "justify-end" : "justify-start"}`}>
                     <div
                       className={`max-w-[560px] rounded-3xl px-4 py-2.5 text-[13px] leading-relaxed ${
-                        out ? "rounded-br-lg bg-lime text-navy" : "rounded-bl-lg bg-white/10 text-white"
+                        out ? "rounded-br-lg bg-ink text-white" : "rounded-bl-lg bg-black/[0.05] text-ink"
                       }`}
                     >
                       <p className="whitespace-pre-wrap">{m.body}</p>
-                      <p className={`mt-1 text-[10px] ${out ? "text-navy/60" : "text-white/40"}`}>
+                      <p className={`mt-1 text-[10px] ${out ? "text-white/70" : "text-ink/40"}`}>
                         {time(m.at)}
                         {m.nurtureId && " · approved draft"}
                       </p>
@@ -187,7 +209,7 @@ export default function UnifiedInbox() {
               <div ref={endRef} />
             </div>
 
-            <div className="border-t border-white/10 px-6 py-4">
+            <div className="border-t border-black/10 px-6 py-4">
               {note && <div className="mb-3"><Toast tone="ok">{note}</Toast></div>}
               {error && <div className="mb-3"><Toast tone="error">{error}</Toast></div>}
               <div className="flex items-end gap-2">
@@ -202,7 +224,7 @@ export default function UnifiedInbox() {
                   <Send size={16} />
                 </button>
               </div>
-              <p className="mt-2 text-[10px] text-white/35">
+              <p className="mt-2 text-[10px] text-ink/35">
                 Logged messages are read for life events — a promotion, a baby or a layoff worry updates the profile.
               </p>
             </div>
@@ -213,64 +235,37 @@ export default function UnifiedInbox() {
       </section>
 
       {/* ---------- client snapshot ---------- */}
-      <aside className="glass hidden w-[290px] shrink-0 flex-col overflow-auto p-5 xl:flex">
+      <aside className="glass flex min-h-0 flex-col overflow-auto p-5">
         {ctx && active ? (
-          <div className="animate-fade space-y-5">
+          <div className="animate-fade">
             <div className="flex items-center gap-3">
-              <Ring value={ctx.profile.score} size={52} label="Financial health" />
+              <Avatar name={ctx.profile.displayName} size={40} />
               <div>
                 <p className="text-sm font-semibold">{ctx.profile.displayName}</p>
-                <p className="text-[11px] text-white/45">
-                  {moneyShort(ctx.profile.investableApprox)} invested
+                <p className="text-[11px] text-ink/45">
+                  {ctx.profile.city} · {moneyShort(ctx.profile.investableApprox)} invested
                 </p>
               </div>
             </div>
-
-            <div>
-              <p className="eyebrow mb-2">Talk to them like this</p>
-              <p className="rounded-2xl bg-white/6 px-3 py-2.5 text-xs leading-snug text-white/80">
-                {ctx.profile.persona.decisionStyle}
-              </p>
-            </div>
-
-            {ctx.profile.persona.concerns.length > 0 && (
-              <div>
-                <p className="eyebrow mb-2">On their mind</p>
-                <ul className="space-y-1.5">
-                  {ctx.profile.persona.concerns.slice(0, 2).map((c) => (
-                    <li key={c} className="line-clamp-3 text-xs leading-snug text-white/65">
-                      {c}
-                    </li>
+            {(() => {
+              const b = clientBrief(ctx.profile, ctx.crm.extraMembers.filter((m) => m.role === "child").length);
+              const rows = [
+                ["How to talk", b.talk],
+                ["Family", b.family],
+                ["Investing", b.markets],
+                b.next ? ["Next", `${b.next.name} · ${b.next.date}`] : null,
+              ].filter((row): row is [string, string] => row !== null);
+              return (
+                <dl className="mt-5 space-y-3">
+                  {rows.map(([k, v]) => (
+                    <div key={k}>
+                      <dt className="text-[10px] font-semibold uppercase tracking-[0.14em] text-ink/40">{k}</dt>
+                      <dd className="mt-0.5 text-xs leading-snug text-ink/80">{v}</dd>
+                    </div>
                   ))}
-                </ul>
-              </div>
-            )}
-
-            {ctx.profile.goals[0] && (
-              <div className="flex items-center gap-2.5 rounded-2xl bg-amber/10 px-3 py-2.5 text-xs text-amber">
-                <Calendar size={14} className="shrink-0" />
-                <span>
-                  {ctx.profile.goals[0].name} · {ctx.profile.goals[0].date}
-                </span>
-              </div>
-            )}
-
-            {ctx.linkedIn.recentActivity.filter((a) => a.signal).slice(0, 1).map((a) => (
-              <div key={a.date} className="flex items-start gap-2.5 rounded-2xl bg-lime/10 px-3 py-2.5 text-xs text-lime">
-                <Radar size={14} className="mt-0.5 shrink-0" />
-                <span>{a.signal}</span>
-              </div>
-            ))}
-
-            {ctx.crm.tags.length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
-                {ctx.crm.tags.map((t) => (
-                  <span key={t} className="chip">
-                    {t}
-                  </span>
-                ))}
-              </div>
-            )}
+                </dl>
+              );
+            })()}
           </div>
         ) : (
           <div className="space-y-3">

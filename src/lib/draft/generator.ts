@@ -175,7 +175,7 @@ export async function composeDraft(
 ): Promise<MessageDraft> {
   const name = firstName(profile);
   const written = await writeClientNote({
-    cacheKey: `${draft.id}:${signal.headline}`,
+    cacheKey: `${draft.id}:${signal.headline}:${draft.touches.join("|").slice(0, 160)}`,
     clientName: name,
     voice: toneHint(profile).opener,
     situation: signal.headline,

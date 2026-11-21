@@ -41,12 +41,12 @@ export default function Composer(p: ComposerProps) {
         <Avatar name={p.name} size={44} />
         <div className="min-w-0">
           <p className="truncate text-base font-semibold">{p.name}</p>
-          <p className="mt-0.5 flex items-center gap-1.5 text-xs text-white/55">
+          <p className="mt-0.5 flex items-center gap-1.5 text-xs text-ink/55">
             <ChannelIcon channel={p.channel} size={12} /> {CHANNEL[p.channel].label}
             {p.tone && (
               <>
-                <span className="text-white/25">·</span>
-                <Sparkles size={11} className="text-lime" /> {p.tone}
+                <span className="text-ink/25">·</span>
+                <Sparkles size={11} className="text-ink" /> {p.tone}
               </>
             )}
           </p>
@@ -58,7 +58,7 @@ export default function Composer(p: ComposerProps) {
       {p.why.length > 0 && (
         <ul className="mt-5 space-y-2">
           {p.why.slice(0, 3).map((w) => (
-            <li key={w} className="flex items-start gap-2.5 text-[13px] leading-snug text-white/75">
+            <li key={w} className="flex items-start gap-2.5 text-[13px] leading-snug text-ink/75">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-lime" />
               {w}
             </li>
@@ -83,7 +83,7 @@ export default function Composer(p: ComposerProps) {
       </div>
 
       {p.approved ? (
-        <div className="mt-4 flex items-center gap-2 rounded-2xl bg-lime/15 px-4 py-3 text-sm font-medium text-lime">
+        <div className="mt-4 flex items-center gap-2 rounded-2xl bg-lime/15 px-4 py-3 text-sm font-medium text-ink">
           <Check size={16} /> Approved — ready in {CHANNEL[p.channel].label}
         </div>
       ) : (
@@ -108,13 +108,13 @@ export default function Composer(p: ComposerProps) {
           )}
           <Link
             href={`/clients/${p.slug}`}
-            className="ml-auto inline-flex items-center gap-1 text-xs font-medium text-lav hover:text-white"
+            className="ml-auto inline-flex items-center gap-1 text-xs font-medium text-lav hover:text-ink"
           >
             Profile <ChevronRight size={14} />
           </Link>
         </div>
       )}
-      <p className="mt-3 text-[10px] text-white/35">Nothing is sent without your approval.</p>
+      <p className="mt-3 text-[10px] text-ink/35">Nothing is sent without your approval.</p>
     </div>
   );
 }

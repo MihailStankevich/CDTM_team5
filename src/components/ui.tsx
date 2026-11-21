@@ -84,27 +84,17 @@ export function KindBadge({ kind }: { kind: FeedKind }) {
 }
 
 /* ---------- avatar ---------- */
-const GRADS = [
-  ["#aab4f0", "#5a67d8"],
-  ["#bcd600", "#5f8f00"],
-  ["#f5c26b", "#d9822b"],
-  ["#ff8fa3", "#b83a7a"],
-  ["#7fd6ff", "#3b6fd8"],
-];
-
 export function Avatar({ name, size = 40 }: { name: string; size?: number }) {
   const parts = name.replace(/[&·]/g, " ").split(/\s+/).filter(Boolean);
   const initials = ((parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "")).toUpperCase();
-  const g = GRADS[[...name].reduce((a, c) => a + c.charCodeAt(0), 0) % GRADS.length];
   return (
     <span
-      className="inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-navy"
+      className="inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-ink"
       style={{
         width: size,
         height: size,
-        fontSize: size * 0.36,
-        background: `linear-gradient(135deg, ${g[0]}, ${g[1]})`,
-        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.4)",
+        fontSize: size * 0.34,
+        background: "#e6e6ea",
       }}
     >
       {initials}
@@ -155,7 +145,7 @@ export function Ring({
 
 export function Meter({ value, color = "var(--lime)" }: { value: number; color?: string }) {
   return (
-    <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+    <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/[0.05]">
       <div
         className="h-full rounded-full"
         style={{ width: `${Math.max(3, Math.min(100, value * 100))}%`, background: color, transition: "width 0.6s" }}
@@ -171,14 +161,14 @@ export function Dots({ level, max = 3 }: { level: number; max?: number }) {
         <span
           key={i}
           className="h-1.5 w-1.5 rounded-full"
-          style={{ background: i < level ? "var(--lime)" : "rgba(255,255,255,0.18)" }}
+          style={{ background: i < level ? "var(--ink)" : "rgba(0,0,0,0.12)" }}
         />
       ))}
     </span>
   );
 }
 
-const DONUT = ["#bcd600", "#aab4f0", "#f5c26b", "#ff8fa3", "#7fd6ff", "#8f7bff", "#5a67d8", "#ffffff"];
+const DONUT = ["#1c1c1e", "#8e96c8", "#c4a15a", "#d27a8a", "#6aaed4", "#8f7bff", "#5a67d8", "#b7b7be"];
 export const donutColor = (i: number) => DONUT[i % DONUT.length];
 
 export function Donut({
@@ -240,7 +230,7 @@ export function PageHeader({
       <div>
         {eyebrow && <p className="eyebrow">{eyebrow}</p>}
         <h1 className="mt-1 text-[28px] font-semibold leading-tight tracking-tight">{title}</h1>
-        {subtitle && <p className="mt-1.5 text-sm text-white/55">{subtitle}</p>}
+        {subtitle && <p className="mt-1.5 text-sm text-ink/55">{subtitle}</p>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </header>
@@ -271,7 +261,7 @@ export function Stat({
       </span>
       <div className="min-w-0">
         <p className="text-2xl font-semibold leading-none tabular-nums">{value}</p>
-        <p className="mt-1.5 truncate text-[11px] text-white/55">{label}</p>
+        <p className="mt-1.5 truncate text-[11px] text-ink/55">{label}</p>
         {hint && <p className="sr-only">{hint}</p>}
       </div>
     </div>
@@ -281,11 +271,11 @@ export function Stat({
 export function Empty({ icon: Icon, title, text }: { icon: LucideIcon; title: string; text?: string }) {
   return (
     <div className="glass flex flex-col items-center gap-2 px-6 py-14 text-center">
-      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/8 text-lav">
+      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-black/[0.04] text-lav">
         <Icon size={22} />
       </span>
       <p className="text-sm font-medium">{title}</p>
-      {text && <p className="max-w-xs text-xs text-white/50">{text}</p>}
+      {text && <p className="max-w-xs text-xs text-ink/50">{text}</p>}
     </div>
   );
 }
@@ -294,7 +284,7 @@ export function Toast({ tone, children }: { tone: "ok" | "error"; children: Reac
   return (
     <div
       className={`animate-rise rounded-2xl px-4 py-2.5 text-xs font-medium ${
-        tone === "ok" ? "bg-lime/15 text-lime" : "bg-rose/15 text-rose"
+        tone === "ok" ? "bg-black/5 text-ink" : "bg-rose/15 text-rose"
       }`}
     >
       {children}
@@ -321,13 +311,13 @@ export function Drawer({
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
-      <div className="animate-fade absolute inset-0 bg-navy/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="animate-fade absolute inset-0 bg-black/25 backdrop-blur-sm" onClick={onClose} />
       <aside className="glass-strong animate-slide-in relative m-3 flex w-full max-w-[520px] flex-col overflow-hidden">
         <button
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white"
+          className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/[0.05] text-ink/70 hover:bg-black/10 hover:text-ink"
         >
           <X size={16} />
         </button>

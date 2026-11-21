@@ -1,5 +1,5 @@
 import type { AdvisorStore, DraftStatus, MessageDraft } from "./types";
-import { groupImpactsBySignal, runPipeline, type IngestMode } from "./pipeline";
+import { groupImpactsBySignal, rescoreSignals, runPipeline, type IngestMode } from "./pipeline";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -24,6 +24,21 @@ export function getStore(): AdvisorStore {
 
 export async function ingest(mode: IngestMode = "replay"): Promise<AdvisorStore> {
   const result = await runPipeline(mode);
+  const store: AdvisorStore = {
+    signals: result.signals,
+    drafts: result.drafts,
+    impactsBySignal: groupImpactsBySignal(result.signals, result.drafts),
+    meta: result.meta,
+  };
+  globalThis.__advisorStore = store;
+  return store;
+}
+
+/** Re-match the headlines already on the desk. Drops stories that touch no one's book. */
+export async function rescore(): Promise<AdvisorStore> {
+  const current = getStore();
+  if (!current.signals.length) return ingest("replay");
+  const result = await rescoreSignals(current.signals);
   const store: AdvisorStore = {
     signals: result.signals,
     drafts: result.drafts,
