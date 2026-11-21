@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { pickDesk } from "@/lib/desk";
 import type { MessageDraft, NewsSignal } from "@/lib/types";
 import DayPlanner, { SEED } from "./DayPlanner";
 import {
@@ -30,16 +31,10 @@ const KIND: Record<RequestKind, { label: string; cls: string }> = {
   consulta_plan: { label: "Plan view", cls: "bg-black/5 text-ink/70" },
 };
 
-/** Quiet stories go out on their own. A hard hit, or a high-severity one, waits for the advisor. */
+/** Quiet stories go out on their own. A hard hit waits for the advisor. */
 function why(draft: MessageDraft) {
   const lines = (draft.touches?.length ? draft.touches : draft.reasons).slice(0, 2);
   return lines.join(" ");
-}
-
-function needsAdvisor(signal: NewsSignal, matched: MessageDraft[]) {
-  const peak = matched.reduce((max, d) => Math.max(max, d.impactScore), 0);
-  if (peak >= 52) return true;
-  return signal.severity === "high" && peak >= 42;
 }
 
 const DESK_KEY = "advisor-desk-v2";
@@ -180,18 +175,7 @@ export default function Dashboard() {
 
   const name = (slug: string) => clients.find((c) => c.slug === slug)?.displayName ?? slug;
 
-  const grouped = useMemo(() => {
-    const rows = signals
-      .map((s) => {
-        const ds = drafts.filter((d) => d.signalId === s.id);
-        return { s, drafts: ds };
-      })
-      .filter((row) => row.drafts.length > 0);
-    return {
-      auto: rows.filter((row) => !needsAdvisor(row.s, row.drafts)),
-      review: rows.filter((row) => needsAdvisor(row.s, row.drafts)),
-    };
-  }, [signals, drafts]);
+  const grouped = useMemo(() => pickDesk(signals, drafts), [signals, drafts]);
 
   useEffect(() => {
     for (const slug of new Set(CLIENT_REQUESTS.map((r) => r.slug))) {
@@ -236,14 +220,13 @@ export default function Dashboard() {
   );
 
   const shown = useMemo(() => {
-    const peak = (ds: MessageDraft[]) => ds.reduce((max, d) => Math.max(max, d.impactScore), 0);
-    const byImpact = (a: { s: NewsSignal; drafts: MessageDraft[] }, b: { s: NewsSignal; drafts: MessageDraft[] }) =>
-      peak(b.drafts) - peak(a.drafts) || a.s.id.localeCompare(b.s.id);
     const open = (row: { drafts: MessageDraft[] }) =>
       row.drafts.some((d) => d.status === "pending" || d.status === "edited");
+    const review = grouped.review.filter(open);
+    const taken = new Set(review.map((row) => row.s.id));
     return {
-      auto: [...grouped.auto].sort(byImpact).slice(0, 5),
-      review: [...grouped.review].filter(open).sort(byImpact).slice(0, 2),
+      review,
+      auto: grouped.auto.filter((row) => !taken.has(row.s.id)),
     };
   }, [grouped]);
 

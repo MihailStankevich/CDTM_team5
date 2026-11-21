@@ -1,3 +1,4 @@
+import { pickDesk } from "./desk";
 import { composeDraft, generateDraft, mapPool } from "./draft/generator";
 import { matchSignalToFamilies } from "./match/scorer";
 import { fetchRssSignals } from "./news/rss";
@@ -90,18 +91,8 @@ async function finish(
 
 /** The desk shows two decisions and five quiet notes. Only those are worth a model call. */
 function onScreen(signals: NewsSignal[], drafts: MessageDraft[]): MessageDraft[] {
-  const peak = (rows: MessageDraft[]) => rows.reduce((max, d) => Math.max(max, d.impactScore), 0);
-  const rows = signals
-    .map((signal) => ({ signal, drafts: drafts.filter((d) => d.signalId === signal.id) }))
-    .filter((row) => row.drafts.length > 0);
-  const needsAdvisor = (row: (typeof rows)[number]) => {
-    const score = peak(row.drafts);
-    return score >= 52 || (row.signal.severity === "high" && score >= 42);
-  };
-  const byImpact = (a: (typeof rows)[number], b: (typeof rows)[number]) => peak(b.drafts) - peak(a.drafts);
-  const review = rows.filter(needsAdvisor).sort(byImpact).slice(0, 2);
-  const quiet = rows.filter((row) => !needsAdvisor(row)).sort(byImpact).slice(0, 5);
-  return [...review, ...quiet].flatMap((row) => row.drafts);
+  const picked = pickDesk(signals, drafts);
+  return [...picked.review, ...picked.auto].flatMap((row) => row.drafts);
 }
 
 /** Writes the notes on screen for each household. A failed call keeps the short paragraph from the card. */
