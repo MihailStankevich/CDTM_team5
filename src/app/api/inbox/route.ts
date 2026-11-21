@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as {
-    action?: "sync" | "inbound" | "approve" | "dismiss";
+    action?: "sync" | "inbound" | "outbound" | "approve" | "dismiss";
     slug?: string;
     channel?: Channel;
     text?: string;
@@ -68,6 +68,23 @@ export async function POST(req: NextRequest) {
       writeInbox(state);
     }
     return NextResponse.json({ ok: true, channel: item.channel, slug: item.slug });
+  }
+
+  if (body.action === "outbound" && body.slug && body.text?.trim()) {
+    const thread = THREADS.find((t) => t.slug === body.slug);
+    const channel = body.channel ?? thread?.channel ?? "email";
+    const message: ChatMessage = {
+      id: `out-${body.slug}-${Date.now()}`,
+      slug: body.slug,
+      channel,
+      direction: "out",
+      at: new Date().toISOString(),
+      body: body.text.trim(),
+    };
+    const state = readInbox();
+    state.extraMessages.push(message);
+    writeInbox(state);
+    return NextResponse.json({ ok: true, message });
   }
 
   if (body.action === "inbound" && body.slug && body.text?.trim()) {

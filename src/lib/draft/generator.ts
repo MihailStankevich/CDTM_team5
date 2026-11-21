@@ -80,7 +80,7 @@ function withV1(raw: string): string {
 }
 
 /** Team key talks to the Sherpas proxy. A plain OpenAI key talks to OpenAI. */
-function llmAuth(): { url: string; key: string } | null {
+export function llmAuth(): { url: string; key: string } | null {
   const team = process.env.TEAM_KEY || process.env.SHERPAS_LLM_API_KEY;
   if (team) {
     return {

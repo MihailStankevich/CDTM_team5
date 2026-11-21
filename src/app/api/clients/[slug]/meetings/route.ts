@@ -6,6 +6,7 @@ import {
   extractLifeEventsWithLlm,
   toProfileUpdates,
 } from "@/lib/meetings/extract";
+import { llmAuth } from "@/lib/draft/generator";
 import { getProfile } from "@/lib/profiles";
 import type { MeetingRecord } from "@/lib/types";
 
@@ -127,20 +128,16 @@ export async function POST(
 }
 
 async function tryWhisper(file: File): Promise<string | null> {
-  const apiKey = process.env.SHERPAS_LLM_API_KEY || process.env.OPENAI_API_KEY || process.env.TEAM_KEY;
-  const baseUrl =
-    process.env.SHERPAS_LLM_BASE_URL ||
-    process.env.LLM_PROXY_URL ||
-    "https://llm-hackathon.sherpaswealth.com/v1";
-  if (!apiKey) return null;
+  const auth = llmAuth();
+  if (!auth) return null;
 
   try {
     const form = new FormData();
     form.append("file", file, file.name);
     form.append("model", "whisper-1");
-    const res = await fetch(`${baseUrl.replace(/\/$/, "")}/audio/transcriptions`, {
+    const res = await fetch(`${auth.url}/audio/transcriptions`, {
       method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}` },
+      headers: { Authorization: `Bearer ${auth.key}` },
       body: form,
     });
     if (!res.ok) return null;

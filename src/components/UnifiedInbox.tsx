@@ -43,6 +43,38 @@ function clientBrief(profile: ClientProfile, extraKids: number) {
   return { talk, family, markets, next };
 }
 
+const BIRTHDAY_SLUG = "samantha-lewis";
+const BIRTHDAY_NOTE =
+  "Hi Samantha,\n\nHappy birthday. Hope you, Ethan and Ava have a good day. Nothing about the plan in this note — just wanted to say it.";
+
+function BirthdayNote({
+  text,
+  onChange,
+  onSend,
+  pending,
+}: {
+  text: string;
+  onChange: (value: string) => void;
+  onSend: () => void;
+  pending: boolean;
+}) {
+  return (
+    <div className="mb-5 rounded-2xl bg-black/[0.03] p-3 ring-1 ring-black/5">
+      <p className="text-xs font-semibold">It's her birthday today</p>
+      <p className="mt-0.5 text-[11px] leading-snug text-ink/55">Wish her a happy birthday.</p>
+      <textarea
+        value={text}
+        onChange={(e) => onChange(e.target.value)}
+        rows={6}
+        className="field mt-2 resize-none text-xs leading-relaxed"
+      />
+      <button type="button" className="btn btn-primary mt-2 w-full" disabled={pending || !text.trim()} onClick={onSend}>
+        {pending ? "Sending…" : "Send"}
+      </button>
+    </div>
+  );
+}
+
 function BriefFacts({ profile, extraKids }: { profile: ClientProfile; extraKids: number }) {
   const b = clientBrief(profile, extraKids);
   const rows = [
@@ -75,6 +107,9 @@ export default function UnifiedInbox() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<Channel | "all">("all");
   const [openChat, setOpenChat] = useState(Boolean(params.get("slug")));
+  const [birthday, setBirthday] = useState(BIRTHDAY_NOTE);
+  const [birthdaySent, setBirthdaySent] = useState(false);
+  const [sendingBirthday, setSendingBirthday] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -124,6 +159,26 @@ export default function UnifiedInbox() {
     setSlug(next);
     setOpenChat(true);
     router.replace(`/inbox?slug=${next}`);
+  }
+
+  async function sendBirthday() {
+    if (!slug || !active || slug !== BIRTHDAY_SLUG || !birthday.trim()) return;
+    setSendingBirthday(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/inbox", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "outbound", slug, channel: active.channel, text: birthday }),
+      });
+      const data = await res.json();
+      if (!data.ok) return setError(data.error || "Failed");
+      setAll((prev) => [...prev, data.message]);
+      setBirthdaySent(true);
+      setNote("Birthday note sent.");
+    } finally {
+      setSendingBirthday(false);
+    }
   }
 
   async function sendInbound() {
@@ -217,6 +272,12 @@ export default function UnifiedInbox() {
               </Link>
             </header>
 
+            {slug === BIRTHDAY_SLUG && !birthdaySent && (
+              <div className="border-b border-black/10 px-4 py-3 lg:hidden">
+                <BirthdayNote text={birthday} onChange={setBirthday} onSend={sendBirthday} pending={sendingBirthday} />
+              </div>
+            )}
+
             <details className="border-b border-black/10 px-4 py-3 lg:hidden">
               <summary className="cursor-pointer text-xs font-semibold">How to talk to them</summary>
               <div className="pt-3">
@@ -288,6 +349,11 @@ export default function UnifiedInbox() {
                 </p>
               </div>
             </div>
+            {slug === BIRTHDAY_SLUG && !birthdaySent && (
+              <div className="mt-5">
+                <BirthdayNote text={birthday} onChange={setBirthday} onSend={sendBirthday} pending={sendingBirthday} />
+              </div>
+            )}
             <div className="mt-5">
               <BriefFacts profile={ctx.profile} extraKids={ctx.crm.extraMembers.filter((m) => m.role === "child").length} />
             </div>
