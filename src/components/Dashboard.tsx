@@ -38,6 +38,27 @@ function why(draft: MessageDraft) {
 }
 
 const DESK_KEY = "advisor-desk-v2";
+const LIVE_KEY = "advisor-live-scrape";
+
+function isLiveDesk(signals: NewsSignal[]) {
+  return signals.some((signal) => signal.source === "rss");
+}
+
+function readLivePref(): boolean {
+  try {
+    return sessionStorage.getItem(LIVE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function writeLivePref(on: boolean) {
+  try {
+    sessionStorage.setItem(LIVE_KEY, on ? "1" : "0");
+  } catch {
+    // The switch still works for this visit.
+  }
+}
 
 type DeskCache = { signals: NewsSignal[]; drafts: MessageDraft[] };
 
@@ -58,6 +79,18 @@ function writeDesk(signals: NewsSignal[], drafts: MessageDraft[]) {
     sessionStorage.setItem(DESK_KEY, JSON.stringify({ signals, drafts }));
   } catch {
     // The desk still works if the browser refuses the cache.
+  }
+}
+
+async function readDeskResponse(res: Response) {
+  const text = await res.text();
+  try {
+    return JSON.parse(text) as { ok?: boolean; error?: string; signals?: NewsSignal[]; drafts?: MessageDraft[] };
+  } catch {
+    return {
+      ok: false,
+      error: text.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 180) || `Request failed (${res.status})`,
+    };
   }
 }
 
@@ -82,53 +115,91 @@ export default function Dashboard() {
   const [edits, setEdits] = useState<Record<string, string>>({});
   const [ready, setReady] = useState(false);
   const [deskError, setDeskError] = useState<string | null>(null);
+  const [live, setLive] = useState(false);
+  const [scraping, setScraping] = useState(false);
   const notified = useRef(new Set<string>());
+  const request = useRef(0);
 
-  const load = useCallback(async () => {
-    const read = async (res: Response) => {
-      const text = await res.text();
-      try {
-        return JSON.parse(text) as { ok?: boolean; error?: string; signals?: NewsSignal[]; drafts?: MessageDraft[] };
-      } catch {
-        return { ok: false, error: text.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 180) || `Request failed (${res.status})` };
-      }
-    };
-    try {
-      let d = await read(await fetch("/api/drafts"));
-      if (!d.signals?.length) {
-        d = await read(
-          await fetch("/api/ingest", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mode: "rss" }),
-          }),
-        );
-      }
-      if (!d.signals?.length) {
-        d = await read(
-          await fetch("/api/ingest", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mode: "replay" }),
-          }),
-        );
-      }
-      const nextSignals = d.signals ?? [];
-      const nextDrafts = d.drafts ?? [];
-      setSignals(nextSignals);
-      setDrafts(nextDrafts);
-      if (nextSignals.length) writeDesk(nextSignals, nextDrafts);
-      setDeskError(nextSignals.length ? null : String(d.error ?? "The desk did not load.").slice(0, 180));
-    } catch (err) {
-      setDeskError(err instanceof Error ? err.message : "The desk did not load.");
-    } finally {
-      setReady(true);
-    }
+  const applyDesk = useCallback((nextSignals: NewsSignal[], nextDrafts: MessageDraft[]) => {
+    setSignals(nextSignals);
+    setDrafts(nextDrafts);
+    setLive(isLiveDesk(nextSignals));
+    if (nextSignals.length) writeDesk(nextSignals, nextDrafts);
   }, []);
 
+  const load = useCallback(async () => {
+    const ticket = ++request.current;
+    const wantLive = readLivePref();
+    setLive(wantLive);
+    try {
+      let d = await readDeskResponse(await fetch("/api/drafts"));
+      const got = d.signals ?? [];
+      if (!got.length || isLiveDesk(got) !== wantLive) {
+        d = await readDeskResponse(
+          await fetch("/api/ingest", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mode: wantLive ? "rss" : "replay" }),
+          }),
+        );
+      }
+      if (ticket !== request.current) return;
+      const nextSignals = d.signals ?? [];
+      const nextDrafts = d.drafts ?? [];
+      applyDesk(nextSignals, nextDrafts);
+      setDeskError(nextSignals.length ? null : String(d.error ?? "The desk did not load.").slice(0, 180));
+    } catch (err) {
+      if (ticket !== request.current) return;
+      setDeskError(err instanceof Error ? err.message : "The desk did not load.");
+    } finally {
+      if (ticket === request.current) setReady(true);
+    }
+  }, [applyDesk]);
+
+  const setScrape = useCallback(
+    async (next: boolean) => {
+      const ticket = ++request.current;
+      writeLivePref(next);
+      setLive(next);
+      setScraping(true);
+      setDeskError(null);
+      try {
+        const d = await readDeskResponse(
+          await fetch("/api/ingest", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mode: next ? "rss" : "replay" }),
+          }),
+        );
+        if (ticket !== request.current) return;
+        const nextSignals = d.signals ?? [];
+        if (!nextSignals.length) {
+          writeLivePref(!next);
+          setLive(!next);
+          setDeskError(String(d.error ?? "The feeds did not answer.").slice(0, 180));
+          return;
+        }
+        notified.current.clear();
+        setDecided({});
+        setEdits({});
+        applyDesk(nextSignals, d.drafts ?? []);
+      } catch (err) {
+        if (ticket !== request.current) return;
+        writeLivePref(!next);
+        setLive(!next);
+        setDeskError(err instanceof Error ? err.message : "The feeds did not answer.");
+      } finally {
+        if (ticket === request.current) setScraping(false);
+      }
+    },
+    [applyDesk],
+  );
+
   useLayoutEffect(() => {
+    const wantLive = readLivePref();
+    setLive(wantLive);
     const cached = readDesk();
-    if (!cached) return;
+    if (!cached || isLiveDesk(cached.signals) !== wantLive) return;
     setSignals(cached.signals);
     setDrafts(cached.drafts);
     setReady(true);
@@ -306,6 +377,22 @@ export default function Dashboard() {
   return (
     <div className="mx-auto grid max-w-[1500px] grid-cols-1 gap-5 p-3 sm:p-5 lg:h-full lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
       <div className="min-h-0 space-y-4 overflow-y-auto pr-1">
+        <button
+          type="button"
+          role="switch"
+          aria-checked={live}
+          aria-label="Live scrape"
+          disabled={scraping}
+          onClick={() => void setScrape(!live)}
+          className="glass inline-flex items-center gap-2 !rounded-full px-3 py-1.5 disabled:opacity-60"
+        >
+          <span className="text-[11px] font-medium text-ink/70">{scraping ? "Reading feeds" : "Live scrape"}</span>
+          <span className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${live ? "bg-ink" : "bg-black/15"}`}>
+            <span
+              className={`absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${live ? "translate-x-4" : ""}`}
+            />
+          </span>
+        </button>
         <details className={box} open>
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
             <span className="min-w-0 flex-1 text-lg font-semibold">Actions</span>

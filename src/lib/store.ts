@@ -37,8 +37,8 @@ function withPersonalNotes(store: AdvisorStore): Promise<AdvisorStore> {
 }
 
 /**
- * A fresh Vercel instance has an empty desk. Load live headlines once, and
- * fall back to the past shocks if every feed fails.
+ * A fresh server starts on the historical shocks. Live headlines load only
+ * when the advisor turns the scrape switch on.
  */
 export function ensureStore(): Promise<AdvisorStore> {
   const current = getStore();
@@ -52,12 +52,6 @@ export function ensureStore(): Promise<AdvisorStore> {
 }
 
 async function fillColdStore(): Promise<AdvisorStore> {
-  try {
-    const live = await ingest("rss");
-    if (live.signals.length > 0) return live;
-  } catch {
-    // Feeds or case files failed; the historical shocks still open the desk.
-  }
   return ingest("replay");
 }
 
