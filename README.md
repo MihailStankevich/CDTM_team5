@@ -39,7 +39,7 @@ A priority model scores the day behind that screen. The formula, the gates and t
 
 A headline only reaches a family when it is about something they own. A bond story goes to the bond sleeve. An oil story goes to the foreign funds. An index move goes to the largest US-equity book, and mentions a leveraged fund only as a clause, not as the reason.
 
-The first text on screen is written from that card, so the desk does not wait on a language model. The model then rewrites only the notes that are actually showing: the two decisions and the five that already went out. It has to use their names, their holdings and their way of deciding. Swap the names and the note should stop making sense. A hard hit waits, with the text already written, until the advisor sends it or leaves it.
+The notes on screen are written by the model for that household before the desk opens: the two decisions and the five that already went out. Each one has to use their names, their holdings and their way of deciding. Swap the names and the note should stop making sense. A hard hit waits, with the text already written, until the advisor sends it or leaves it. Notes that never reach the screen stay as a short paragraph from the same card.
 
 ## The priority model
 

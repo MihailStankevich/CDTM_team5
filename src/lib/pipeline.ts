@@ -104,7 +104,7 @@ function onScreen(signals: NewsSignal[], drafts: MessageDraft[]): MessageDraft[]
   return [...review, ...quiet].flatMap((row) => row.drafts);
 }
 
-/** Rewrites the notes on screen after the desk is already visible. Failures keep the first text. */
+/** Writes the notes on screen for each household. A failed call keeps the short paragraph from the card. */
 export function polishOnScreen(
   signals: NewsSignal[],
   drafts: MessageDraft[],

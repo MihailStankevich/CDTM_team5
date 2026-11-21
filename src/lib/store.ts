@@ -24,6 +24,17 @@ export function getStore(): AdvisorStore {
 }
 
 let filling: Promise<AdvisorStore> | null = null;
+const polishing = new WeakMap<AdvisorStore, Promise<void>>();
+
+/** The notes on screen are written for that household before anyone sees them. */
+function withPersonalNotes(store: AdvisorStore): Promise<AdvisorStore> {
+  let job = polishing.get(store);
+  if (!job) {
+    job = polishOnScreen(store.signals, store.drafts, loadAllProfiles()).catch(() => undefined);
+    polishing.set(store, job);
+  }
+  return job.then(() => store);
+}
 
 /**
  * A fresh Vercel instance has an empty desk. Load live headlines once, and
@@ -31,7 +42,7 @@ let filling: Promise<AdvisorStore> | null = null;
  */
 export function ensureStore(): Promise<AdvisorStore> {
   const current = getStore();
-  if (current.signals.length > 0) return Promise.resolve(current);
+  if (current.signals.length > 0) return withPersonalNotes(current);
   if (!filling) {
     filling = fillColdStore().finally(() => {
       filling = null;
@@ -59,8 +70,7 @@ export async function ingest(mode: IngestMode = "replay"): Promise<AdvisorStore>
     meta: result.meta,
   };
   globalThis.__advisorStore = store;
-  void polishOnScreen(store.signals, store.drafts, loadAllProfiles()).catch(() => undefined);
-  return store;
+  return withPersonalNotes(store);
 }
 
 /** Re-match the headlines already on the desk. Drops stories that touch no one's book. */
@@ -75,8 +85,7 @@ export async function rescore(): Promise<AdvisorStore> {
     meta: result.meta,
   };
   globalThis.__advisorStore = store;
-  void polishOnScreen(store.signals, store.drafts, loadAllProfiles()).catch(() => undefined);
-  return store;
+  return withPersonalNotes(store);
 }
 
 export function updateDraft(

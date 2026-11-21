@@ -42,7 +42,7 @@ function needsAdvisor(signal: NewsSignal, matched: MessageDraft[]) {
   return signal.severity === "high" && peak >= 42;
 }
 
-const DESK_KEY = "advisor-desk-v1";
+const DESK_KEY = "advisor-desk-v2";
 
 type DeskCache = { signals: NewsSignal[]; drafts: MessageDraft[] };
 
