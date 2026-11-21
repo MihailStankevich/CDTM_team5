@@ -22,7 +22,9 @@ npm install
 npm run dev
 ```
 
-- [http://localhost:3000](http://localhost:3000) — news inbox  
+- [http://localhost:3000](http://localhost:3000) — today: calm / life dates / pay, grouped
+- [http://localhost:3000/inbox](http://localhost:3000/inbox) — WhatsApp, email, and Telegram in one inbox
+- [http://localhost:3000/markets](http://localhost:3000/markets) — news matched to plans  
 - [http://localhost:3000/clients](http://localhost:3000/clients) — client book  
 - Open a family → **Run demo meeting** (e.g. Johnsons → baby Nora updates the household)
 

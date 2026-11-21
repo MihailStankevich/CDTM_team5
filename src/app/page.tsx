@@ -1,5 +1,5 @@
-import AdvisorInbox from "@/components/AdvisorInbox";
+import Dashboard from "@/components/Dashboard";
 
 export default function HomePage() {
-  return <AdvisorInbox />;
+  return <Dashboard />;
 }

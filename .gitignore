@@ -9,6 +9,7 @@ out/
 
 # Local CRM persistence (meetings / profile updates)
 data/crm.json
+data/inbox.json
 
 # Dependencies and builds
 node_modules/

@@ -182,3 +182,38 @@ export interface ClientCrmState {
 export interface CrmStore {
   bySlug: Record<string, ClientCrmState>;
 }
+
+export type Channel = "email" | "whatsapp" | "telegram";
+
+export type NurtureKind = "market_calm" | "milestone" | "career" | "chat";
+
+export interface ChatMessage {
+  id: string;
+  slug: string;
+  channel: Channel;
+  direction: "in" | "out";
+  at: string;
+  body: string;
+  /** Outbound drafts the advisor approved */
+  nurtureId?: string;
+}
+
+export interface NurtureItem {
+  id: string;
+  slug: string;
+  displayName: string;
+  kind: NurtureKind;
+  channel: Channel;
+  title: string;
+  why: string;
+  subject?: string;
+  body: string;
+  tone: string;
+}
+
+export interface InboxState {
+  ingestedIds: string[];
+  dismissedIds: string[];
+  approvedIds: string[];
+  extraMessages: ChatMessage[];
+}

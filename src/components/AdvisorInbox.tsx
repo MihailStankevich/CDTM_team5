@@ -139,25 +139,21 @@ export default function AdvisorInbox() {
 
   return (
     <div className="min-h-screen">
-      <header className="border-b border-line/80 bg-ink/95 text-paper">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-6 sm:flex-row sm:items-end sm:justify-between">
-          <div className="animate-rise">
-            <p className="text-xs uppercase tracking-[0.22em] text-emerald-200/80">
-              Tracker · Communications
-            </p>
-            <h1 className="display mt-1 text-3xl font-semibold tracking-tight sm:text-4xl">
-              Advisor inbox
-            </h1>
-            <p className="mt-2 max-w-xl text-sm text-emerald-50/80">
-              News that touches a plan, turned into personal drafts you approve before
-              anything reaches a family.
+      <header className="border-b border-line bg-white">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-5 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.18em] text-muted">News matched to each plan</p>
+            <h1 className="display mt-1 text-3xl font-semibold tracking-tight">Markets</h1>
+            <p className="mt-2 max-w-xl text-sm text-muted">
+              One headline, grouped by the families it actually touches. Approve a draft here or
+              send the calmer version from Today.
             </p>
           </div>
-          <div className="animate-rise-delay-1 flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <select
               value={mode}
               onChange={(e) => setMode(e.target.value as Mode)}
-              className="rounded-md border border-emerald-700/50 bg-ink-soft px-3 py-2 text-sm"
+              className="rounded-md border border-line bg-paper px-3 py-2 text-sm"
             >
               <option value="replay">Demo replay</option>
               <option value="rss">Live RSS</option>

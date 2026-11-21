@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Fraunces, Source_Sans_3 } from "next/font/google";
-import AppNav from "@/components/AppNav";
+import Shell from "@/components/Shell";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -25,8 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${fraunces.variable} ${sourceSans.variable} antialiased`}>
-        <AppNav />
-        {children}
+        <Shell>{children}</Shell>
       </body>
     </html>
   );
