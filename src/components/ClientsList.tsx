@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Calendar, Radar, Search, Users } from "lucide-react";
+import { Avatar, Empty, filing, moneyShort, PageHeader, Ring, Skeletons } from "./ui";
 
 interface ClientRow {
   slug: string;
@@ -12,30 +14,19 @@ interface ClientRow {
   childCount: number;
   tags: string[];
   updateCount: number;
-  meetingCount: number;
   salaryTotal: number;
   investableApprox: number;
   taxFilingStatus: string;
-  techWeight: number;
   tickers: string[];
-  nextGoal: { name: string; date: string } | null;
+  nextGoal: { name: string; date: string; monthsAway: number } | null;
   members: { firstName: string; age: number; role: string }[];
-  linkedIn: { title: string };
-  persona: { decisionStyle: string; riskOrientation: string; concerns: string[] };
+  linkedIn: { title: string; recentActivity: { signal?: string }[] };
+  persona: { concerns: string[] };
 }
-
-function filing(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-const money = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
 
 export default function ClientsList() {
-  const [clients, setClients] = useState<ClientRow[]>([]);
+  const [clients, setClients] = useState<ClientRow[] | null>(null);
+  const [q, setQ] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -48,71 +39,101 @@ export default function ClientsList() {
       .catch((e) => setError(e.message));
   }, []);
 
+  const shown = useMemo(
+    () =>
+      (clients ?? []).filter((c) =>
+        `${c.displayName} ${c.city} ${c.tags.join(" ")}`.toLowerCase().includes(q.toLowerCase()),
+      ),
+    [clients, q],
+  );
+
   return (
-    <div className="mx-auto max-w-6xl px-6 py-8">
-      <h1 className="display text-3xl font-semibold">Clients</h1>
-      <p className="mt-1 text-sm text-muted">{clients.length || "—"} households</p>
-      {error && <p className="mt-4 text-sm text-rose-800">{error}</p>}
-      <ul className="mt-6 grid gap-4 lg:grid-cols-2">
-        {clients.map((c) => (
-          <li key={c.slug}>
-            <Link
-              href={`/clients/${c.slug}`}
-              className="block h-full rounded-xl border border-line bg-white p-4 hover:border-accent"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-lg font-semibold text-ink">{c.displayName}</p>
-                  <p className="text-sm text-muted">
-                    {c.city}, {c.state}
-                    {c.taxFilingStatus ? ` · ${filing(c.taxFilingStatus)}` : ""}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs uppercase tracking-wide text-muted">Score</p>
-                  <p className="text-lg font-semibold tabular-nums">{c.score}</p>
-                </div>
-              </div>
-              <p className="mt-3 text-sm">{c.linkedIn.title}</p>
-              <p className="mt-2 text-sm text-ink-soft">
-                {c.members.map((m) => `${m.firstName} ${m.age}`).join(" · ")}
-              </p>
-              <dl className="mt-3 grid grid-cols-3 gap-2 text-sm">
-                <div>
-                  <dt className="text-[11px] uppercase tracking-wide text-muted">Salary</dt>
-                  <dd className="font-medium">{money(c.salaryTotal)}</dd>
-                </div>
-                <div>
-                  <dt className="text-[11px] uppercase tracking-wide text-muted">Invested</dt>
-                  <dd className="font-medium">{money(Math.round(c.investableApprox))}</dd>
-                </div>
-                <div>
-                  <dt className="text-[11px] uppercase tracking-wide text-muted">Next</dt>
-                  <dd className="font-medium">{c.nextGoal?.name ?? "—"}</dd>
-                </div>
-              </dl>
-              <p className="mt-3 text-xs text-muted">{c.tickers.slice(0, 6).join(" · ")}</p>
-              {c.persona.concerns[0] && (
-                <p className="mt-2 line-clamp-2 text-sm text-ink-soft">{c.persona.concerns[0]}</p>
-              )}
-              {(c.tags.length > 0 || c.updateCount > 0) && (
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {c.tags.map((t) => (
-                    <span key={t} className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-900">
-                      {t}
-                    </span>
-                  ))}
-                  {c.updateCount > 0 && (
-                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-900">
-                      {c.updateCount} updates
-                    </span>
-                  )}
-                </div>
-              )}
-            </Link>
-          </li>
-        ))}
-      </ul>
+    <div className="mx-auto max-w-[1240px] px-6 py-7 lg:px-8">
+      <PageHeader
+        eyebrow="Your book"
+        title="Clients"
+        subtitle={clients ? `${clients.length} households` : "Loading…"}
+        actions={
+          <label className="glass flex items-center gap-2 !rounded-full px-4 py-2">
+            <Search size={14} className="text-white/45" />
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search name, city, tag"
+              className="w-48 bg-transparent text-sm outline-none placeholder:text-white/35"
+            />
+          </label>
+        }
+      />
+      {error && <p className="mt-4 text-sm text-rose">{error}</p>}
+
+      {!clients ? (
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <div className="skeleton h-56" />
+          <div className="skeleton h-56" />
+        </div>
+      ) : shown.length === 0 ? (
+        <div className="mt-6">
+          <Empty icon={Users} title="No client matches" />
+        </div>
+      ) : (
+        <ul className="mt-6 grid gap-4 md:grid-cols-2">
+          {shown.map((c, i) => {
+            const signals = c.linkedIn.recentActivity.filter((a) => a.signal).length;
+            return (
+              <li key={c.slug} className="animate-rise" style={{ animationDelay: `${i * 60}ms` }}>
+                <Link href={`/clients/${c.slug}`} className="glass glass-hover block h-full p-5">
+                  <div className="flex items-center gap-4">
+                    <Avatar name={c.displayName} size={52} />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-base font-semibold">{c.displayName}</p>
+                      <p className="mt-0.5 truncate text-xs text-white/50">
+                        {c.city}, {c.state} · {filing(c.taxFilingStatus)}
+                      </p>
+                    </div>
+                    <Ring value={c.score} size={54} label="Financial health score" />
+                  </div>
+
+                  <div className="mt-5 grid grid-cols-3 gap-2">
+                    {[
+                      ["Invested", moneyShort(c.investableApprox)],
+                      ["Income", moneyShort(c.salaryTotal)],
+                      ["Household", `${c.members.length} people`],
+                    ].map(([k, v]) => (
+                      <div key={k} className="rounded-2xl bg-white/5 px-3 py-2.5">
+                        <p className="text-[10px] uppercase tracking-wider text-white/40">{k}</p>
+                        <p className="mt-0.5 text-sm font-semibold tabular-nums">{v}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-4 flex flex-wrap items-center gap-1.5">
+                    {c.nextGoal && (
+                      <span className="chip">
+                        <Calendar size={11} className="text-amber" />
+                        {c.nextGoal.name}
+                      </span>
+                    )}
+                    {signals > 0 && (
+                      <span className="chip !text-lime">
+                        <Radar size={11} /> {signals} social {signals === 1 ? "signal" : "signals"}
+                      </span>
+                    )}
+                    {c.updateCount > 0 && (
+                      <span className="chip !text-amber">{c.updateCount} new facts</span>
+                    )}
+                    {c.tags.map((t) => (
+                      <span key={t} className="chip">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 }

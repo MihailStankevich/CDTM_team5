@@ -2,202 +2,393 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { Channel, NurtureItem } from "@/lib/types";
+import type { MessageDraft, NewsSignal } from "@/lib/types";
+import DayPlanner, { SEED } from "./DayPlanner";
+import {
+  TASKS_EVENT,
+  TASKS_KEY,
+  findSlot,
+  isUnconfirmed,
+  mergeIntoNotes,
+  proposeToClient,
+  remind,
+  scheduledFor,
+  type Range,
+  type Task,
+} from "@/lib/dayTasks";
+import { CLIENT_ALERTS, CLIENT_REQUESTS, type RequestKind } from "@/data/client-requests";
 
-interface Workspace {
-  nurture: NurtureItem[];
-  counts: { waiting: number; nurture: number };
+interface ClientRow {
+  slug: string;
+  displayName: string;
+  techWeight: number;
 }
 
-const KIND = {
-  market_calm: { label: "Calm the drop", blurb: "They should hear it from you, not from the headline." },
-  milestone: { label: "Life dates", blurb: "Birthdays and ages already in the plan." },
-  career: { label: "Pay & role", blurb: "Income or title looks different from the plan." },
-  chat: { label: "From chat", blurb: "Something they already told you." },
-} as const;
+const KIND: Record<RequestKind, { label: string; cls: string }> = {
+  llamada: { label: "Call", cls: "bg-lime/20 text-lime" },
+  reunion: { label: "Meeting", cls: "bg-lav/20 text-lav" },
+  chatbot: { label: "Chat", cls: "bg-white/10 text-white/70" },
+  consulta_plan: { label: "Plan view", cls: "bg-amber/15 text-amber" },
+};
 
-const CHANNEL_LABEL: Record<Channel, string> = {
-  email: "Email",
-  whatsapp: "WhatsApp",
-  telegram: "Telegram",
+type Action = {
+  id: string;
+  type: "mensaje" | "inversion" | "recordatorio";
+  taskIds?: string[];
+  title: string;
+  detail: string;
+  clients: string[];
+  signalId?: string;
 };
 
 export default function Dashboard() {
-  const [data, setData] = useState<Workspace | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [note, setNote] = useState<string | null>(null);
-  const [busy, setBusy] = useState<string | null>(null);
+  const [signals, setSignals] = useState<NewsSignal[]>([]);
+  const [drafts, setDrafts] = useState<MessageDraft[]>([]);
+  const [clients, setClients] = useState<ClientRow[]>([]);
+  const [decided, setDecided] = useState<Record<string, "ok" | "no">>({});
+  const [open, setOpen] = useState<string | null>(null);
+  const [tasks, setTasks] = useState<Task[]>(SEED);
+  const [scheduled, setScheduled] = useState<Record<string, string>>({});
+  const [picking, setPicking] = useState<{ key: string; type: "llamada" | "reunion" } | null>(null);
 
-  const load = useCallback(() => {
-    fetch("/api/workspace")
-      .then((r) => r.json())
-      .then((d) => {
-        if (!d.ok) throw new Error(d.error || "Failed");
-        setData(d);
-      })
-      .catch((e) => setError(e.message));
+  const load = useCallback(async () => {
+    let d = await fetch("/api/drafts").then((r) => r.json());
+    if (!d.signals?.length) {
+      d = await fetch("/api/ingest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: "replay" }),
+      }).then((r) => r.json());
+    }
+    setSignals(d.signals ?? []);
+    setDrafts(d.drafts ?? []);
   }, []);
 
   useEffect(() => {
     load();
+    fetch("/api/clients")
+      .then((r) => r.json())
+      .then((d) => setClients(d.clients ?? []));
   }, [load]);
 
-  const groups = useMemo(() => {
-    const nurture = data?.nurture ?? [];
-    return (["milestone", "career"] as const)
-      .map((kind) => ({ kind, items: nurture.filter((n) => n.kind === kind) }))
-      .filter((g) => g.items.length);
-  }, [data]);
+  useEffect(() => {
+    const read = () => {
+      const v = localStorage.getItem(TASKS_KEY);
+      setTasks(v ? JSON.parse(v) : SEED);
+    };
+    read();
+    window.addEventListener(TASKS_EVENT, read);
+    return () => window.removeEventListener(TASKS_EVENT, read);
+  }, []);
 
-  async function act(action: "approve" | "dismiss" | "sync", nurtureId?: string) {
-    setBusy(nurtureId ?? action);
-    setError(null);
-    try {
-      const res = await fetch("/api/inbox", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, nurtureId }),
-      });
-      const d = await res.json();
-      if (!d.ok) throw new Error(d.error || "Failed");
-      if (action === "sync") {
-        setNote(
-          d.applied
-            ? `Chats updated ${d.applied} fact(s) on client profiles.`
-            : "Chats read — no new life events this pass.",
-        );
-      }
-      if (action === "approve") setNote("Approved. It is in their inbox.");
-      load();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed");
-    } finally {
-      setBusy(null);
+  const name = (slug: string) => clients.find((c) => c.slug === slug)?.displayName ?? slug;
+
+  const trends = useMemo(
+    () =>
+      signals
+        .map((s) => {
+          const ds = drafts.filter((d) => d.signalId === s.id);
+          const avg = ds.length ? Math.round(ds.reduce((a, d) => a + d.impactScore, 0) / ds.length) : 0;
+          return { s, n: ds.length, avg, top: [...ds].sort((a, b) => b.impactScore - a.impactScore)[0] };
+        })
+        .sort((a, b) => b.avg - a.avg)
+        .slice(0, 5),
+    [signals, drafts],
+  );
+
+  useEffect(() => {
+    for (const slug of new Set(CLIENT_REQUESTS.map((r) => r.slug))) {
+      const t = scheduledFor(slug, tasks);
+      if (t) mergeIntoNotes(t, CLIENT_REQUESTS.filter((r) => r.slug === slug).map((r) => r.text), SEED);
     }
+  }, [tasks]);
+
+  const pending = useMemo(() => {
+    const slugs = [...new Set([...CLIENT_REQUESTS.map((r) => r.slug), ...CLIENT_ALERTS.map((a) => a.slug)])];
+    return slugs
+      .map((slug) => {
+        const reqs = CLIENT_REQUESTS.filter((r) => r.slug === slug);
+        const triggers = [
+          ...reqs
+            .filter((r) => r.kind === "llamada" || r.kind === "reunion")
+            .map((r) => ({ kind: r.kind, text: r.text, when: r.when })),
+          ...CLIENT_ALERTS.filter((a) => a.slug === slug).map((a) => ({ kind: "alerta" as const, text: a.reason, when: "" })),
+        ];
+        const queries = reqs.filter((r) => r.kind === "chatbot" || r.kind === "consulta_plan");
+        return { slug, triggers, queries };
+      })
+      .filter((c) => !scheduledFor(c.slug, tasks))
+      .sort((a, b) => b.triggers.length - a.triggers.length);
+  }, [tasks]);
+
+  function schedule(slug: string, key: string, type: "llamada" | "reunion", why: string, range: Range) {
+    const label = type === "llamada" ? "Call" : "Meeting";
+    const slot = proposeToClient(slug, type, range, `${label} with ${name(slug)}`, why, SEED);
+    setPicking(null);
+    setScheduled((p) => ({
+      ...p,
+      [key]: slot
+        ? `${label} proposed: ${new Date(`${slot.date}T12:00`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })} · ${slot.time}. Waiting on them.`
+        : `No slot|${type}`,
+    }));
   }
 
+  const actions = useMemo<Action[]>(() => {
+    const out: Action[] = [];
+    const unconf = tasks.filter((t) => isUnconfirmed(t));
+    if (unconf.length) {
+      out.push({
+        id: `remind-${unconf.map((t) => t.id).join("-")}`,
+        type: "recordatorio",
+        taskIds: unconf.map((t) => t.id),
+        title: "These clients have not confirmed their calls and meetings. Nudge them?",
+        detail: "We send a reminder. If the time does not work, they can propose another and you accept it in My day.",
+        clients: [...new Set(unconf.map((t) => name(t.slug)))],
+      });
+    }
+    for (const t of trends.slice(0, 3)) {
+      const ds = drafts.filter((d) => d.signalId === t.s.id && (d.status === "pending" || d.status === "edited"));
+      if (ds.length >= 2) {
+        out.push({
+          id: `msg-${t.s.id}`,
+          type: "mensaje",
+          signalId: t.s.id,
+          title: `Message ${ds.length} clients about “${t.s.headline}”`,
+          detail: ds[0]?.body ?? "",
+          clients: ds.map((d) => d.displayName),
+        });
+      }
+    }
+    const techHeavy = clients.filter((c) => c.techWeight > 0.3);
+    if (techHeavy.length) {
+      out.push({
+        id: "inv-tech-rebalance",
+        type: "inversion",
+        title: "Rebalance technology into a broad ETF (VTI)",
+        detail: "Tech is above 30% after the DeepSeek shock and the tariffs. Proposal: move the excess over 25% into a broad market ETF.",
+        clients: techHeavy.map((c) => c.displayName),
+      });
+    }
+    out.push({
+      id: "inv-bonds-ratecut",
+      type: "inversion",
+      title: "Lock bond yield (BND) before further rate cuts",
+      detail: "With the Fed cutting, clients sitting on cash can lock quality bond yield now.",
+      clients: clients.slice(0, 2).map((c) => c.displayName),
+    });
+    return out;
+  }, [trends, drafts, clients, tasks]);
+
+  async function accept(a: Action) {
+    if (a.type === "recordatorio" && a.taskIds) remind(a.taskIds, SEED);
+    if (a.type === "mensaje" && a.signalId) {
+      const d = await fetch("/api/drafts", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ approveAllSignalId: a.signalId }),
+      }).then((r) => r.json());
+      if (d.drafts) setDrafts(d.drafts);
+    }
+    setDecided((p) => ({ ...p, [a.id]: "ok" }));
+  }
+
+  const box = "glass group p-5";
+  const btn = "btn btn-ghost !px-2.5 !py-1 text-xs";
+
   return (
-    <div className="mx-auto max-w-6xl px-6 py-8">
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-xs uppercase tracking-[0.18em] text-muted">Advisor workspace</p>
-          <h1 className="display mt-1 text-3xl font-semibold tracking-tight">Life and pay</h1>
-          <p className="mt-2 max-w-xl text-sm text-muted">
-            Dates and pay changes worth a note. Market messages stay on Markets.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => act("sync")}
-            disabled={busy === "sync"}
-            className="rounded-lg border border-line bg-white px-3 py-2 text-sm font-semibold hover:bg-paper-2 disabled:opacity-50"
-          >
-            {busy === "sync" ? "Reading chats…" : "Update profiles from chats"}
-          </button>
-          <Link
-            href="/inbox"
-            className="rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-white hover:bg-accent-deep"
-          >
-            Open inbox
-          </Link>
-        </div>
-      </header>
-
-      {error && (
-        <p className="mt-4 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-900">
-          {error}
-        </p>
-      )}
-      {note && (
-        <p className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
-          {note}
-        </p>
-      )}
-
-      <section className="mt-6 grid grid-cols-2 gap-3">
-        {[
-          { label: "Waiting on you", value: data?.counts.waiting ?? "—" },
-          { label: "Notes to approve", value: data?.counts.nurture ?? "—" },
-        ].map((s) => (
-          <div key={s.label} className="rounded-xl border border-line bg-white px-4 py-3">
-            <p className="text-[11px] uppercase tracking-wide text-muted">{s.label}</p>
-            <p className="display mt-1 text-2xl font-semibold">{s.value}</p>
-          </div>
-        ))}
-      </section>
-
-      <section className="mt-8">
-        <div className="mb-3 flex items-baseline justify-between">
-          <h2 className="display text-xl font-semibold">Notes to approve</h2>
-          <Link href="/" className="text-sm font-medium text-accent hover:underline">
-            Market, sector, and legislation drafts are on Markets →
-          </Link>
-        </div>
-        {!data ? (
-          <p className="text-sm text-muted">Loading the book…</p>
-        ) : groups.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-line bg-white px-4 py-8 text-sm text-muted">
-            Queue is clear. New drops, birthdays, and chat facts will land here.
-          </p>
-        ) : (
-          <div className="space-y-6">
-            {groups.map((group) => (
-              <div key={group.kind}>
-                <div className="mb-2">
-                  <h3 className="text-sm font-semibold text-ink">{KIND[group.kind].label}</h3>
-                  <p className="text-xs text-muted">{KIND[group.kind].blurb}</p>
-                </div>
-                <ul className="grid gap-3 lg:grid-cols-2">
-                  {group.items.map((item) => (
-                    <li key={item.id} className="flex flex-col rounded-xl border border-line bg-white p-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="text-sm font-semibold">{item.displayName}</p>
-                          <p className="mt-0.5 text-xs text-muted">
-                            {CHANNEL_LABEL[item.channel]} · {item.tone}
-                          </p>
-                        </div>
-                        <span className="rounded-full bg-paper-2 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-ink-soft">
-                          {item.channel}
+    <div className="mx-auto grid max-w-[1500px] grid-cols-1 gap-5 p-5 lg:h-screen lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+      <div className="min-h-0 space-y-4 overflow-y-auto pr-1">
+        <details className={box} open>
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+            <span className="text-lg font-semibold">Clients waiting</span>
+            <span className="flex items-center gap-2">
+              <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-rose px-1.5 text-xs font-bold text-navy">
+                {pending.length}
+              </span>
+              <span className="text-white/40 transition group-open:rotate-180">▾</span>
+            </span>
+          </summary>
+          <ul className="mt-4 space-y-3">
+            {pending.map((c) => (
+              <li key={c.slug} className="rounded-2xl bg-white/5 p-3 ring-1 ring-white/10">
+                <Link href={`/clients/${c.slug}`} className="text-sm font-semibold text-lime hover:underline">
+                  {name(c.slug)}
+                </Link>
+                {c.triggers.map((t, i) => {
+                  const k = `${c.slug}-${i}`;
+                  return (
+                    <div key={i} className="mt-2">
+                      <p className="text-sm text-white/75">
+                        <span
+                          className={`mr-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                            t.kind === "alerta" ? "bg-rose/15 text-rose" : KIND[t.kind].cls
+                          }`}
+                        >
+                          {t.kind === "alerta" ? "Alert" : KIND[t.kind].label}
                         </span>
-                      </div>
-                      <p className="mt-2 text-sm font-medium text-ink">{item.title}</p>
-                      <p className="mt-1 text-xs text-muted">{item.why}</p>
-                      <pre className="mt-3 max-h-36 overflow-auto whitespace-pre-wrap rounded-lg bg-paper px-3 py-2 font-sans text-xs leading-relaxed text-ink-soft">
-                        {item.body}
-                      </pre>
-                      <div className="mt-3 flex gap-2">
-                        <button
-                          type="button"
-                          disabled={busy === item.id}
-                          onClick={() => act("approve", item.id)}
-                          className="rounded-md bg-accent px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-deep disabled:opacity-50"
-                        >
-                          Approve into {CHANNEL_LABEL[item.channel]}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => act("dismiss", item.id)}
-                          className="rounded-md px-3 py-1.5 text-xs font-medium text-muted hover:text-danger"
-                        >
-                          Dismiss
-                        </button>
-                        <Link
-                          href={`/clients/${item.slug}`}
-                          className="ml-auto self-center text-xs font-medium text-accent hover:underline"
-                        >
-                          Profile
-                        </Link>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                        {t.text}
+                      </p>
+                      {scheduled[k] ? (
+                        scheduled[k].startsWith("No slot") ? (
+                          (() => {
+                            const type = scheduled[k].endsWith("|reunion") ? "reunion" : "llamada";
+                            const alts = (
+                              [
+                                ["hoy", "Today"],
+                                ["semana", "This week"],
+                                ["mes", "This month"],
+                              ] as const
+                            ).filter(([r]) => findSlot(c.slug, r, tasks));
+                            return (
+                              <div className="mt-2 flex flex-wrap items-center gap-2">
+                                <span className="text-xs font-semibold text-rose">
+                                  {alts.length ? "No free slot. Try:" : "No free slot this month."}
+                                </span>
+                                {alts.map(([r, l]) => (
+                                  <button key={r} type="button" onClick={() => schedule(c.slug, k, type, t.text, r)} className={btn}>
+                                    {l}
+                                  </button>
+                                ))}
+                              </div>
+                            );
+                          })()
+                        ) : (
+                          <p className="mt-1 text-xs font-semibold text-lime">{scheduled[k]}</p>
+                        )
+                      ) : (
+                        <div className="mt-2 flex flex-wrap items-center gap-2">
+                          {picking?.key === k ? (
+                            <>
+                              {(
+                                [
+                                  ["hoy", "Today"],
+                                  ["semana", "This week"],
+                                  ["mes", "This month"],
+                                ] as const
+                              ).map(([r, l]) => (
+                                <button key={r} type="button" onClick={() => schedule(c.slug, k, picking.type, t.text, r)} className={btn}>
+                                  {l}
+                                </button>
+                              ))}
+                              <button type="button" onClick={() => setPicking(null)} className="text-xs text-white/40 hover:underline">
+                                Cancel
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              {t.kind !== "reunion" && (
+                                <button type="button" onClick={() => setPicking({ key: k, type: "llamada" })} className={btn}>
+                                  Add call
+                                </button>
+                              )}
+                              {t.kind !== "llamada" && (
+                                <button type="button" onClick={() => setPicking({ key: k, type: "reunion" })} className={btn}>
+                                  Add meeting
+                                </button>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+                {c.queries.length > 0 && (
+                  <p className="mt-2 rounded-xl bg-white/5 p-2 text-xs text-white/60">
+                    <span className="font-semibold text-white">They are looking at ({c.queries.length}):</span>{" "}
+                    {c.queries.map((q) => q.text.replace(/\.$/, "")).join(" · ")}
+                  </p>
+                )}
+              </li>
             ))}
-          </div>
-        )}
-      </section>
+          </ul>
+        </details>
+
+        <details className={box}>
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+            <span className="text-lg font-semibold">Actions</span>
+            <span className="flex items-center gap-2">
+              <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-lime px-1.5 text-xs font-bold text-navy">
+                {actions.filter((a) => !decided[a.id]).length}
+              </span>
+              <span className="text-white/40 transition group-open:rotate-180">▾</span>
+            </span>
+          </summary>
+          <ul className="mt-4 space-y-3">
+            {actions.map((a) => {
+              const st = decided[a.id];
+              return (
+                <li key={a.id} className={`rounded-2xl p-3 ring-1 ${st ? "bg-white/5 opacity-60 ring-white/10" : "bg-lime/5 ring-lime/30"}`}>
+                  <p className="eyebrow">
+                    {a.type === "mensaje" ? "Group message" : a.type === "recordatorio" ? "Reminder" : "Investment"}
+                  </p>
+                  <p className="mt-1 text-sm font-semibold">{a.title}</p>
+                  <p className="mt-1 text-[11px] text-white/45">{a.clients.join(", ")}</p>
+                  {open === a.id ? (
+                    <pre className="mt-2 max-h-48 overflow-y-auto whitespace-pre-wrap rounded-xl bg-white/5 p-2 font-sans text-xs text-white/70">
+                      {a.detail}
+                    </pre>
+                  ) : (
+                    <button type="button" onClick={() => setOpen(a.id)} className="mt-1 text-xs text-lime hover:underline">
+                      See detail
+                    </button>
+                  )}
+                  {st ? (
+                    <p className={`mt-2 text-xs font-semibold ${st === "ok" ? "text-lime" : "text-white/40"}`}>
+                      {st === "ok" ? (a.type === "recordatorio" ? "Reminder sent" : a.type === "mensaje" ? "Sent" : "Approved") : "Dismissed"}
+                    </p>
+                  ) : (
+                    <div className="mt-2 flex gap-2">
+                      <button type="button" onClick={() => accept(a)} className="btn btn-primary !px-3 !py-1.5 text-xs">
+                        {a.type === "mensaje" ? "Send to all" : a.type === "recordatorio" ? "Nudge" : "Approve"}
+                      </button>
+                      <button type="button" onClick={() => setDecided((p) => ({ ...p, [a.id]: "no" }))} className="btn btn-ghost !px-3 !py-1.5 text-xs">
+                        Dismiss
+                      </button>
+                    </div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </details>
+
+        <details className={box} open>
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+            <span className="text-lg font-semibold">What moved today</span>
+            <span className="flex items-center gap-2">
+              <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-lav px-1.5 text-xs font-bold text-navy">
+                {trends.length}
+              </span>
+              <span className="text-white/40 transition group-open:rotate-180">▾</span>
+            </span>
+          </summary>
+          <ul className="mt-4 space-y-3">
+            {trends.map(({ s, n, avg, top }) => {
+              const hot = avg >= 80;
+              return (
+                <li key={s.id} className={`rounded-2xl ${hot ? "bg-lime/10 ring-1 ring-lime/40" : "bg-white/5 ring-1 ring-white/10"}`}>
+                  <details className="group/t p-3">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-2">
+                      <span className="text-sm font-semibold">{s.headline}</span>
+                      <span className="flex shrink-0 items-center gap-2">
+                        {hot && <span className="rounded-full bg-lime px-2 py-0.5 text-[10px] font-semibold text-navy">Important</span>}
+                        <span className="text-xs text-white/40 transition group-open/t:rotate-180">▾</span>
+                      </span>
+                    </summary>
+                    <p className="mt-2 text-xs text-white/65">{s.what_happened}</p>
+                    <p className="mt-1 text-[11px] text-white/40">
+                      {n} clients · impact {avg}
+                      {top ? ` · most exposed: ${top.displayName}` : ""}
+                    </p>
+                  </details>
+                </li>
+              );
+            })}
+          </ul>
+        </details>
+      </div>
+      <DayPlanner />
     </div>
   );
 }

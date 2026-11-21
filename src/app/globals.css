@@ -1,86 +1,242 @@
 @import "tailwindcss";
 
+/* Sherpas palette — taken from the brand banner */
 :root {
-  --ink: #0c1a1a;
-  --ink-soft: #1a2e2e;
-  --paper: #f3f6f4;
-  --paper-2: #e8eee9;
-  --line: #c5d2cb;
-  --accent: #0d7a5f;
-  --accent-deep: #065a45;
-  --warn: #b45309;
-  --danger: #9f1239;
-  --ok: #047857;
-  --muted: #5a6e68;
+  --navy: #0b0f2e;
+  --navy-2: #131a4a;
+  --lav: #aab4f0;
+  --lime: #bcd600;
+  --rose: #ff8fa3;
+  --amber: #f5c26b;
 }
 
 @theme inline {
-  --color-ink: var(--ink);
-  --color-ink-soft: var(--ink-soft);
-  --color-paper: var(--paper);
-  --color-paper-2: var(--paper-2);
-  --color-line: var(--line);
-  --color-accent: var(--accent);
-  --color-accent-deep: var(--accent-deep);
-  --color-warn: var(--warn);
-  --color-danger: var(--danger);
-  --color-ok: var(--ok);
-  --color-muted: var(--muted);
-  --font-sans: var(--font-source-sans);
-  --font-display: var(--font-fraunces);
+  --color-navy: var(--navy);
+  --color-navy-2: var(--navy-2);
+  --color-lav: var(--lav);
+  --color-lime: var(--lime);
+  --color-rose: var(--rose);
+  --color-amber: var(--amber);
+  --font-sans: var(--font-poppins);
 }
 
 html,
 body {
   min-height: 100%;
+  background: var(--navy);
+  color: #fff;
+  font-family: var(--font-poppins), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-body {
-  background:
-    radial-gradient(1200px 600px at 10% -10%, #d7ebe3 0%, transparent 55%),
-    radial-gradient(900px 500px at 100% 0%, #e4efe8 0%, transparent 50%),
-    var(--paper);
-  color: var(--ink);
-  font-family: var(--font-source-sans), system-ui, sans-serif;
+::selection {
+  background: var(--lime);
+  color: var(--navy);
 }
 
-.display {
-  font-family: var(--font-fraunces), Georgia, serif;
+/* ---------- Glass ---------- */
+.glass {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 40px rgba(3, 5, 25, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
+}
+.glass-strong {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05));
+  backdrop-filter: blur(30px) saturate(160%);
+  -webkit-backdrop-filter: blur(30px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 20px 60px rgba(3, 5, 25, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  border-radius: 26px;
+}
+.glass-hover {
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+.glass-hover:hover {
+  transform: translateY(-2px);
+  border-color: rgba(188, 214, 0, 0.45);
+}
+.glass-active {
+  border-color: rgba(188, 214, 0, 0.7) !important;
+  box-shadow: 0 10px 40px rgba(3, 5, 25, 0.4), 0 0 0 1px rgba(188, 214, 0, 0.35),
+    0 0 30px rgba(188, 214, 0, 0.12);
 }
 
+/* ---------- Controls ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  padding: 0.55rem 1.1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+.btn:disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+.btn-primary {
+  background: var(--lime);
+  color: var(--navy);
+  box-shadow: 0 6px 24px rgba(188, 214, 0, 0.25);
+}
+.btn-primary:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.13);
+}
+.btn-quiet {
+  color: rgba(255, 255, 255, 0.55);
+  padding-inline: 0.7rem;
+}
+.btn-quiet:hover {
+  color: var(--rose);
+}
+
+.field {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.85rem;
+  color: #fff;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.field::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+.field:focus {
+  border-color: var(--lav);
+  box-shadow: 0 0 0 3px rgba(170, 180, 240, 0.18);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.68rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tab {
+  position: relative;
+  padding: 0.55rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+  transition: all 0.15s;
+}
+.tab:hover {
+  color: #fff;
+}
+.tab[data-active="true"] {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.eyebrow {
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--lav);
+  font-weight: 500;
+}
+
+/* ---------- Motion ---------- */
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
-
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(30px, -24px, 0);
+  }
+}
 @keyframes pulse-soft {
   0%,
   100% {
     opacity: 1;
   }
   50% {
-    opacity: 0.55;
+    opacity: 0.4;
   }
 }
-
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
 .animate-rise {
-  animation: rise 0.45s ease-out both;
+  animation: rise 0.5s ease-out both;
 }
-
-.animate-rise-delay-1 {
-  animation: rise 0.45s ease-out 0.08s both;
+.animate-slide-in {
+  animation: slide-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
-
-.animate-rise-delay-2 {
-  animation: rise 0.45s ease-out 0.16s both;
+.animate-fade {
+  animation: fade 0.25s ease-out both;
 }
-
 .live-dot {
   animation: pulse-soft 1.6s ease-in-out infinite;
+}
+.skeleton {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.12) 50%, rgba(255, 255, 255, 0.05) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+  border-radius: 16px;
+}
+
+/* ---------- Scrollbars ---------- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
 }

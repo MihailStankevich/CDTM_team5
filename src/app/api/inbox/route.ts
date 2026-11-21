@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
     channel?: Channel;
     text?: string;
     nurtureId?: string;
+    body?: string;
   };
 
   if (body.action === "sync") {
@@ -59,7 +60,7 @@ export async function POST(req: NextRequest) {
         channel: item.channel,
         direction: "out",
         at: new Date().toISOString(),
-        body: item.body,
+        body: body.body?.trim() || item.body,
         nurtureId: item.id,
       };
       state.extraMessages.push(message);
