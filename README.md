@@ -1,72 +1,103 @@
-# First to know — News Tracker + Client Profiling
+# First to know
 
-MVP for the [Sherpas challenge at CDTM Valencia Hacks 2026](CHALLENGE.md): keep every family feeling personally watched — via **news → personalized drafts** and a **client profile** fed by meetings and simulated professional signals.
+An advisor looks after about 150 families. Each one wants to feel like the only one.
 
-**Never auto-sends.** Drafts stay in the advisor inbox until Approve / Dismiss.
+Sherpas already knows who they are and has built the plan. The hard part starts the morning after: a headline lands, a tax table changes, a child is born, and the family hears it from the news before they hear it from the person they pay. Silence reads as neglect. A newsletter that could have gone to anyone reads as worse.
 
-## What we built
+**First to know** is the advisor's morning. It watches the four families in this case, decides what can go out on its own, and keeps the rest for a human yes.
 
-| Piece | What it does |
-|---|---|
-| **Client profiles** | Household, persona (decision style, risk, concerns), plan hooks, advisor notes. |
-| **Simulated LinkedIn** | Per-family professional card + activity (employer concentration, career signals). **Not scraped** — challenge forbids scraping real people. |
-| **Meetings → CRM** | Paste transcript or upload audio; extract life events (new child, job change, home hunt…); update household / tags / facts in `data/crm.json`. |
-| **News ingest** | Demo replay of shocks from `investment-analysis.json` + 2027 tax rule; optional live RSS. |
-| **Matcher + drafts** | Score impact per family; email-ready copy with `$` / `%` from the plan. |
-| **Advisor inbox** | Group by headline → edit / approve / approve-all. |
+Built for the [Sherpas challenge at CDTM Valencia Hacks 2026](CHALLENGE.md).
 
-## Quick start
+## The problem
+
+On the family's side:
+
+- They hear a market move or a tax change from the news, and wonder if anyone is watching their plan.
+- A drop feels like their drop, even when the plan was built for it.
+- A promotion, a layoff worry, a new child or a house hunt sits in a chat and never reaches the plan.
+- The same paragraph goes to every household.
+
+On the advisor's side:
+
+- Nobody can read every headline against every portfolio before breakfast.
+- A note that is safe for one family is the wrong note for the next. One person checks a number. A couple decides together. Someone else wants it said warmly, with their partner's name.
+- Thirty personal drafts, approved one by one, is the whole morning. Some of those drafts did not need a person at all.
+
+## What we do about it
+
+The desk has three places.
+
+**Today** is the morning. *What moved today* is the quiet news that has already gone out: five headlines, each one tied to the sleeve that household actually holds, with the note that was sent. *Actions* is the short list that still needs the advisor: two important stories, with the message open so it can be rewritten before it goes, plus the day's calls and meetings (accepted, waiting, or still to propose).
+
+**Inbox** is every channel in one thread: WhatsApp, email, Telegram. The column on the right is a brief, not a dossier: how to talk to them, whether they have children, how much market language they want, and the next goal. A life event typed into the thread updates the profile. Samantha's column also carries a birthday note, ready to send.
+
+**Clients** is the household, structured: who they are, how they decide, what they hold, and the meetings that changed the file. Paste what was said, or upload the audio. A new child, a raise or a house hunt is written back onto the profile.
+
+A priority model scores the day behind that screen. It weighs how hard the news hits, how soon something is due, how this person decides, how long it has been since anyone spoke to them, and what the relationship is worth. The ranking is available at `/api/priority`. The screen the advisor uses stays the one above.
+
+## How a note gets written
+
+A headline only reaches a family when it is about something they own. A bond story goes to the bond sleeve. An oil story goes to the foreign funds. An index move goes to the largest US-equity book, and mentions a leveraged fund only as a clause, not as the reason.
+
+The model then writes one note for that household. It has to use their names, their holdings and their way of deciding. Swap the names and the note should stop making sense. Quiet notes go out. A hard hit waits, with the text already written, until the advisor sends it or leaves it.
+
+## Run it
 
 ```bash
 npm install
 npm run dev
 ```
 
-- [http://localhost:3000](http://localhost:3000) — today: calm / life dates / pay, grouped
-- [http://localhost:3000/inbox](http://localhost:3000/inbox) — WhatsApp, email, and Telegram in one inbox
-- [http://localhost:3000/markets](http://localhost:3000/markets) — news matched to plans  
-- [http://localhost:3000/clients](http://localhost:3000/clients) — client book  
-- Open a family → **Run demo meeting** (e.g. Johnsons → baby Nora updates the household)
+Open [http://localhost:3000](http://localhost:3000).
 
-### Optional LLM / Whisper
+| | |
+|---|---|
+| Today | [http://localhost:3000](http://localhost:3000) |
+| Inbox | [http://localhost:3000/inbox](http://localhost:3000/inbox) |
+| Clients | [http://localhost:3000/clients](http://localhost:3000/clients) |
 
-Copy `.env.example` to `.env.local`:
+To write notes and transcribe audio, copy `.env.example` to `.env.local` and set one key:
 
 ```
-SHERPAS_LLM_API_KEY=your-team-key
+OPENAI_API_KEY=sk-...
+```
+
+A team key uses the Sherpas proxy instead:
+
+```
+TEAM_KEY=your-team-key
 SHERPAS_LLM_BASE_URL=https://llm-hackathon.sherpaswealth.com/v1
 ```
 
-Without a key: template drafts + heuristic transcript extraction still work offline. With a key: draft polish, richer event extraction, and Whisper if the proxy supports `/audio/transcriptions`.
+Without a key, the desk still runs. Notes fall back to a short paragraph grounded in that household, and a pasted transcript is read with rules rather than a model. Audio needs a key: it goes to Whisper.
 
-## What is real vs simulated
+```bash
+npm run test:priority
+```
 
-| Real | Simulated |
+## A four-minute walkthrough
+
+1. **Today.** Open *What moved today*. The note names that family's funds and the dollars in them, not a generic "you hold the market".
+2. **Actions.** Two stories are waiting. Change a sentence and send it, or leave it. Under them, a meeting is already accepted and a call is still waiting. *Propose a call or a meeting* comes from how that client has been acting.
+3. **Inbox.** Open Samantha. The right column says how to talk to her. It is her birthday: the note is written, and Send puts it in the thread.
+4. **A client.** Open Daniel & Emily, then Meetings. Paste a line about a new child, or upload a short recording. The profile picks up the fact.
+5. **A phone.** The same three places sit on a bottom bar. The list and the conversation take turns, so nothing has to be read sideways.
+
+## What is real, and what is not
+
+The four households are the case files in `cases/`, with the 2027 tax tables in `legal/`. Nothing here is a real client's LinkedIn, inbox or brokerage account.
+
+| From the case | Played for the demo |
 |---|---|
-| Case data under `cases/` and `legal/` | LinkedIn / employer names (explicitly simulated) |
-| Replay market events & drawdowns | Sending email to clients |
-| Meeting transcript → CRM updates (local JSON) | Live LinkedIn scrape (not done — against rules) |
-| RSS when reachable | Scale story to 150 families (same pipelines) |
-| Advisor approve workflow | |
+| Holdings, goals, income, persona, tax tables | Names of employers and the LinkedIn-style cards |
+| Live headlines, when the feeds answer | Days since last contact, and how comfortable someone is with an automatic note |
+| A pasted transcript or a Whisper transcription updating the local profile | Delivery. Send stays inside the app. Nothing goes to WhatsApp, email or Telegram |
+| The quiet-versus-advisor split | A book of 150. The same pipeline, four families |
 
-## API
-
-- `POST /api/ingest` `{ "mode": "replay" | "rss" | "both" }`
-- `GET/PATCH /api/drafts`
-- `GET /api/clients` · `GET/PATCH /api/clients/:slug`
-- `GET/POST /api/clients/:slug/meetings` — `{ transcript }` or `{ demo: true }` or multipart audio
-
-## Demo script (≈4 min)
-
-1. **Clients** → Daniel & Emily → **Run demo meeting** → household gains Nora; tags `new-parent`.
-2. **Clients** → Michael → demo meeting → home hunt + promotion + layoff watch.
-3. **News inbox** → Ingest today → Liberation Day → approve a personal draft.
-4. Pitch: profiling + tracker + advisor-approved comms — life events and markets in one loop.
+Days without contact and the comfort with automatic notes are simulated on purpose. The case files do not contain them, and the priority model needs them.
 
 ## Stack
 
-Next.js 15 · TypeScript · Tailwind CSS 4 · `rss-parser` · local CRM file
+Next.js 15 · React 19 · TypeScript · Tailwind CSS 4
 
-## Challenge brief
-
-[CHALLENGE.md](CHALLENGE.md)
+News from public RSS. Notes and transcripts through the OpenAI API, or the Sherpas proxy when a team key is set. The priority model is a pure function with its thresholds in one config, covered by `npm run test:priority`.

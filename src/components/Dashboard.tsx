@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { MessageDraft, NewsSignal } from "@/lib/types";
 import DayPlanner, { SEED } from "./DayPlanner";
 import {
@@ -40,6 +40,30 @@ function needsAdvisor(signal: NewsSignal, matched: MessageDraft[]) {
   const peak = matched.reduce((max, d) => Math.max(max, d.impactScore), 0);
   if (peak >= 52) return true;
   return signal.severity === "high" && peak >= 42;
+}
+
+const DESK_KEY = "advisor-desk-v1";
+
+type DeskCache = { signals: NewsSignal[]; drafts: MessageDraft[] };
+
+function readDesk(): DeskCache | null {
+  try {
+    const raw = sessionStorage.getItem(DESK_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as DeskCache;
+    if (!parsed.signals?.length) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function writeDesk(signals: NewsSignal[], drafts: MessageDraft[]) {
+  try {
+    sessionStorage.setItem(DESK_KEY, JSON.stringify({ signals, drafts }));
+  } catch {
+    // The desk still works if the browser refuses the cache.
+  }
 }
 
 type Action = {
@@ -94,14 +118,25 @@ export default function Dashboard() {
           }),
         );
       }
-      setSignals(d.signals ?? []);
-      setDrafts(d.drafts ?? []);
-      setDeskError(d.signals?.length ? null : String(d.error ?? "The desk did not load.").slice(0, 180));
+      const nextSignals = d.signals ?? [];
+      const nextDrafts = d.drafts ?? [];
+      setSignals(nextSignals);
+      setDrafts(nextDrafts);
+      if (nextSignals.length) writeDesk(nextSignals, nextDrafts);
+      setDeskError(nextSignals.length ? null : String(d.error ?? "The desk did not load.").slice(0, 180));
     } catch (err) {
       setDeskError(err instanceof Error ? err.message : "The desk did not load.");
     } finally {
       setReady(true);
     }
+  }, []);
+
+  useLayoutEffect(() => {
+    const cached = readDesk();
+    if (!cached) return;
+    setSignals(cached.signals);
+    setDrafts(cached.drafts);
+    setReady(true);
   }, []);
 
   useEffect(() => {
@@ -111,16 +146,26 @@ export default function Dashboard() {
       .then((d) => setClients(d.clients ?? []));
   }, [load]);
 
-  // The priority model ranks the day. The panel stays as it is; nothing here is drawn from the score.
   useEffect(() => {
+    if (signals.length) writeDesk(signals, drafts);
+  }, [signals, drafts]);
+
+  // The priority model ranks the day. It waits until the desk is on screen, and nothing here is drawn from the score.
+  useEffect(() => {
+    if (!drafts.length) return;
     const ctrl = new AbortController();
-    fetch("/api/priority", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tasks }),
-      signal: ctrl.signal,
-    }).catch(() => {});
-    return () => ctrl.abort();
+    const timer = window.setTimeout(() => {
+      fetch("/api/priority", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tasks }),
+        signal: ctrl.signal,
+      }).catch(() => {});
+    }, 800);
+    return () => {
+      window.clearTimeout(timer);
+      ctrl.abort();
+    };
   }, [tasks, drafts]);
 
   useEffect(() => {
