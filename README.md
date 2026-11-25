@@ -10,10 +10,10 @@ Built for the [Sherpas challenge at CDTM Valencia Hacks 2026](CHALLENGE.md).
 
 ## Pitch and demo
 
-- **[Pitch deck (PDF)](assets/first-to-know-pitch.pdf)** — the story, the market and the product.
-- **[Demo video (MP4)](assets/first-to-know-demo.mp4)** — a short walkthrough of the desk.
+https://github.com/user-attachments/assets/027e0dd7-13ef-4960-9e7e-42dd55e7d7fc
 
-> GitHub plays the video inline when you open the file; the PDF opens in the browser.
+- **[Pitch deck (PDF)](assets/first-to-know-pitch.pdf)** — the story, the market and the product.
+- **[Demo video (MP4, 3.3 MB)](assets/first-to-know-demo.mp4)** — the same walkthrough, if you prefer to keep a local copy.
 
 ## The problem
 
